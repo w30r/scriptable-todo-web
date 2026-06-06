@@ -1,4 +1,5 @@
 const API_BASE = 'https://scriptable-todo.onrender.com/api/todos';
+const SHOP_API = 'https://scriptable-todo.onrender.com/api/shopping';
 
 const QUADRANTS = [
   { key: 'q1', tag: '!ui',   title: 'Do First',    sub: 'Urgent & Important' },
@@ -7,8 +8,19 @@ const QUADRANTS = [
   { key: 'q4', tag: '',      title: 'Eliminate',   sub: 'Not Urgent & Not Important' },
 ];
 
+const CATEGORIES = [
+  { key: 'grocery', label: 'Grocery', color: '#30d158' },
+  { key: 'watsons', label: 'Watsons', color: '#0a84ff' },
+  { key: 'mrdiy',   label: 'MRDIY',   color: '#ff9f0a' },
+  { key: 'online',  label: 'Online',  color: '#bf5af2' },
+  { key: 'etc',     label: 'Etc',     color: '#636366' },
+];
+
 let todos = [];
+let shoppingItems = [];
 let currentFilter = localStorage.getItem('meor-filter') || 'all';
+let activeTab = localStorage.getItem('meor-tab') || 'todo';
+let shoppingFilter = localStorage.getItem('meor-shop-filter') || 'all';
 
 const matrix = document.getElementById('matrix');
 const todoForm = document.getElementById('todo-form');
@@ -18,6 +30,19 @@ const addBtn = document.getElementById('add-btn');
 const todoCount = document.getElementById('todo-count');
 const clearCompletedBtn = document.getElementById('clear-completed');
 const filterBtns = document.querySelectorAll('.filter-btn');
+
+const shopForm = document.getElementById('shop-form');
+const shopInput = document.getElementById('shop-input');
+const shopCategory = document.getElementById('shop-category');
+const shopAddBtn = document.getElementById('shop-add-btn');
+const shopList = document.getElementById('shopping-list');
+const shopCount = document.getElementById('shop-count');
+const shopBoughtCount = document.getElementById('shop-bought-count');
+const clearBoughtBtn = document.getElementById('clear-bought');
+const shopFilterBtns = document.querySelectorAll('.shop-filter-btn');
+const tabBtns = document.querySelectorAll('.tab');
+const todoSection = document.getElementById('todo-section');
+const shoppingSection = document.getElementById('shopping-section');
 
 function getQuadrantKey(title) {
   if (title.includes('!ui')) return 'q1';
@@ -70,6 +95,22 @@ async function apiFetch(method, body) {
 
 async function apiFetchId(id, method, body) {
   return fetchWithTimeout(`${API_BASE}/${id}`, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    ...(body ? { body: JSON.stringify(body) } : {}),
+  });
+}
+
+async function shopFetch(method, body) {
+  return fetchWithTimeout(SHOP_API, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    ...(body ? { body: JSON.stringify(body) } : {}),
+  });
+}
+
+async function shopFetchId(id, method, body) {
+  return fetchWithTimeout(`${SHOP_API}/${id}`, {
     method,
     headers: { 'Content-Type': 'application/json' },
     ...(body ? { body: JSON.stringify(body) } : {}),
@@ -141,6 +182,69 @@ function render() {
   todayEl.textContent = doneToday ? `${doneToday} done today` : '';
 }
 
+function renderShopping() {
+  const filtered = shoppingItems.filter(item => {
+    if (shoppingFilter !== 'all') return item.category === shoppingFilter;
+    return true;
+  });
+
+  const grouped = {};
+  for (const cat of CATEGORIES) {
+    grouped[cat.key] = [];
+  }
+  for (const item of filtered) {
+    if (grouped[item.category]) {
+      grouped[item.category].push(item);
+    }
+  }
+
+  const hasItems = Object.values(grouped).some(arr => arr.length > 0);
+
+  if (shoppingItems.length === 0) {
+    shopList.innerHTML = '<div class="loading">Nothing to buy yet. Add something above!</div>';
+    shopCount.textContent = '0 items';
+    shopBoughtCount.textContent = '';
+    return;
+  }
+
+  if (!hasItems) {
+    shopList.innerHTML = '<div class="loading">No items in this category.</div>';
+    shopCount.textContent = `${shoppingItems.length} item${shoppingItems.length !== 1 ? 's' : ''}`;
+    const boughtCount = shoppingItems.filter(i => i.completed).length;
+    shopBoughtCount.textContent = boughtCount ? `${boughtCount} bought` : '';
+    return;
+  }
+
+  shopList.innerHTML = CATEGORIES.map(cat => {
+    const items = grouped[cat.key];
+    if (items.length === 0) return '';
+    return `
+      <div class="shop-category" data-category="${cat.key}">
+        <div class="shop-category-header" style="--cat-color: ${cat.color}">
+          <span class="shop-cat-label">${cat.label}</span>
+          <span class="badge">${items.length}</span>
+        </div>
+        <div class="shop-category-list">
+          ${items.map(item => `
+            <div class="shop-item ${item.completed ? 'completed' : ''}" data-id="${item._id}">
+              <input type="checkbox" class="shop-checkbox" ${item.completed ? 'checked' : ''}>
+              <div class="shop-body">
+                <span class="shop-name">${escapeHtml(item.name)}</span>
+                <span class="shop-cat-badge" style="--cat-color: ${cat.color}">${cat.label}</span>
+              </div>
+              <button class="shop-delete" title="Delete">✕</button>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+  }).join('');
+
+  const total = shoppingItems.length;
+  const bought = shoppingItems.filter(i => i.completed).length;
+  shopCount.textContent = `${total} item${total !== 1 ? 's' : ''}`;
+  shopBoughtCount.textContent = bought ? `${bought} bought` : '';
+}
+
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
@@ -154,11 +258,22 @@ async function loadTodos() {
       todos = await apiFetch('GET');
       applyFilterUI();
       render();
+      loadShopping();
       return;
     } catch {
       matrix.innerHTML = '<div class="loading">Render is probably spinning this up, retrying in 5s...</div>';
       await new Promise(r => setTimeout(r, 5000));
     }
+  }
+}
+
+async function loadShopping() {
+  try {
+    shoppingItems = await shopFetch('GET');
+    applyShopFilterUI();
+    renderShopping();
+  } catch {
+    shopList.innerHTML = '<div class="loading">Failed to load shopping items.</div>';
   }
 }
 
@@ -225,6 +340,74 @@ async function clearCompleted() {
   }
 }
 
+async function addShoppingItem(name, category) {
+  shopAddBtn.disabled = true;
+  shopAddBtn.textContent = 'Adding...';
+  try {
+    const item = await shopFetch('POST', { name, category });
+    shoppingItems.unshift(item);
+    shopInput.value = '';
+    applyShopFilterUI();
+    renderShopping();
+  } catch (err) {
+    alert('Failed to add shopping item: ' + err.message);
+  } finally {
+    shopAddBtn.disabled = false;
+    shopAddBtn.textContent = 'Add';
+    shopInput.focus();
+  }
+}
+
+async function renameShoppingItem(id, newName, category) {
+  try {
+    const updated = await shopFetchId(id, 'PUT', { name: newName, category });
+    const idx = shoppingItems.findIndex(i => i._id === id);
+    if (idx !== -1) shoppingItems[idx] = updated;
+    renderShopping();
+  } catch (err) {
+    alert('Failed to rename item: ' + err.message);
+  }
+}
+
+async function toggleShoppingItem(id, completed) {
+  try {
+    const updated = await shopFetchId(id, 'PUT', { completed });
+    const idx = shoppingItems.findIndex(i => i._id === id);
+    if (idx !== -1) shoppingItems[idx] = updated;
+    renderShopping();
+  } catch (err) {
+    alert('Failed to update shopping item: ' + err.message);
+  }
+}
+
+async function deleteShoppingItem(id) {
+  try {
+    await shopFetchId(id, 'DELETE');
+    shoppingItems = shoppingItems.filter(i => i._id !== id);
+    renderShopping();
+  } catch (err) {
+    alert('Failed to delete shopping item: ' + err.message);
+  }
+}
+
+async function clearBought() {
+  const bought = shoppingItems.filter(i => i.completed);
+  if (bought.length === 0) return;
+  try {
+    await fetchWithTimeout(`${SHOP_API}/completed`, { method: 'DELETE' });
+    shoppingItems = shoppingItems.filter(i => !i.completed);
+    renderShopping();
+  } catch {
+    try {
+      await Promise.all(bought.map(i => shopFetchId(i._id, 'DELETE')));
+      shoppingItems = shoppingItems.filter(i => !i.completed);
+      renderShopping();
+    } catch (err) {
+      alert('Failed to clear bought items: ' + err.message);
+    }
+  }
+}
+
 function applyFilterUI() {
   filterBtns.forEach(b => {
     b.classList.toggle('active', b.dataset.filter === currentFilter);
@@ -238,7 +421,30 @@ function setFilter(filter) {
   render();
 }
 
-/* ── Inline edit ── */
+function applyShopFilterUI() {
+  shopFilterBtns.forEach(b => {
+    b.classList.toggle('active', b.dataset.cat === shoppingFilter);
+  });
+}
+
+function setShopFilter(cat) {
+  shoppingFilter = cat;
+  localStorage.setItem('meor-shop-filter', cat);
+  applyShopFilterUI();
+  renderShopping();
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  localStorage.setItem('meor-tab', tab);
+  todoSection.style.display = tab === 'todo' ? '' : 'none';
+  shoppingSection.style.display = tab === 'shopping' ? '' : 'none';
+  tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  if (tab === 'shopping') shopInput.focus();
+  else todoInput.focus();
+}
+
+/* ── Inline edit (todo) ── */
 
 function startEdit(item) {
   const titleEl = item.querySelector('.todo-title');
@@ -283,6 +489,50 @@ function startEdit(item) {
   });
 }
 
+/* ── Inline edit (shopping) ── */
+
+function startShopEdit(item) {
+  const nameEl = item.querySelector('.shop-name');
+  const raw = nameEl.textContent;
+  const id = item.dataset.id;
+  const shopItem = shoppingItems.find(i => i._id === id);
+  if (!shopItem) return;
+  const cat = shopItem.category;
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'shop-edit-input';
+  input.value = raw;
+  item.querySelector('.shop-body').prepend(input);
+  nameEl.style.display = 'none';
+  item.querySelector('.shop-cat-badge').style.display = 'none';
+  item.classList.add('editing');
+  input.focus();
+  input.select();
+
+  function save() {
+    const val = input.value.trim();
+    if (val && val !== raw) {
+      renameShoppingItem(id, val, cat);
+    }
+    cleanup();
+  }
+
+  function cleanup() {
+    input.remove();
+    nameEl.style.display = '';
+    const badge = item.querySelector('.shop-cat-badge');
+    if (badge) badge.style.display = '';
+    item.classList.remove('editing');
+  }
+
+  input.addEventListener('blur', save);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+    if (e.key === 'Escape') { cleanup(); }
+  });
+}
+
 /* ── Change tag via dropdown ── */
 
 async function changeTag(item, newTag) {
@@ -311,6 +561,13 @@ todoForm.addEventListener('submit', (e) => {
   if (title) addTodo(title);
 });
 
+shopForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const name = shopInput.value.trim();
+  const cat = shopCategory.value;
+  if (name && cat) addShoppingItem(name, cat);
+});
+
 matrix.addEventListener('click', (e) => {
   const item = e.target.closest('.todo-item');
   if (!item) return;
@@ -319,11 +576,26 @@ matrix.addEventListener('click', (e) => {
   }
 });
 
+shopList.addEventListener('click', (e) => {
+  if (e.target.classList.contains('shop-delete')) {
+    const item = e.target.closest('.shop-item');
+    if (item) deleteShoppingItem(item.dataset.id);
+  }
+});
+
 matrix.addEventListener('dblclick', (e) => {
   const item = e.target.closest('.todo-item');
   if (!item || item.classList.contains('editing')) return;
   if (e.target.classList.contains('todo-title')) {
     startEdit(item);
+  }
+});
+
+shopList.addEventListener('dblclick', (e) => {
+  const item = e.target.closest('.shop-item');
+  if (!item || item.classList.contains('editing')) return;
+  if (e.target.classList.contains('shop-name')) {
+    startShopEdit(item);
   }
 });
 
@@ -338,21 +610,45 @@ matrix.addEventListener('change', (e) => {
   }
 });
 
+shopList.addEventListener('change', (e) => {
+  if (e.target.classList.contains('shop-checkbox')) {
+    const item = e.target.closest('.shop-item');
+    if (item) toggleShoppingItem(item.dataset.id, e.target.checked);
+  }
+});
+
 filterBtns.forEach(btn => {
   btn.addEventListener('click', () => {
     setFilter(btn.dataset.filter);
   });
 });
 
+shopFilterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    setShopFilter(btn.dataset.cat);
+  });
+});
+
 clearCompletedBtn.addEventListener('click', clearCompleted);
+clearBoughtBtn.addEventListener('click', clearBought);
+
+tabBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    switchTab(btn.dataset.tab);
+  });
+});
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'n' || e.key === '/') {
     if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT') {
       e.preventDefault();
-      todoInput.focus();
+      if (activeTab === 'shopping') shopInput.focus();
+      else todoInput.focus();
     }
   }
 });
 
+/* ── Init ── */
+
+switchTab(activeTab);
 loadTodos();

@@ -1,52 +1,115 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>meor todo list</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <div class="container">
-    <header>
-      <h1>TODO!</h1>
-      <p class="subtitle">
-        <a href="https://scriptable-todo.onrender.com/api/todos" target="_blank">Scriptable Todo API</a>
-        &middot; Tags: !ui !nui !uni
-      </p>
-    </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>meor todo list</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Second Brain</h1>
+        <!-- <p class="subtitle">
+          <a
+            href="https://scriptable-todo.onrender.com/api/todos"
+            target="_blank"
+            >Scriptable Todo API</a
+          >
+          &middot; Tags: !ui !nui !uni
+        </p> -->
+      </header>
 
-    <form id="todo-form" class="todo-form">
-      <div class="input-row">
-        <input type="text" id="todo-input" placeholder="What needs to be done?" required autofocus>
-        <select id="quadrant-select">
-          <option value="!ui">Urgent &amp; Important</option>
-          <option value="!nui">Not Urgent &amp; Important</option>
-          <option value="!uni">Urgent &amp; Not Important</option>
-          <option value="">Not Urgent &amp; Not Important</option>
-        </select>
-        <button type="submit" id="add-btn">Add</button>
+      <div class="tabs">
+        <button class="tab active" data-tab="todo" id="tab-todo">TODO</button>
+        <button class="tab" data-tab="shopping" id="tab-shopping">
+          SHOPPING
+        </button>
       </div>
-    </form>
 
-    <div class="filters">
-      <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="active">Active</button>
-      <button class="filter-btn" data-filter="completed">Completed</button>
+      <div id="todo-section">
+        <form id="todo-form" class="todo-form">
+          <div class="input-row">
+            <input
+              type="text"
+              id="todo-input"
+              placeholder="What needs to be done?"
+              required
+            />
+            <select id="quadrant-select">
+              <option value="!ui">Urgent &amp; Important</option>
+              <option value="!nui">Not Urgent &amp; Important</option>
+              <option value="!uni">Urgent &amp; Not Important</option>
+              <option value="">Not Urgent &amp; Not Important</option>
+            </select>
+            <button type="submit" id="add-btn">Add</button>
+          </div>
+        </form>
+
+        <div class="filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="active">Active</button>
+          <button class="filter-btn" data-filter="completed">Completed</button>
+        </div>
+
+        <div id="matrix" class="matrix">
+          <div class="loading">Loading todos...</div>
+        </div>
+
+        <div class="stats">
+          <span id="todo-count">0 items left</span>
+          <span id="today-count"></span>
+          <button id="clear-completed" class="clear-btn">
+            Clear completed
+          </button>
+        </div>
+      </div>
+
+      <div id="shopping-section" style="display: none">
+        <form id="shop-form" class="shop-form">
+          <div class="input-row">
+            <input
+              type="text"
+              id="shop-input"
+              placeholder="What to buy?"
+              required
+            />
+          <select id="shop-category">
+            <option value="grocery">Grocery</option>
+            <option value="watsons">Watsons / Pharmacy</option>
+            <option value="mrdiy">MRDIY</option>
+            <option value="online">Online</option>
+            <option value="etc">Etc</option>
+          </select>
+            <button type="submit" id="shop-add-btn">Add</button>
+          </div>
+        </form>
+
+        <div class="shop-filters">
+          <button class="shop-filter-btn active" data-cat="all">All</button>
+          <button class="shop-filter-btn" data-cat="grocery">Grocery</button>
+          <button class="shop-filter-btn" data-cat="watsons">Watsons</button>
+        <button class="shop-filter-btn" data-cat="mrdiy">MRDIY</button>
+        <button class="shop-filter-btn" data-cat="online">Online</button>
+        <button class="shop-filter-btn" data-cat="etc">Etc</button>
+      </div>
+
+        <div id="shopping-list" class="shopping-list">
+          <div class="loading">Loading shopping items...</div>
+        </div>
+
+        <div class="shop-stats stats">
+          <span id="shop-count">0 items</span>
+          <span id="shop-bought-count"></span>
+          <button id="clear-bought" class="clear-btn">Clear bought</button>
+        </div>
+      </div>
     </div>
 
-    <div id="matrix" class="matrix">
-      <div class="loading">Loading todos...</div>
-    </div>
-
-    <div class="stats">
-      <span id="todo-count">0 items left</span>
-      <span id="today-count"></span>
-      <button id="clear-completed" class="clear-btn">Clear completed</button>
-    </div>
-  </div>
-
-  <script src="app.js"></script>
-</body>
+    <script src="app.js"></script>
+  </body>
 </html>

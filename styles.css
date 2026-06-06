@@ -8,15 +8,16 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
-  background: #2a2a2a;
+  background: #1c1c1e;
   min-height: 100vh;
-  padding: 2rem 1rem;
-  color: #d4d4d4;
+  padding: 3rem 1rem;
+  color: #f5f5f7;
+  line-height: 1.5;
 }
 
 .container {
   width: 100%;
-  max-width: 960px;
+  max-width: 800px;
   margin: 0 auto;
 }
 
@@ -24,40 +25,67 @@ body {
 
 header {
   text-align: center;
-  margin-bottom: 2rem;
-  padding: 1.25rem 1.5rem;
-  border-radius: 16px;
-  background: #323232;
-  box-shadow:
-    -4px -4px 8px rgba(255,255,255,0.05),
-    4px 4px 8px rgba(0,0,0,0.4);
+  margin-bottom: 2.5rem;
 }
 
 header h1 {
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: #e8e8e8;
-  letter-spacing: 0.5px;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #f5f5f7;
+  letter-spacing: -0.5px;
 }
 
 .subtitle {
-  font-size: 0.75rem;
-  color: #777;
-  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  color: #636366;
+  margin-top: 0.4rem;
 }
 
 .subtitle a {
-  color: #8a8a8a;
+  color: #636366;
   text-decoration: none;
 }
 
 .subtitle a:hover {
-  color: #bbb;
+  color: #aeaeb2;
+}
+
+/* ── Tabs ── */
+
+.tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 2rem;
+}
+
+.tab {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #636366;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 2px solid #38383a;
+  letter-spacing: 0.5px;
+}
+
+.tab:hover {
+  color: #aeaeb2;
+}
+
+.tab.active {
+  color: #f5f5f7;
+  border-bottom-color: #f5f5f7;
 }
 
 /* ── Input Form ── */
 
-.todo-form {
+.todo-form,
+.shop-form {
   margin-bottom: 1.5rem;
 }
 
@@ -67,111 +95,96 @@ header h1 {
   align-items: stretch;
 }
 
-#todo-input {
+#todo-input,
+#shop-input {
   flex: 1;
-  padding: 0.85rem 1.25rem;
+  padding: 0.75rem 0;
   border: none;
-  border-radius: 14px;
+  border-bottom: 2px solid #38383a;
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 1rem;
   outline: none;
-  background: #2a2a2a;
-  color: #d4d4d4;
-  box-shadow:
-    inset 3px 3px 6px rgba(0,0,0,0.4),
-    inset -3px -3px 6px rgba(255,255,255,0.05);
-  transition: box-shadow 0.2s;
+  background: transparent;
+  color: #f5f5f7;
+  transition: border-color 0.2s;
 }
 
-#todo-input:focus {
-  box-shadow:
-    inset 4px 4px 8px rgba(0,0,0,0.5),
-    inset -4px -4px 8px rgba(255,255,255,0.06);
+#todo-input:focus,
+#shop-input:focus {
+  border-bottom-color: #f5f5f7;
 }
 
-#todo-input::placeholder {
-  color: #666;
+#todo-input::placeholder,
+#shop-input::placeholder {
+  color: #48484a;
 }
 
-#quadrant-select {
-  padding: 0.85rem 1rem;
-  border: none;
-  border-radius: 14px;
+#quadrant-select,
+#shop-category {
+  padding: 0.75rem 1rem;
+  border: 2px solid #38383a;
+  border-radius: 10px;
   font-family: inherit;
-  font-size: 0.8rem;
-  background: #323232;
-  color: #aaa;
+  font-size: 0.85rem;
+  background: #2c2c2e;
+  color: #aeaeb2;
   outline: none;
   cursor: pointer;
-  box-shadow:
-    -3px -3px 6px rgba(255,255,255,0.05),
-    3px 3px 6px rgba(0,0,0,0.4);
-  transition: box-shadow 0.2s, color 0.2s;
+  transition: border-color 0.2s;
+  min-width: 120px;
 }
 
-#quadrant-select:focus {
-  color: #d4d4d4;
-  box-shadow:
-    -4px -4px 8px rgba(255,255,255,0.06),
-    4px 4px 8px rgba(0,0,0,0.45);
+#quadrant-select:focus,
+#shop-category:focus {
+  border-color: #636366;
 }
 
-#add-btn {
-  padding: 0.85rem 1.75rem;
-  border: none;
-  border-radius: 14px;
-  background: #323232;
-  color: #5a7db5;
+#add-btn,
+#shop-add-btn {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #f5f5f7;
+  border-radius: 10px;
+  background: #f5f5f7;
+  color: #1c1c1e;
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  box-shadow:
-    -4px -4px 8px rgba(255,255,255,0.05),
-    4px 4px 8px rgba(0,0,0,0.4);
-  transition: all 0.15s;
+  transition: all 0.2s;
 }
 
-#add-btn:hover {
-  box-shadow:
-    -5px -5px 10px rgba(255,255,255,0.06),
-    5px 5px 10px rgba(0,0,0,0.45);
-  color: #6c8fc7;
+#add-btn:hover,
+#shop-add-btn:hover {
+  background: transparent;
+  color: #f5f5f7;
 }
 
-#add-btn:active {
-  background: #2a2a2a;
-  box-shadow:
-    inset 3px 3px 6px rgba(0,0,0,0.4),
-    inset -3px -3px 6px rgba(255,255,255,0.05);
-  color: #5a7db5;
+#add-btn:active,
+#shop-add-btn:active {
+  transform: scale(0.97);
 }
 
-#add-btn:disabled {
+#add-btn:disabled,
+#shop-add-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
-  box-shadow:
-    -2px -2px 4px rgba(255,255,255,0.03),
-    2px 2px 4px rgba(0,0,0,0.3);
-  color: #555;
+  background: #f5f5f7;
+  color: #1c1c1e;
 }
 
 /* ── Filters ── */
 
-.filters {
+.filters,
+.shop-filters {
   display: flex;
   gap: 0;
   margin-bottom: 1.5rem;
-  padding: 4px;
-  border-radius: 16px;
-  background: #2a2a2a;
-  box-shadow:
-    inset 2px 2px 5px rgba(0,0,0,0.4),
-    inset -2px -2px 5px rgba(255,255,255,0.05);
+  border-bottom: 2px solid #38383a;
 }
 
-.filter-btn {
+.filter-btn,
+.shop-filter-btn {
   flex: 1;
   padding: 0.6rem 0.5rem;
   border: none;
@@ -179,22 +192,22 @@ header h1 {
   font-family: inherit;
   font-size: 0.8rem;
   font-weight: 500;
-  color: #777;
+  color: #636366;
   cursor: pointer;
-  transition: all 0.25s;
-  border-radius: 12px;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
 }
 
-.filter-btn:hover {
-  color: #999;
+.filter-btn:hover,
+.shop-filter-btn:hover {
+  color: #aeaeb2;
 }
 
-.filter-btn.active {
-  background: #323232;
-  color: #d4d4d4;
-  box-shadow:
-    3px 3px 6px rgba(0,0,0,0.4),
-    -3px -3px 6px rgba(255,255,255,0.05);
+.filter-btn.active,
+.shop-filter-btn.active {
+  color: #f5f5f7;
+  border-bottom-color: #f5f5f7;
 }
 
 /* ── Matrix Grid ── */
@@ -202,19 +215,17 @@ header h1 {
 .matrix {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 12px;
   margin-bottom: 1.5rem;
 }
 
 .quadrant {
-  background: #323232;
+  background: #2c2c2e;
   padding: 1.25rem;
-  min-height: 200px;
+  min-height: 180px;
   position: relative;
-  border-radius: 16px;
-  box-shadow:
-    -4px -4px 8px rgba(255,255,255,0.05),
-    4px 4px 8px rgba(0,0,0,0.4);
+  border-radius: 12px;
+  border: 1px solid #38383a;
   overflow: hidden;
 }
 
@@ -225,40 +236,36 @@ header h1 {
   left: 0;
   width: 4px;
   height: 100%;
-  border-radius: 16px 0 0 16px;
 }
 
-.quadrant.q1::before { background: #e06050; }
-.quadrant.q2::before { background: #50b080; }
-.quadrant.q3::before { background: #5090c0; }
-.quadrant.q4::before { background: #b080c0; }
+.quadrant.q1::before { background: #ff453a; }
+.quadrant.q2::before { background: #30d158; }
+.quadrant.q3::before { background: #0a84ff; }
+.quadrant.q4::before { background: #bf5af2; }
 
 .quadrant-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.75rem;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 1px;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid #3a3a3a;
+  border-bottom: 1px solid #38383a;
 }
 
 .quadrant-header .badge {
-  font-size: 0.65rem;
-  width: 24px;
-  height: 24px;
+  font-size: 0.6rem;
+  width: 22px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #aaa;
-  background: #2a2a2a;
-  border-radius: 8px;
+  color: #636366;
+  background: #1c1c1e;
+  border-radius: 50%;
   font-weight: 600;
-  box-shadow:
-    inset 2px 2px 4px rgba(0,0,0,0.3),
-    inset -2px -2px 4px rgba(255,255,255,0.04);
 }
 
 .quadrant-title {
@@ -269,29 +276,29 @@ header h1 {
 
 .quadrant-title .label {
   font-weight: 600;
-  color: #d4d4d4;
+  color: #f5f5f7;
 }
 
 .quadrant-title .sublabel {
-  color: #777;
+  color: #636366;
   font-weight: 400;
-  font-style: italic;
+  font-size: 0.9em;
 }
 
 .quadrant-tag {
   font-family: 'SF Mono', 'Fira Code', monospace;
-  font-size: 0.65rem;
-  color: #666;
+  font-size: 0.6rem;
+  color: #48484a;
 }
 
 .quadrant-list {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .quadrant-empty {
-  color: #555;
+  color: #48484a;
   font-size: 0.8rem;
   text-align: center;
   padding: 1.5rem 0.5rem;
@@ -303,7 +310,7 @@ header h1 {
   grid-column: 1 / -1;
   text-align: center;
   padding: 2rem 1rem;
-  color: #777;
+  color: #636366;
   font-size: 0.85rem;
   font-style: italic;
 }
@@ -313,61 +320,58 @@ header h1 {
 .todo-item {
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
+  gap: 0.6rem;
   padding: 0.5rem 0.5rem;
-  transition: all 0.2s;
-  animation: fadeIn 0.25s ease;
-  border-radius: 10px;
+  transition: background 0.15s;
+  animation: fadeIn 0.2s ease;
+  border-radius: 8px;
 }
 
 .todo-item:hover {
-  background: #2e2e2e;
+  background: #38383a;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-4px); }
+  from { opacity: 0; transform: translateY(-3px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.todo-checkbox {
-  width: 22px;
-  height: 22px;
+.todo-checkbox,
+.shop-checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #48484a;
+  border-radius: 6px;
   cursor: pointer;
   flex-shrink: 0;
-  margin-top: 1px;
+  margin-top: 2px;
   appearance: none;
   -webkit-appearance: none;
-  transition: all 0.25s;
   position: relative;
-  border: none;
-  border-radius: 7px;
-  background: #323232;
-  box-shadow:
-    -3px -3px 6px rgba(255,255,255,0.05),
-    3px 3px 6px rgba(0,0,0,0.4);
+  transition: all 0.2s;
+  background: transparent;
 }
 
-.todo-checkbox:hover {
-  box-shadow:
-    -4px -4px 8px rgba(255,255,255,0.06),
-    4px 4px 8px rgba(0,0,0,0.45);
+.todo-checkbox:hover,
+.shop-checkbox:hover {
+  border-color: #636366;
 }
 
-.todo-checkbox:checked {
-  background: #2a2a2a;
-  box-shadow:
-    inset 2px 2px 5px rgba(0,0,0,0.4),
-    inset -2px -2px 5px rgba(255,255,255,0.05);
+.todo-checkbox:checked,
+.shop-checkbox:checked {
+  border-color: #30d158;
+  background: #30d158;
 }
 
-.todo-checkbox:checked::after {
+.todo-checkbox:checked::after,
+.shop-checkbox:checked::after {
   content: '';
   position: absolute;
-  top: 3px;
-  left: 7px;
+  top: 2px;
+  left: 6px;
   width: 5px;
-  height: 10px;
-  border: solid #50b080;
+  height: 9px;
+  border: solid #fff;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
@@ -387,40 +391,36 @@ header h1 {
   font-size: 0.9rem;
   line-height: 1.4;
   word-break: break-word;
-  color: #d4d4d4;
+  color: #f5f5f7;
   cursor: default;
 }
 
 .todo-item.completed .todo-title {
   text-decoration: line-through;
-  color: #666;
+  color: #48484a;
 }
 
 .todo-tag-select {
   font-family: 'SF Mono', 'Fira Code', monospace;
-  font-size: 0.65rem;
-  color: #888;
+  font-size: 0.6rem;
+  color: #636366;
   cursor: pointer;
   flex-shrink: 0;
-  padding: 2px 8px;
-  border: none;
-  border-radius: 8px;
-  background: #2a2a2a;
+  padding: 2px 6px;
+  border: 1px solid #38383a;
+  border-radius: 6px;
+  background: #1c1c1e;
   outline: none;
-  line-height: 1.6;
-  transition: all 0.2s;
-  box-shadow:
-    inset 2px 2px 4px rgba(0,0,0,0.3),
-    inset -2px -2px 4px rgba(255,255,255,0.04);
+  transition: all 0.15s;
 }
 
 .todo-tag-select:hover {
-  color: #aaa;
+  border-color: #48484a;
 }
 
 .todo-tag-select option {
-  background: #323232;
-  color: #d4d4d4;
+  background: #2c2c2e;
+  color: #f5f5f7;
 }
 
 .todo-meta {
@@ -429,68 +429,49 @@ header h1 {
 
 .todo-date {
   font-size: 0.65rem;
-  color: #555;
+  color: #48484a;
 }
 
-.todo-edit-input {
+.todo-edit-input,
+.shop-edit-input {
   width: 100%;
   padding: 6px 10px;
-  border: none;
-  border-radius: 10px;
-  background: #2a2a2a;
-  color: #d4d4d4;
+  border: 2px solid #636366;
+  border-radius: 8px;
+  background: #1c1c1e;
+  color: #f5f5f7;
   font-size: 0.9rem;
   font-family: inherit;
   outline: none;
-  box-shadow:
-    inset 3px 3px 6px rgba(0,0,0,0.4),
-    inset -3px -3px 6px rgba(255,255,255,0.05);
 }
 
-.todo-edit-input:focus {
-  box-shadow:
-    inset 4px 4px 8px rgba(0,0,0,0.5),
-    inset -4px -4px 8px rgba(255,255,255,0.06);
-}
-
-.todo-delete {
-  width: 30px;
-  height: 30px;
+.todo-delete,
+.shop-delete {
+  width: 28px;
+  height: 28px;
   border: none;
-  border-radius: 10px;
-  background: #323232;
-  color: #e06050;
-  font-size: 0.9rem;
+  border-radius: 8px;
+  background: transparent;
+  color: #ff453a;
+  font-size: 0.85rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all 0.15s;
   flex-shrink: 0;
   opacity: 0;
-  margin-top: 0;
-  box-shadow:
-    -3px -3px 6px rgba(255,255,255,0.05),
-    3px 3px 6px rgba(0,0,0,0.4);
+  margin-top: 1px;
 }
 
-.todo-item:hover .todo-delete {
+.todo-item:hover .todo-delete,
+.shop-item:hover .shop-delete {
   opacity: 1;
 }
 
-.todo-delete:hover {
-  box-shadow:
-    -4px -4px 8px rgba(255,255,255,0.06),
-    4px 4px 8px rgba(0,0,0,0.45);
-  color: #e87868;
-}
-
-.todo-delete:active {
-  background: #2a2a2a;
-  box-shadow:
-    inset 2px 2px 5px rgba(0,0,0,0.4),
-    inset -2px -2px 5px rgba(255,255,255,0.05);
-  color: #d05040;
+.todo-delete:hover,
+.shop-delete:hover {
+  background: #3a1e1e;
 }
 
 /* ── Stats ── */
@@ -499,47 +480,163 @@ header h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.85rem 1.25rem;
+  padding: 0.75rem 0;
   margin-top: 1rem;
-  background: #323232;
-  border-radius: 14px;
   font-size: 0.8rem;
-  color: #888;
-  box-shadow:
-    -4px -4px 8px rgba(255,255,255,0.05),
-    4px 4px 8px rgba(0,0,0,0.4);
+  color: #636366;
+  border-top: 1px solid #38383a;
+}
+
+#todo-count,
+#shop-count {
+  color: #636366;
+  font-size: 0.8rem;
 }
 
 #today-count {
-  color: #aaa;
+  color: #636366;
+  font-size: 0.8rem;
+}
+
+#shop-bought-count {
+  color: #30d158;
   font-size: 0.8rem;
 }
 
 .clear-btn {
   background: transparent;
   border: none;
-  border-radius: 10px;
-  color: #e06050;
+  border-radius: 8px;
+  color: #ff453a;
   font-family: inherit;
   font-size: 0.8rem;
   font-weight: 500;
   cursor: pointer;
   padding: 0.4rem 0.75rem;
-  transition: all 0.2s;
+  transition: all 0.15s;
 }
 
 .clear-btn:hover {
-  background: #2e2e2e;
-  color: #e87868;
+  background: #3a1e1e;
 }
 
-.clear-btn:active {
-  color: #d05040;
+/* ── Shopping Section ── */
+
+.shopping-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.shop-category {
+  background: #2c2c2e;
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px solid #38383a;
+  position: relative;
+  overflow: hidden;
+}
+
+.shop-category::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--cat-color, #636366);
+}
+
+.shop-category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #38383a;
+}
+
+.shop-cat-label {
+  font-weight: 600;
+  color: #f5f5f7;
+}
+
+.shop-category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.shop-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.5rem;
+  transition: background 0.15s;
+  animation: fadeIn 0.2s ease;
+  border-radius: 8px;
+  position: relative;
+}
+
+.shop-item:hover {
+  background: #38383a;
+}
+
+.shop-item.completed .shop-name {
+  text-decoration: line-through;
+  color: #48484a;
+}
+
+.shop-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.shop-name {
+  flex: 1;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  word-break: break-word;
+  color: #f5f5f7;
+  cursor: default;
+  min-width: 0;
+}
+
+.shop-cat-badge {
+  font-size: 0.55rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--cat-color, #636366);
+  color: #fff;
+  flex-shrink: 0;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.shop-stats {
+  margin-top: 1rem;
+}
+
+#shop-count {
+  color: #636366;
+}
+
+#shop-bought-count {
+  color: #30d158;
+  font-size: 0.8rem;
 }
 
 @media (max-width: 640px) {
   body {
-    padding: 0.75rem;
+    padding: 1.5rem 0.75rem;
   }
   .matrix {
     grid-template-columns: 1fr;
@@ -547,10 +644,13 @@ header h1 {
   .input-row {
     flex-wrap: wrap;
   }
-  #todo-input {
+  #todo-input,
+  #shop-input {
     min-width: 100%;
   }
-  #quadrant-select {
+  #quadrant-select,
+  #shop-category {
     flex: 1;
+    min-width: 0;
   }
 }
