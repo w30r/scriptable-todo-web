@@ -325,6 +325,7 @@ header h1 {
   transition: background 0.15s;
   animation: fadeIn 0.2s ease;
   border-radius: 8px;
+  cursor: pointer;
 }
 
 .todo-item:hover {
@@ -381,46 +382,16 @@ header h1 {
   min-width: 0;
 }
 
-.todo-row {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-}
-
 .todo-title {
   font-size: 0.9rem;
   line-height: 1.4;
   word-break: break-word;
   color: #f5f5f7;
-  cursor: default;
 }
 
 .todo-item.completed .todo-title {
   text-decoration: line-through;
   color: #48484a;
-}
-
-.todo-tag-select {
-  font-family: 'SF Mono', 'Fira Code', monospace;
-  font-size: 0.6rem;
-  color: #636366;
-  cursor: pointer;
-  flex-shrink: 0;
-  padding: 2px 6px;
-  border: 1px solid #38383a;
-  border-radius: 6px;
-  background: #1c1c1e;
-  outline: none;
-  transition: all 0.15s;
-}
-
-.todo-tag-select:hover {
-  border-color: #48484a;
-}
-
-.todo-tag-select option {
-  background: #2c2c2e;
-  color: #f5f5f7;
 }
 
 .todo-meta {
@@ -430,6 +401,11 @@ header h1 {
 .todo-date {
   font-size: 0.65rem;
   color: #48484a;
+}
+
+.todo-due {
+  color: #30d158;
+  font-weight: 500;
 }
 
 .todo-edit-input,
@@ -632,6 +608,244 @@ header h1 {
 #shop-bought-count {
   color: #30d158;
   font-size: 0.8rem;
+}
+
+/* ── Floating Add Button ── */
+
+#float-add-btn {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 56px;
+  height: 56px;
+  border: none;
+  border-radius: 50%;
+  background: #f5f5f7;
+  color: #1c1c1e;
+  font-size: 1.8rem;
+  font-weight: 300;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  line-height: 1;
+}
+
+#float-add-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 28px rgba(0,0,0,0.5);
+}
+
+#float-add-btn:active {
+  transform: scale(0.95);
+}
+
+/* ── Add Modal ── */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.15s ease;
+}
+
+.modal-card {
+  background: #2c2c2e;
+  border-radius: 16px;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 400px;
+  border: 1px solid #38383a;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.modal-header h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #f5f5f7;
+}
+
+.modal-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #636366;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.modal-close:hover {
+  background: #38383a;
+  color: #f5f5f7;
+}
+
+.modal-card input {
+  width: 100%;
+  padding: 0.75rem 0;
+  border: none;
+  border-bottom: 2px solid #38383a;
+  font-family: inherit;
+  font-size: 1rem;
+  outline: none;
+  background: transparent;
+  color: #f5f5f7;
+  transition: border-color 0.2s;
+  margin-bottom: 0.4rem;
+}
+
+.modal-card input:focus {
+  border-bottom-color: #f5f5f7;
+}
+
+.modal-card input::placeholder {
+  color: #48484a;
+}
+
+.modal-date-row {
+  margin-bottom: 1rem;
+  animation: fadeIn 0.15s ease;
+}
+
+.modal-date-row label {
+  display: block;
+  font-size: 0.65rem;
+  color: #636366;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.4rem;
+}
+
+#modal-date {
+  width: 100%;
+  padding: 0.6rem 0;
+  border: none;
+  border-bottom: 2px solid #30d158;
+  font-family: inherit;
+  font-size: 1rem;
+  outline: none;
+  background: transparent;
+  color: #f5f5f7;
+  transition: border-color 0.2s;
+}
+
+#modal-date:focus {
+  border-bottom-color: #f5f5f7;
+}
+
+#modal-date::-webkit-calendar-picker-indicator,
+#edit-date::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+.modal-hint {
+  font-size: 0.7rem;
+  color: #48484a;
+  margin-bottom: 1rem;
+}
+
+.modal-quadrants {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.modal-quadrant {
+  padding: 0.85rem 0.75rem;
+  border: 1px solid #38383a;
+  border-radius: 10px;
+  background: #1c1c1e;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  font-family: inherit;
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-quadrant::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+}
+
+.modal-quadrant.q1::before { background: #ff453a; }
+.modal-quadrant.q2::before { background: #30d158; }
+.modal-quadrant.q3::before { background: #0a84ff; }
+.modal-quadrant.q4::before { background: #bf5af2; }
+
+.modal-quadrant:hover {
+  border-color: #636366;
+  transform: translateY(-1px);
+}
+
+.modal-quadrant:active {
+  transform: scale(0.97);
+}
+
+.modal-quadrant.selected {
+  border-color: #f5f5f7;
+  background: #38383a;
+}
+
+.edit-save-btn {
+  width: 100%;
+  padding: 0.85rem;
+  border: 2px solid #f5f5f7;
+  border-radius: 10px;
+  background: #f5f5f7;
+  color: #1c1c1e;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-top: 1rem;
+}
+
+.edit-save-btn:hover {
+  background: transparent;
+  color: #f5f5f7;
+}
+
+.edit-save-btn:active {
+  transform: scale(0.97);
+}
+
+.mq-title {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #f5f5f7;
+}
+
+.mq-sub {
+  display: block;
+  font-size: 0.65rem;
+  color: #636366;
+  margin-top: 2px;
 }
 
 @media (max-width: 640px) {

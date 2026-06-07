@@ -31,26 +31,8 @@
         </button>
       </div>
 
-      <div id="todo-section">
-        <form id="todo-form" class="todo-form">
-          <div class="input-row">
-            <input
-              type="text"
-              id="todo-input"
-              placeholder="What needs to be done?"
-              required
-            />
-            <select id="quadrant-select">
-              <option value="!ui">Urgent &amp; Important</option>
-              <option value="!nui">Not Urgent &amp; Important</option>
-              <option value="!uni">Urgent &amp; Not Important</option>
-              <option value="">Not Urgent &amp; Not Important</option>
-            </select>
-            <button type="submit" id="add-btn">Add</button>
-          </div>
-        </form>
-
-        <div class="filters">
+    <div id="todo-section">
+      <div class="filters">
           <button class="filter-btn active" data-filter="all">All</button>
           <button class="filter-btn" data-filter="active">Active</button>
           <button class="filter-btn" data-filter="completed">Completed</button>
@@ -108,8 +90,76 @@
           <button id="clear-bought" class="clear-btn">Clear bought</button>
         </div>
       </div>
+    <button id="float-add-btn">+</button>
+
+    <div id="edit-modal" class="modal-overlay" style="display:none">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Edit Task</h3>
+          <button class="modal-close" id="edit-close">✕</button>
+        </div>
+        <input type="text" id="edit-input" placeholder="Task title">
+        <div class="modal-date-row">
+          <label for="edit-date">Due date</label>
+          <input type="date" id="edit-date">
+        </div>
+        <p class="modal-hint">Tap a quadrant to change</p>
+        <div class="modal-quadrants" id="edit-quadrants">
+          <button class="modal-quadrant q1" data-tag="!ui">
+            <span class="mq-title">Do First</span>
+            <span class="mq-sub">Urgent &amp; Important</span>
+          </button>
+          <button class="modal-quadrant q2" data-tag="!nui">
+            <span class="mq-title">Schedule</span>
+            <span class="mq-sub">Not Urgent &amp; Important</span>
+          </button>
+          <button class="modal-quadrant q3" data-tag="!uni">
+            <span class="mq-title">Delegate</span>
+            <span class="mq-sub">Urgent &amp; Not Important</span>
+          </button>
+          <button class="modal-quadrant q4" data-tag="">
+            <span class="mq-title">Eliminate</span>
+            <span class="mq-sub">Not Urgent &amp; Not Important</span>
+          </button>
+        </div>
+        <button class="edit-save-btn" id="edit-save">Save</button>
+      </div>
     </div>
 
-    <script src="app.js"></script>
+    <div id="add-modal" class="modal-overlay" style="display:none">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>New Task</h3>
+          <button class="modal-close" id="modal-close">✕</button>
+        </div>
+        <input type="text" id="modal-input" placeholder="What needs to be done?">
+        <p class="modal-hint">Tap a quadrant to add</p>
+        <div class="modal-date-row" style="display:none">
+          <label for="modal-date">Due date</label>
+          <input type="date" id="modal-date">
+        </div>
+        <div class="modal-quadrants">
+          <button class="modal-quadrant q1" data-tag="!ui">
+            <span class="mq-title">Do First</span>
+            <span class="mq-sub">Urgent &amp; Important</span>
+          </button>
+          <button class="modal-quadrant q2" data-tag="!nui">
+            <span class="mq-title">Schedule</span>
+            <span class="mq-sub">Not Urgent &amp; Important</span>
+          </button>
+          <button class="modal-quadrant q3" data-tag="!uni">
+            <span class="mq-title">Delegate</span>
+            <span class="mq-sub">Urgent &amp; Not Important</span>
+          </button>
+          <button class="modal-quadrant q4" data-tag="">
+            <span class="mq-title">Eliminate</span>
+            <span class="mq-sub">Not Urgent &amp; Not Important</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
   </body>
 </html>

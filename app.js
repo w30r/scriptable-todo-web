@@ -23,10 +23,6 @@ let activeTab = localStorage.getItem('meor-tab') || 'todo';
 let shoppingFilter = localStorage.getItem('meor-shop-filter') || 'all';
 
 const matrix = document.getElementById('matrix');
-const todoForm = document.getElementById('todo-form');
-const todoInput = document.getElementById('todo-input');
-const quadrantSelect = document.getElementById('quadrant-select');
-const addBtn = document.getElementById('add-btn');
 const todoCount = document.getElementById('todo-count');
 const clearCompletedBtn = document.getElementById('clear-completed');
 const filterBtns = document.querySelectorAll('.filter-btn');
@@ -43,6 +39,21 @@ const shopFilterBtns = document.querySelectorAll('.shop-filter-btn');
 const tabBtns = document.querySelectorAll('.tab');
 const todoSection = document.getElementById('todo-section');
 const shoppingSection = document.getElementById('shopping-section');
+
+const floatAddBtn = document.getElementById('float-add-btn');
+const addModal = document.getElementById('add-modal');
+const modalInput = document.getElementById('modal-input');
+const modalClose = document.getElementById('modal-close');
+const modalDateRow = document.querySelector('.modal-date-row');
+const modalDate = document.getElementById('modal-date');
+
+const editModal = document.getElementById('edit-modal');
+const editInput = document.getElementById('edit-input');
+const editDate = document.getElementById('edit-date');
+const editQuadrants = document.getElementById('edit-quadrants');
+const editSave = document.getElementById('edit-save');
+const editClose = document.getElementById('edit-close');
+let editingTodoId = null;
 
 function getQuadrantKey(title) {
   if (title.includes('!ui')) return 'q1';
@@ -71,6 +82,19 @@ function formatDate(iso) {
   if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
   if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
   return d.toLocaleDateString('en-MY', { day: 'numeric', month: 'short' });
+}
+
+function formatDueDate(iso) {
+  const d = new Date(iso);
+  const now = new Date();
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const target = new Date(d); target.setHours(0, 0, 0, 0);
+  const dayDiff = Math.round((target - today) / 86400000);
+
+  if (dayDiff === 0) return 'Due today';
+  if (dayDiff === 1) return 'Due tomorrow';
+  if (dayDiff > 0) return `Due in ${dayDiff} days`;
+  return `Due ${d.toLocaleDateString('en-MY', { day: 'numeric', month: 'short' })}`;
 }
 
 async function fetchWithTimeout(url, options, timeout = 3000) {
@@ -136,6 +160,25 @@ function render() {
     grouped[q].push(t);
   }
 
+  grouped.q2.sort((a, b) => {
+    if (!a.dueDate && !b.dueDate) return 0;
+    if (!a.dueDate) return 1;
+    if (!b.dueDate) return -1;
+    return new Date(a.dueDate) - new Date(b.dueDate);
+  });
+
+  if (currentFilter === 'all') {
+    for (const q of ['q2', 'q3', 'q4']) {
+      const urgent = grouped[q].filter(t => {
+        if (!t.dueDate) return false;
+        const days = (new Date(t.dueDate) - Date.now()) / 86400000;
+        return days >= 0 && days <= 2;
+      });
+      grouped.q1.push(...urgent);
+      grouped[q] = grouped[q].filter(t => !urgent.includes(t));
+    }
+  }
+
   matrix.innerHTML = QUADRANTS.map(q => `
     <div class="quadrant ${q.key}">
       <div class="quadrant-header">
@@ -149,20 +192,15 @@ function render() {
         ${grouped[q.key].length === 0
           ? `<div class="quadrant-empty">No tasks</div>`
           : grouped[q.key].map(t => {
-              const tag = getCurrentTag(t.title);
-              const opts = ['!ui', '!nui', '!uni', ''];
+              const dd = t.dueDate ? new Date(t.dueDate) : null;
+              const ddStr = dd ? `<span class="todo-due">${formatDueDate(dd)}</span>` : '';
               return `
             <div class="todo-item ${t.completed ? 'completed' : ''}" data-id="${t._id}">
               <input type="checkbox" class="todo-checkbox" ${t.completed ? 'checked' : ''}>
               <div class="todo-body">
-                <div class="todo-row">
-                  <span class="todo-title">${escapeHtml(stripTag(t.title))}</span>
-                  <select class="todo-tag-select">
-                    ${opts.map(o => `<option value="${o}"${tag === o ? ' selected' : ''}>${o || '·'}</option>`).join('')}
-                  </select>
-                </div>
+                <span class="todo-title">${escapeHtml(stripTag(t.title))}</span>
                 <div class="todo-meta">
-                  <span class="todo-date">${formatDate(t.createdAt)}${t.updatedAt !== t.createdAt ? ' · edited ' + formatDate(t.updatedAt) : ''}</span>
+                  <span class="todo-date">${formatDate(t.createdAt)}${t.updatedAt !== t.createdAt ? ' · edited ' + formatDate(t.updatedAt) : ''}${dd ? ' · ' : ''}${ddStr}</span>
                 </div>
               </div>
               <button class="todo-delete" title="Delete">✕</button>
@@ -277,22 +315,16 @@ async function loadShopping() {
   }
 }
 
-async function addTodo(titleRaw) {
-  const tag = quadrantSelect.value;
+async function addTodo(titleRaw, tag, dueDate) {
   const title = tag ? `${titleRaw} ${tag}` : titleRaw;
-  addBtn.disabled = true;
-  addBtn.textContent = 'Adding...';
   try {
-    const newTodo = await apiFetch('POST', { title });
+    const body = { title };
+    if (dueDate) body.dueDate = dueDate;
+    const newTodo = await apiFetch('POST', body);
     todos.push(newTodo);
-    todoInput.value = '';
     render();
   } catch (err) {
     alert('Failed to add todo: ' + err.message);
-  } finally {
-    addBtn.disabled = false;
-    addBtn.textContent = 'Add';
-    todoInput.focus();
   }
 }
 
@@ -441,52 +473,6 @@ function switchTab(tab) {
   shoppingSection.style.display = tab === 'shopping' ? '' : 'none';
   tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   if (tab === 'shopping') shopInput.focus();
-  else todoInput.focus();
-}
-
-/* ── Inline edit (todo) ── */
-
-function startEdit(item) {
-  const titleEl = item.querySelector('.todo-title');
-  const raw = titleEl.textContent;
-  const id = item.dataset.id;
-  const todo = todos.find(t => t._id === id);
-  if (!todo) return;
-  const tag = getCurrentTag(todo.title);
-
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.className = 'todo-edit-input';
-  input.value = raw;
-  item.querySelector('.todo-body').prepend(input);
-  titleEl.style.display = 'none';
-  item.querySelector('.todo-tag-select').style.display = 'none';
-  item.classList.add('editing');
-  input.focus();
-  input.select();
-
-  function save() {
-    const val = input.value.trim();
-    if (val && val !== raw) {
-      const newTitle = tag ? `${val} ${tag}` : val;
-      renameTodo(id, newTitle);
-    }
-    cleanup();
-  }
-
-  function cleanup() {
-    input.remove();
-    titleEl.style.display = '';
-    const tagEl = item.querySelector('.todo-tag-select');
-    if (tagEl) tagEl.style.display = '';
-    item.classList.remove('editing');
-  }
-
-  input.addEventListener('blur', save);
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
-    if (e.key === 'Escape') { cleanup(); }
-  });
 }
 
 /* ── Inline edit (shopping) ── */
@@ -533,33 +519,121 @@ function startShopEdit(item) {
   });
 }
 
-/* ── Change tag via dropdown ── */
+/* ── Edit Modal ── */
 
-async function changeTag(item, newTag) {
-  const id = item.dataset.id;
-  const todo = todos.find(t => t._id === id);
-  if (!todo) return;
-  const current = getCurrentTag(todo.title);
-  if (current === newTag) return;
-  const clean = stripTag(todo.title);
-  const newTitle = newTag ? `${clean} ${newTag}` : clean;
+function openEditModal(todo) {
+  editingTodoId = todo._id;
+  editInput.value = stripTag(todo.title);
+  editDate.value = todo.dueDate ? todo.dueDate.split('T')[0] : '';
+  const currentTag = getCurrentTag(todo.title);
+
+  editQuadrants.querySelectorAll('.modal-quadrant').forEach(btn => {
+    btn.classList.toggle('selected', btn.dataset.tag === currentTag);
+  });
+
+  editModal.style.display = 'flex';
+  setTimeout(() => editInput.focus(), 50);
+}
+
+function closeEditModal() {
+  editModal.style.display = 'none';
+  editingTodoId = null;
+}
+
+async function saveEdit() {
+  const id = editingTodoId;
+  if (!id) return;
+  const title = editInput.value.trim();
+  if (!title) return;
+
+  const selected = editQuadrants.querySelector('.modal-quadrant.selected');
+  const tag = selected ? selected.dataset.tag : '';
+  const newTitle = tag ? `${title} ${tag}` : title;
+  const dueDate = editDate.value || null;
+
   try {
-    const updated = await apiFetchId(id, 'PUT', { title: newTitle });
+    const body = { title: newTitle };
+    if (dueDate) body.dueDate = dueDate;
+    const updated = await apiFetchId(id, 'PUT', body);
     const idx = todos.findIndex(t => t._id === id);
     if (idx !== -1) todos[idx] = updated;
+    closeEditModal();
     render();
   } catch (err) {
-    alert('Failed to update quadrant: ' + err.message);
+    alert('Failed to save todo: ' + err.message);
   }
 }
 
-/* ── Event listeners ── */
-
-todoForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const title = todoInput.value.trim();
-  if (title) addTodo(title);
+editModal.addEventListener('click', (e) => {
+  if (e.target === editModal) closeEditModal();
 });
+
+editClose.addEventListener('click', closeEditModal);
+editSave.addEventListener('click', saveEdit);
+
+editInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); saveEdit(); }
+  if (e.key === 'Escape') { closeEditModal(); }
+});
+
+editQuadrants.addEventListener('click', (e) => {
+  const btn = e.target.closest('.modal-quadrant');
+  if (!btn) return;
+  editQuadrants.querySelectorAll('.modal-quadrant').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+});
+
+/* ── Add Modal ── */
+
+function openModal() {
+  modalInput.value = '';
+  modalDate.value = '';
+  modalDateRow.style.display = 'none';
+  addModal.style.display = 'flex';
+  setTimeout(() => modalInput.focus(), 50);
+}
+
+function closeModal() {
+  addModal.style.display = 'none';
+}
+
+addModal.addEventListener('click', (e) => {
+  if (e.target === addModal) closeModal();
+});
+
+modalClose.addEventListener('click', closeModal);
+
+modalInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const title = modalInput.value.trim();
+    if (!title) return;
+    e.preventDefault();
+    addTodo(title, '', modalDate.value || null);
+    closeModal();
+  }
+});
+
+addModal.addEventListener('click', (e) => {
+  const btn = e.target.closest('.modal-quadrant');
+  if (!btn) return;
+  const title = modalInput.value.trim();
+  if (!title) return;
+  const tag = btn.dataset.tag;
+
+  if (tag === '!nui' && !modalDate.value) {
+    modalDateRow.style.display = '';
+    modalDate.focus();
+    modalDate.showPicker?.();
+    return;
+  }
+
+  addTodo(title, tag, modalDate.value || null);
+  closeModal();
+});
+
+floatAddBtn.addEventListener('click', openModal);
+
+/* ── Event listeners ── */
 
 shopForm.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -573,21 +647,17 @@ matrix.addEventListener('click', (e) => {
   if (!item) return;
   if (e.target.classList.contains('todo-delete')) {
     deleteTodo(item.dataset.id);
+    return;
   }
+  if (e.target.classList.contains('todo-checkbox')) return;
+  const todo = todos.find(t => t._id === item.dataset.id);
+  if (todo) openEditModal(todo);
 });
 
 shopList.addEventListener('click', (e) => {
   if (e.target.classList.contains('shop-delete')) {
     const item = e.target.closest('.shop-item');
     if (item) deleteShoppingItem(item.dataset.id);
-  }
-});
-
-matrix.addEventListener('dblclick', (e) => {
-  const item = e.target.closest('.todo-item');
-  if (!item || item.classList.contains('editing')) return;
-  if (e.target.classList.contains('todo-title')) {
-    startEdit(item);
   }
 });
 
@@ -603,10 +673,6 @@ matrix.addEventListener('change', (e) => {
   if (e.target.classList.contains('todo-checkbox')) {
     const item = e.target.closest('.todo-item');
     if (item) toggleTodo(item.dataset.id, e.target.checked);
-  }
-  if (e.target.classList.contains('todo-tag-select')) {
-    const item = e.target.closest('.todo-item');
-    if (item) changeTag(item, e.target.value);
   }
 });
 
@@ -639,11 +705,16 @@ tabBtns.forEach(btn => {
 });
 
 document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (editModal.style.display === 'flex') closeEditModal();
+    else if (addModal.style.display === 'flex') closeModal();
+    return;
+  }
   if (e.key === 'n' || e.key === '/') {
     if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT') {
       e.preventDefault();
       if (activeTab === 'shopping') shopInput.focus();
-      else todoInput.focus();
+      else openModal();
     }
   }
 });
