@@ -1,5 +1,6 @@
 const API_BASE = 'https://scriptable-todo.onrender.com/api/todos';
 const SHOP_API = 'https://scriptable-todo.onrender.com/api/shopping';
+const PROGRESS_API = 'https://scriptable-todo.onrender.com/api/progress';
 
 const QUADRANTS = [
   { key: 'q1', tag: '!ui',   title: 'Do First',    sub: 'Urgent & Important' },
@@ -84,20 +85,36 @@ let rpgStreak = 0;
 let rpgLastDate = '';
 let rpgTotalCompleted = 0;
 
-function loadRpgState() {
-  rpgXP = parseInt(localStorage.getItem('meor-xp')) || 0;
-  rpgLevel = parseInt(localStorage.getItem('meor-level')) || 1;
-  rpgStreak = parseInt(localStorage.getItem('meor-streak')) || 0;
-  rpgLastDate = localStorage.getItem('meor-last-date') || '';
-  rpgTotalCompleted = parseInt(localStorage.getItem('meor-total-completed')) || 0;
+async function loadRpgState() {
+  try {
+    const data = await progressFetch('GET');
+    rpgXP = data.xp || 0;
+    rpgLevel = data.level || 1;
+    rpgStreak = data.streak || 0;
+    rpgLastDate = data.lastDate || '';
+    rpgTotalCompleted = data.totalCompleted || 0;
+  } catch {
+    // API unavailable — use defaults
+    rpgXP = 0;
+    rpgLevel = 1;
+    rpgStreak = 0;
+    rpgLastDate = '';
+    rpgTotalCompleted = 0;
+  }
 }
 
-function saveRpgState() {
-  localStorage.setItem('meor-xp', rpgXP);
-  localStorage.setItem('meor-level', rpgLevel);
-  localStorage.setItem('meor-streak', rpgStreak);
-  localStorage.setItem('meor-last-date', rpgLastDate);
-  localStorage.setItem('meor-total-completed', rpgTotalCompleted);
+async function saveRpgState() {
+  try {
+    await progressFetch('PUT', {
+      xp: rpgXP,
+      level: rpgLevel,
+      streak: rpgStreak,
+      lastDate: rpgLastDate,
+      totalCompleted: rpgTotalCompleted
+    });
+  } catch {
+    // Non-critical — fail silently
+  }
 }
 
 function xpForLevel(level) {
@@ -158,7 +175,7 @@ function updateStreak() {
   rpgLastDate = todayStr;
 }
 
-function awardXp(baseXp) {
+async function awardXp(baseXp) {
   const mult = getStreakMultiplier();
   const awarded = Math.round(baseXp * mult);
 
@@ -171,7 +188,7 @@ function awardXp(baseXp) {
   const info = calcLevel(rpgXP);
   rpgLevel = info.level;
 
-  saveRpgState();
+  await saveRpgState();
   renderRpgBadge();
 
   if (rpgLevel > oldLevel) {
@@ -350,6 +367,14 @@ async function shopFetch(method, body) {
 
 async function shopFetchId(id, method, body) {
   return fetchWithTimeout(`${SHOP_API}/${id}`, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    ...(body ? { body: JSON.stringify(body) } : {}),
+  });
+}
+
+async function progressFetch(method, body) {
+  return fetchWithTimeout(PROGRESS_API, {
     method,
     headers: { 'Content-Type': 'application/json' },
     ...(body ? { body: JSON.stringify(body) } : {}),
@@ -1033,7 +1058,8 @@ document.addEventListener('keydown', (e) => {
 
 /* ── Init ── */
 
-loadRpgState();
-renderRpgBadge();
-switchTab(activeTab);
-loadTodos();
+loadRpgState().then(() => {
+  renderRpgBadge();
+  switchTab(activeTab);
+  loadTodos();
+});
