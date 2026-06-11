@@ -62,6 +62,11 @@ const SoundManager = {
     setTimeout(() => this._tone(330, 0.12, 'sine', 0.07), 60);
   },
   drop() { this._tone(220, 0.12, 'triangle', 0.05); },
+  click() { this._tone(600, 0.04, 'sine', 0.04); },
+  success() {
+    this._tone(660, 0.06, 'sine', 0.06);
+    setTimeout(() => this._tone(880, 0.08, 'sine', 0.06), 60);
+  },
   levelUp() {
     this._tone(523, 0.1, 'sine', 0.07);
     setTimeout(() => this._tone(659, 0.1, 'sine', 0.07), 120);
@@ -271,6 +276,7 @@ const shopFilterBtns = document.querySelectorAll('.shop-filter-btn');
 const tabBtns = document.querySelectorAll('.tab');
 const todoSection = document.getElementById('todo-section');
 const shoppingSection = document.getElementById('shopping-section');
+const calendarSection = document.getElementById('calendar-section');
 
 const floatAddBtn = document.getElementById('float-add-btn');
 const addModal = document.getElementById('add-modal');
@@ -614,6 +620,7 @@ async function deleteTodo(id) {
 async function clearCompleted() {
   const completed = todos.filter(t => t.completed);
   if (completed.length === 0) return;
+  SoundManager.success();
   try {
     await Promise.all(completed.map(t => apiFetchId(t._id, 'DELETE')));
     todos = todos.filter(t => !t.completed);
@@ -679,6 +686,7 @@ async function deleteShoppingItem(id) {
 async function clearBought() {
   const bought = shoppingItems.filter(i => i.completed);
   if (bought.length === 0) return;
+  SoundManager.success();
   try {
     await fetchWithTimeout(`${SHOP_API}/completed`, { method: 'DELETE' });
     shoppingItems = shoppingItems.filter(i => !i.completed);
@@ -701,6 +709,7 @@ function applyFilterUI() {
 }
 
 function setFilter(filter) {
+  SoundManager.click();
   currentFilter = filter;
   localStorage.setItem('meor-filter', filter);
   applyFilterUI();
@@ -714,6 +723,7 @@ function applyShopFilterUI() {
 }
 
 function setShopFilter(cat) {
+  SoundManager.click();
   shoppingFilter = cat;
   localStorage.setItem('meor-shop-filter', cat);
   applyShopFilterUI();
@@ -721,12 +731,15 @@ function setShopFilter(cat) {
 }
 
 function switchTab(tab) {
+  SoundManager.click();
   activeTab = tab;
   localStorage.setItem('meor-tab', tab);
   todoSection.style.display = tab === 'todo' ? '' : 'none';
   shoppingSection.style.display = tab === 'shopping' ? '' : 'none';
+  calendarSection.style.display = tab === 'calendar' ? '' : 'none';
   tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   if (tab === 'shopping') shopInput.focus();
+  if (tab === 'calendar') renderCalendar();
 }
 
 /* ── Inline edit (shopping) ── */
@@ -778,7 +791,12 @@ function startShopEdit(item) {
 function openEditModal(todo) {
   editingTodoId = todo._id;
   editInput.value = stripTag(todo.title);
-  editDate.value = todo.dueDate ? todo.dueDate.split('T')[0] : '';
+  if (todo.dueDate) {
+    const d = new Date(todo.dueDate);
+    editDate.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  } else {
+    editDate.value = '';
+  }
   const currentTag = getCurrentTag(todo.title);
 
   editQuadrants.querySelectorAll('.modal-quadrant').forEach(btn => {
@@ -790,11 +808,13 @@ function openEditModal(todo) {
 }
 
 function closeEditModal() {
+  SoundManager.click();
   editModal.style.display = 'none';
   editingTodoId = null;
 }
 
 async function saveEdit() {
+  SoundManager.click();
   const id = editingTodoId;
   if (!id) return;
   const title = editInput.value.trim();
@@ -807,7 +827,7 @@ async function saveEdit() {
 
   try {
     const body = { title: newTitle };
-    if (dueDate) body.dueDate = dueDate;
+    body.dueDate = dueDate || null;
     const updated = await apiFetchId(id, 'PUT', body);
     const idx = todos.findIndex(t => t._id === id);
     if (idx !== -1) todos[idx] = updated;
@@ -833,6 +853,7 @@ editInput.addEventListener('keydown', (e) => {
 editQuadrants.addEventListener('click', (e) => {
   const btn = e.target.closest('.modal-quadrant');
   if (!btn) return;
+  SoundManager.click();
   editQuadrants.querySelectorAll('.modal-quadrant').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
 });
@@ -840,6 +861,7 @@ editQuadrants.addEventListener('click', (e) => {
 /* ── Add Modal ── */
 
 function openModal() {
+  SoundManager.click();
   modalInput.value = '';
   modalDate.value = '';
   modalDateRow.style.display = 'none';
@@ -848,6 +870,7 @@ function openModal() {
 }
 
 function closeModal() {
+  SoundManager.click();
   addModal.style.display = 'none';
 }
 
@@ -886,6 +909,347 @@ addModal.addEventListener('click', (e) => {
 });
 
 floatAddBtn.addEventListener('click', openModal);
+
+/* ── Calendar ── */
+
+let calendarViewDate = new Date();
+
+function renderCalendar() {
+  const grid = document.getElementById('cal-grid');
+  const titleEl = document.getElementById('cal-title');
+  const year = calendarViewDate.getFullYear();
+  const month = calendarViewDate.getMonth();
+
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  titleEl.textContent = `${monthNames[month]} ${year}`;
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInPrev = new Date(year, month, 0).getDate();
+
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+  // Build a map of dueDate → todos for quick lookup
+  const dueMap = {};
+  for (const t of todos) {
+    if (!t.dueDate) continue;
+    const d = new Date(t.dueDate);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if (!dueMap[key]) dueMap[key] = [];
+    dueMap[key].push(t);
+  }
+
+  const cells = [];
+  const totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
+
+  for (let i = 0; i < totalCells; i++) {
+    let dayNum, dateStr, isOther = false;
+
+    if (i < firstDay) {
+      dayNum = daysInPrev - firstDay + i + 1;
+      isOther = true;
+    } else if (i >= firstDay + daysInMonth) {
+      dayNum = i - firstDay - daysInMonth + 1;
+      isOther = true;
+    } else {
+      dayNum = i - firstDay + 1;
+    }
+
+    const m = isOther ? (i < firstDay ? (month === 0 ? 11 : month - 1) : (month === 11 ? 0 : month + 1)) : month;
+    const y = isOther ? (i < firstDay && month === 0 ? year - 1 : (i >= firstDay + daysInMonth && month === 11 ? year + 1 : year)) : year;
+    dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(dayNum).padStart(2,'0')}`;
+
+    const isToday = dateStr === todayStr;
+    const dayTodos = dueMap[dateStr] || [];
+
+    let dotsHtml = '';
+    for (const t of dayTodos) {
+      const cls = t.completed ? 'done' : (new Date(t.dueDate) < new Date(todayStr) ? 'overdue' : 'upcoming');
+      dotsHtml += `<span class="cal-task-dot ${cls}" data-id="${t._id}">${escapeHtml(stripTag(t.title))}</span>`;
+    }
+
+    cells.push(`
+      <div class="cal-day${isOther ? ' other-month' : ''}${isToday ? ' today' : ''}" data-date="${dateStr}">
+        <div class="cal-day-num">${dayNum}</div>
+        <div class="cal-tasks">${dotsHtml}</div>
+      </div>
+    `);
+  }
+
+  grid.innerHTML = grid.querySelectorAll('.cal-day-header').length
+    ? grid.querySelector('.cal-day-header').outerHTML + cells.join('')
+    : cells.join('');
+
+  // Keep day headers
+  const headers = grid.querySelectorAll('.cal-day-header');
+  if (headers.length === 0) {
+    const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    grid.innerHTML = dayNames.map(d => `<div class="cal-day-header">${d}</div>`).join('') + cells.join('');
+  }
+}
+
+/* ── Pomodoro Timer ── */
+
+const POMO_FOCUS = 25 * 60;
+const POMO_BREAK = 5 * 60;
+
+let pomoState = 'idle'; // idle | running | paused | break | breakRunning
+let pomoTimeLeft = POMO_FOCUS;
+let pomoInterval = null;
+let pomoSessions = parseInt(localStorage.getItem('meor-pomo-sessions')) || 0;
+
+const pomoTimeEl = document.getElementById('pomo-time');
+const pomoStartBtn = document.getElementById('pomo-start');
+const pomoResetBtn = document.getElementById('pomo-reset');
+const pomoSessionsEl = document.getElementById('pomo-sessions');
+const pomoIconEl = document.getElementById('pomo-icon');
+
+function pomoFormat(seconds) {
+  const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+  const s = String(seconds % 60).padStart(2, '0');
+  return `${m}:${s}`;
+}
+
+function pomoUpdateDisplay() {
+  pomoTimeEl.textContent = pomoFormat(pomoTimeLeft);
+  pomoTimeEl.classList.toggle('break', pomoState === 'break' || pomoState === 'breakRunning');
+  pomoSessionsEl.textContent = pomoSessions > 0 ? `🍅 x${pomoSessions}` : '';
+  pomoIconEl.textContent = (pomoState === 'break' || pomoState === 'breakRunning') ? '☕' : '⏱';
+
+  if (pomoState === 'running' || pomoState === 'breakRunning') {
+    pomoStartBtn.textContent = '⏸';
+    pomoStartBtn.classList.add('running');
+  } else {
+    pomoStartBtn.textContent = '▶';
+    pomoStartBtn.classList.remove('running');
+  }
+}
+
+function pomoStop() {
+  if (pomoInterval) {
+    clearInterval(pomoInterval);
+    pomoInterval = null;
+  }
+}
+
+function pomoTick() {
+  pomoTimeLeft--;
+  pomoUpdateDisplay();
+
+  if (pomoTimeLeft <= 0) {
+    pomoStop();
+
+    if (pomoState === 'running') {
+      // Focus session complete
+      pomoSessions++;
+      localStorage.setItem('meor-pomo-sessions', pomoSessions);
+      SoundManager.levelUp(); // triumphant sound
+      pomoState = 'break';
+      pomoTimeLeft = POMO_BREAK;
+      pomoUpdateDisplay();
+      // Auto-start break
+      pomoStartBreak();
+    } else if (pomoState === 'breakRunning') {
+      // Break complete
+      SoundManager.success();
+      pomoState = 'idle';
+      pomoTimeLeft = POMO_FOCUS;
+      pomoUpdateDisplay();
+    }
+  }
+}
+
+function pomoStartFocus() {
+  pomoStop();
+  pomoState = 'running';
+  pomoInterval = setInterval(pomoTick, 1000);
+  pomoUpdateDisplay();
+}
+
+function pomoStartBreak() {
+  pomoStop();
+  pomoState = 'breakRunning';
+  pomoInterval = setInterval(pomoTick, 1000);
+  pomoUpdateDisplay();
+}
+
+function pomoStartPause() {
+  if (pomoState === 'idle' || pomoState === 'break') {
+    // Start
+    if (pomoState === 'idle') {
+      pomoTimeLeft = POMO_FOCUS;
+      pomoStartFocus();
+    } else {
+      pomoStartBreak();
+    }
+  } else if (pomoState === 'running' || pomoState === 'breakRunning') {
+    // Pause
+    pomoStop();
+    pomoState = pomoState === 'running' ? 'paused' : 'break';
+    pomoUpdateDisplay();
+  } else if (pomoState === 'paused') {
+    // Resume
+    pomoStartFocus();
+  }
+}
+
+pomoStartBtn.addEventListener('click', () => {
+  SoundManager.click();
+  pomoStartPause();
+});
+
+pomoResetBtn.addEventListener('click', () => {
+  SoundManager.click();
+  pomoStop();
+  pomoState = 'idle';
+  pomoTimeLeft = POMO_FOCUS;
+  pomoUpdateDisplay();
+});
+
+pomoUpdateDisplay();
+
+/* ── Stats Dashboard ── */
+
+function renderStats() {
+  const el = document.getElementById('stats-content');
+
+  // Overview
+  const info = calcLevel(rpgXP);
+  const pct = info.nextLevelXp > 0 ? Math.round((info.currentXpInLevel / info.nextLevelXp) * 100) : 100;
+
+  // This week: completed tasks per day
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const weekData = [];
+  const now = new Date();
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const start = new Date(d); start.setHours(0, 0, 0, 0);
+    const end = new Date(d); end.setHours(23, 59, 59, 999);
+    const count = todos.filter(t => t.completed && new Date(t.updatedAt) >= start && new Date(t.updatedAt) <= end).length;
+    const dayLabel = i === 0 ? 'Today' : i === 1 ? 'Yest' : days[d.getDay()];
+    weekData.push({ label: dayLabel, count, max: 0 });
+  }
+  const maxWeek = Math.max(...weekData.map(d => d.count), 1);
+
+  // Quadrant distribution
+  const quadCounts = { q1: 0, q2: 0, q3: 0, q4: 0 };
+  for (const t of todos) {
+    if (t.completed) continue;
+    quadCounts[getQuadrantKey(t.title)]++;
+  }
+  const totalActive = Object.values(quadCounts).reduce((a, b) => a + b, 0) || 1;
+
+  // Shopping category breakdown
+  const catCounts = { grocery: 0, watsons: 0, mrdiy: 0, online: 0, etc: 0 };
+  for (const item of shoppingItems) {
+    if (item.completed) continue;
+    if (catCounts[item.category] !== undefined) catCounts[item.category]++;
+  }
+  const catTotal = Object.values(catCounts).reduce((a, b) => a + b, 0) || 1;
+
+  // Streak grid (last 30 days)
+  const streakCells = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const dateStr = `${y}-${m}-${day}`;
+    const isActive = todos.some(t => {
+      if (!t.completed) return false;
+      const u = new Date(t.updatedAt);
+      return `${u.getFullYear()}-${String(u.getMonth()+1).padStart(2,'0')}-${String(u.getDate()).padStart(2,'0')}` === dateStr;
+    });
+    const isToday = dateStr === `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    streakCells.push(`<div class="streak-cell${isActive ? ' active' : ''}${isToday && !isActive ? ' today-cell' : ''}"></div>`);
+  }
+
+  const quadOrder = [
+    { key: 'q1', label: 'Do First', cls: 'q1' },
+    { key: 'q2', label: 'Schedule', cls: 'q2' },
+    { key: 'q3', label: 'Delegate', cls: 'q3' },
+    { key: 'q4', label: 'Eliminate', cls: 'q4' },
+  ];
+
+  const catOrder = [
+    { key: 'grocery', label: 'Grocery', color: 'var(--green)' },
+    { key: 'watsons', label: 'Watsons', color: 'var(--blue)' },
+    { key: 'mrdiy', label: 'MRDIY', color: 'var(--orange)' },
+    { key: 'online', label: 'Online', color: 'var(--purple)' },
+    { key: 'etc', label: 'Etc', color: 'var(--text-tertiary)' },
+  ];
+
+  el.innerHTML = `
+    <div class="stats-section">
+      <h4>Overview</h4>
+      <div class="stats-overview">
+        <div class="stat-box"><span class="stat-value">${rpgLevel}</span><span class="stat-label">Level</span></div>
+        <div class="stat-box"><span class="stat-value">${rpgXP}</span><span class="stat-label">XP</span></div>
+        <div class="stat-box"><span class="stat-value">${rpgStreak}</span><span class="stat-label">Streak</span></div>
+        <div class="stat-box"><span class="stat-value">${rpgTotalCompleted}</span><span class="stat-label">Done</span></div>
+      </div>
+    </div>
+    <div class="stats-section">
+      <h4>This Week</h4>
+      <div class="chart-bars">
+        ${weekData.map(d => `
+          <div class="chart-bar-wrap">
+            <div class="chart-bar${d.count > 0 ? ' done' : ''}" style="height:${(d.count / maxWeek) * 100}%"></div>
+            <span class="chart-label">${d.label}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="stats-section">
+      <h4>Active Tasks by Quadrant</h4>
+      ${quadOrder.map(q => {
+        const pct = Math.round((quadCounts[q.key] / totalActive) * 100);
+        return `
+          <div class="chart-hbar">
+            <span class="hbar-label">${q.label}</span>
+            <div class="hbar-track"><div class="hbar-fill ${q.cls}" style="width:${pct}%"></div></div>
+            <span style="font-size:0.7rem;color:var(--text-tertiary);min-width:3ch">${quadCounts[q.key]}</span>
+          </div>`;
+      }).join('')}
+    </div>
+    <div class="stats-section">
+      <h4>Shopping by Category</h4>
+      ${catOrder.map(c => {
+        const pct = Math.round((catCounts[c.key] / catTotal) * 100);
+        return `
+          <div class="chart-hbar">
+            <span class="hbar-label">${c.label}</span>
+            <div class="hbar-track"><div class="hbar-fill" style="width:${pct}%;background:${c.color}"></div></div>
+            <span style="font-size:0.7rem;color:var(--text-tertiary);min-width:3ch">${catCounts[c.key]}</span>
+          </div>`;
+      }).join('')}
+    </div>
+    <div class="stats-section">
+      <h4>Last 30 Days</h4>
+      <div class="streak-grid">${streakCells.join('')}</div>
+    </div>
+  `;
+}
+
+document.getElementById('stats-btn').addEventListener('click', () => {
+  SoundManager.click();
+  document.getElementById('stats-modal').style.display = 'flex';
+  renderStats();
+});
+
+document.getElementById('stats-close').addEventListener('click', () => {
+  SoundManager.click();
+  document.getElementById('stats-modal').style.display = 'none';
+});
+
+document.getElementById('stats-modal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('stats-modal')) {
+    document.getElementById('stats-modal').style.display = 'none';
+  }
+});
 
 /* ── Event listeners ── */
 
@@ -1039,6 +1403,38 @@ todoSearch.addEventListener('input', () => {
 shopSearch.addEventListener('input', () => {
   shopSearchQuery = shopSearch.value;
   renderShopping();
+});
+
+/* ── Calendar events ── */
+
+document.getElementById('cal-prev').addEventListener('click', () => {
+  SoundManager.click();
+  calendarViewDate.setMonth(calendarViewDate.getMonth() - 1);
+  renderCalendar();
+});
+
+document.getElementById('cal-next').addEventListener('click', () => {
+  SoundManager.click();
+  calendarViewDate.setMonth(calendarViewDate.getMonth() + 1);
+  renderCalendar();
+});
+
+document.getElementById('cal-grid').addEventListener('click', (e) => {
+  const dot = e.target.closest('.cal-task-dot');
+  if (dot) {
+    const todo = todos.find(t => t._id === dot.dataset.id);
+    if (todo) openEditModal(todo);
+    return;
+  }
+  const day = e.target.closest('.cal-day');
+  if (day && !day.classList.contains('other-month')) {
+    const date = day.dataset.date;
+    if (date) {
+      openModal();
+      document.getElementById('modal-date').value = date;
+      modalDateRow.style.display = '';
+    }
+  }
 });
 
 document.addEventListener('keydown', (e) => {
