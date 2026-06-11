@@ -16,12 +16,14 @@ Open `index.html` in a browser — no dev server needed.
 ## Data & State
 
 ### TODO tab
+
 - Items fetched/created/updated/deleted via `https://scriptable-todo.onrender.com/api/todos`
 - Category tags embedded in title: `!ui` (Do First), `!nui` (Schedule), `!uni` (Delegate), empty (Eliminate)
 - Filter persisted in `localStorage` under key `meor-filter`
 - Quadrants defined in `app.js:4-9`
 
 ### SHOPPING tab
+
 - Items fetched/created/updated/deleted via `https://scriptable-todo.onrender.com/api/shopping`
 - Each item has: `name`, `category` (grocery/watsons/mrdiy), `completed`
 - Tab state persisted in `localStorage` under key `meor-tab`
@@ -35,13 +37,6 @@ Open `index.html` in a browser — no dev server needed.
 - Models: `Todo` (title, completed), `ShoppingItem` (name, category, completed)
 - Routes: `/api/todos`, `/api/shopping` (both full CRUD + clear-completed)
 - Deployed at: `https://scriptable-todo.onrender.com`
-
-## Design
-
-- Dark neumorphism (modern skeuomorphism) — dual-shadow depth, no borders
-- Emoji favicon (`📝`) set via inline SVG data URI in `<head>`
-- System sans-serif font, rounded corners (14–16px)
-- Keep the design style consistent when adding/changing elements
 
 ## No
 

@@ -16,11 +16,226 @@ const CATEGORIES = [
   { key: 'etc',     label: 'Etc',     color: '#636366' },
 ];
 
+/* ── Sound Manager (Web Audio API) ── */
+
+const SoundManager = {
+  _ctx: null,
+
+  _ensureCtx() {
+    if (!this._ctx) {
+      const Ctor = window.AudioContext || window.webkitAudioContext;
+      if (!Ctor) return null;
+      this._ctx = new Ctor();
+    }
+    if (this._ctx.state === 'suspended') {
+      this._ctx.resume();
+    }
+    return this._ctx;
+  },
+
+  _tone(freq, duration, type = 'sine', volume = 0.08) {
+    const ctx = this._ensureCtx();
+    if (!ctx) return;
+    try {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      gain.gain.setValueAtTime(volume, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + duration);
+    } catch { /* audio non-critical */ }
+  },
+
+  check()   { this._tone(880, 0.12, 'sine', 0.07); },
+  uncheck() { this._tone(440, 0.12, 'sine', 0.07); },
+  add() {
+    this._tone(660, 0.08, 'sine', 0.07);
+    setTimeout(() => this._tone(880, 0.12, 'sine', 0.07), 60);
+  },
+  delete() {
+    this._tone(440, 0.08, 'sine', 0.07);
+    setTimeout(() => this._tone(330, 0.12, 'sine', 0.07), 60);
+  },
+  drop() { this._tone(220, 0.12, 'triangle', 0.05); },
+  levelUp() {
+    this._tone(523, 0.1, 'sine', 0.07);
+    setTimeout(() => this._tone(659, 0.1, 'sine', 0.07), 120);
+    setTimeout(() => this._tone(784, 0.15, 'sine', 0.07), 240);
+  },
+};
+
 let todos = [];
 let shoppingItems = [];
 let currentFilter = localStorage.getItem('meor-filter') || 'all';
 let activeTab = localStorage.getItem('meor-tab') || 'todo';
 let shoppingFilter = localStorage.getItem('meor-shop-filter') || 'all';
+let todoSearchQuery = '';
+let shopSearchQuery = '';
+
+/* ── RPG State ── */
+
+let rpgXP = 0;
+let rpgLevel = 1;
+let rpgStreak = 0;
+let rpgLastDate = '';
+let rpgTotalCompleted = 0;
+
+function loadRpgState() {
+  rpgXP = parseInt(localStorage.getItem('meor-xp')) || 0;
+  rpgLevel = parseInt(localStorage.getItem('meor-level')) || 1;
+  rpgStreak = parseInt(localStorage.getItem('meor-streak')) || 0;
+  rpgLastDate = localStorage.getItem('meor-last-date') || '';
+  rpgTotalCompleted = parseInt(localStorage.getItem('meor-total-completed')) || 0;
+}
+
+function saveRpgState() {
+  localStorage.setItem('meor-xp', rpgXP);
+  localStorage.setItem('meor-level', rpgLevel);
+  localStorage.setItem('meor-streak', rpgStreak);
+  localStorage.setItem('meor-last-date', rpgLastDate);
+  localStorage.setItem('meor-total-completed', rpgTotalCompleted);
+}
+
+function xpForLevel(level) {
+  // Cumulative XP needed to reach a given level
+  // Level 1 = 0, Level 2 = 50, Level 3 = 130, etc.
+  let xp = 0;
+  for (let i = 1; i < level; i++) {
+    xp += i * 30 + 20;
+  }
+  return xp;
+}
+
+function calcLevel(totalXp) {
+  let level = 1;
+  while (level < 20 && totalXp >= xpForLevel(level + 1)) {
+    level++;
+  }
+  const currentLevelXp = xpForLevel(level);
+  const nextLevelXp = level < 20 ? xpForLevel(level + 1) - currentLevelXp : 1;
+  const currentXpInLevel = totalXp - currentLevelXp;
+  return { level, currentXpInLevel, nextLevelXp };
+}
+
+function getBaseXp(tag) {
+  if (tag === '!ui') return 20;
+  if (tag === '!nui') return 15;
+  if (tag === '!uni') return 10;
+  return 5;
+}
+
+function getStreakMultiplier() {
+  if (rpgStreak >= 7) return 2;
+  if (rpgStreak >= 3) return 1.5;
+  return 1;
+}
+
+function updateStreak() {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const todayStr = `${yyyy}-${mm}-${dd}`;
+
+  if (rpgLastDate === todayStr) return; // already counted today
+
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yyyy2 = yesterday.getFullYear();
+  const mm2 = String(yesterday.getMonth() + 1).padStart(2, '0');
+  const dd2 = String(yesterday.getDate()).padStart(2, '0');
+  const yesterdayStr = `${yyyy2}-${mm2}-${dd2}`;
+
+  if (rpgLastDate === yesterdayStr) {
+    rpgStreak++;
+  } else {
+    rpgStreak = 1;
+  }
+  rpgLastDate = todayStr;
+}
+
+function awardXp(baseXp) {
+  const mult = getStreakMultiplier();
+  const awarded = Math.round(baseXp * mult);
+
+  rpgXP += awarded;
+  rpgTotalCompleted++;
+
+  updateStreak();
+
+  const oldLevel = rpgLevel;
+  const info = calcLevel(rpgXP);
+  rpgLevel = info.level;
+
+  saveRpgState();
+  renderRpgBadge();
+
+  if (rpgLevel > oldLevel) {
+    triggerLevelUp();
+  }
+}
+
+function renderRpgBadge() {
+  const levelEl = document.querySelector('.rpg-level');
+  const fillEl = document.querySelector('.rpg-xp-fill');
+  const streakEl = document.querySelector('.rpg-streak');
+  if (!levelEl || !fillEl) return;
+
+  const info = calcLevel(rpgXP);
+  const pct = info.nextLevelXp > 0 ? (info.currentXpInLevel / info.nextLevelXp) * 100 : 100;
+
+  levelEl.textContent = `Lv. ${rpgLevel}`;
+  fillEl.style.width = `${Math.min(pct, 100)}%`;
+
+  if (rpgStreak > 0 && streakEl) {
+    streakEl.textContent = `🔥 ${rpgStreak}d`;
+  } else if (streakEl) {
+    streakEl.textContent = '';
+  }
+}
+
+function spawnConfetti() {
+  const colors = ['#30d158', '#0a84ff', '#ff9f0a', '#bf5af2', '#ff453a', '#ffd60a'];
+  const header = document.querySelector('header');
+  if (!header) return;
+  const rect = header.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+
+  for (let i = 0; i < 40; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const size = 6 + Math.random() * 6;
+    const spread = (Math.random() - 0.5) * 300;
+    el.style.cssText = `
+      left: ${cx + spread}px;
+      top: ${cy}px;
+      width: ${size}px;
+      height: ${size}px;
+      background: ${color};
+      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+      animation-delay: ${Math.random() * 0.3}s;
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2000);
+  }
+}
+
+function triggerLevelUp() {
+  SoundManager.levelUp();
+  spawnConfetti();
+  const levelEl = document.querySelector('.rpg-level');
+  if (levelEl) {
+    levelEl.classList.remove('pulse');
+    void levelEl.offsetWidth; // force reflow
+    levelEl.classList.add('pulse');
+  }
+}
 
 const matrix = document.getElementById('matrix');
 const todoCount = document.getElementById('todo-count');
@@ -148,10 +363,14 @@ function render() {
     return;
   }
 
+  const query = todoSearchQuery.toLowerCase().trim();
   const filtered = todos.filter(t => {
     if (currentFilter === 'active') return !t.completed;
     if (currentFilter === 'completed') return t.completed;
     return true;
+  }).filter(t => {
+    if (!query) return true;
+    return stripTag(t.title).toLowerCase().includes(query);
   });
 
   const grouped = { q1: [], q2: [], q3: [], q4: [] };
@@ -195,7 +414,7 @@ function render() {
               const dd = t.dueDate ? new Date(t.dueDate) : null;
               const ddStr = dd ? `<span class="todo-due">${formatDueDate(dd)}</span>` : '';
               return `
-            <div class="todo-item ${t.completed ? 'completed' : ''}" data-id="${t._id}">
+            <div class="todo-item ${t.completed ? 'completed' : ''}" draggable="true" data-id="${t._id}">
               <input type="checkbox" class="todo-checkbox" ${t.completed ? 'checked' : ''}>
               <div class="todo-body">
                 <span class="todo-title">${escapeHtml(stripTag(t.title))}</span>
@@ -221,9 +440,13 @@ function render() {
 }
 
 function renderShopping() {
+  const query = shopSearchQuery.toLowerCase().trim();
   const filtered = shoppingItems.filter(item => {
     if (shoppingFilter !== 'all') return item.category === shoppingFilter;
     return true;
+  }).filter(item => {
+    if (!query) return true;
+    return item.name.toLowerCase().includes(query);
   });
 
   const grouped = {};
@@ -322,6 +545,7 @@ async function addTodo(titleRaw, tag, dueDate) {
     if (dueDate) body.dueDate = dueDate;
     const newTodo = await apiFetch('POST', body);
     todos.push(newTodo);
+    SoundManager.add();
     render();
   } catch (err) {
     alert('Failed to add todo: ' + err.message);
@@ -344,6 +568,7 @@ async function toggleTodo(id, completed) {
     const updated = await apiFetchId(id, 'PUT', { completed });
     const idx = todos.findIndex(t => t._id === id);
     if (idx !== -1) todos[idx] = updated;
+    if (completed) awardXp(getBaseXp(getCurrentTag(updated.title)));
     render();
   } catch (err) {
     alert('Failed to update todo: ' + err.message);
@@ -354,6 +579,7 @@ async function deleteTodo(id) {
   try {
     await apiFetchId(id, 'DELETE');
     todos = todos.filter(t => t._id !== id);
+    SoundManager.delete();
     render();
   } catch (err) {
     alert('Failed to delete todo: ' + err.message);
@@ -378,6 +604,7 @@ async function addShoppingItem(name, category) {
   try {
     const item = await shopFetch('POST', { name, category });
     shoppingItems.unshift(item);
+    SoundManager.add();
     shopInput.value = '';
     applyShopFilterUI();
     renderShopping();
@@ -406,6 +633,7 @@ async function toggleShoppingItem(id, completed) {
     const updated = await shopFetchId(id, 'PUT', { completed });
     const idx = shoppingItems.findIndex(i => i._id === id);
     if (idx !== -1) shoppingItems[idx] = updated;
+    if (completed) awardXp(3);
     renderShopping();
   } catch (err) {
     alert('Failed to update shopping item: ' + err.message);
@@ -416,6 +644,7 @@ async function deleteShoppingItem(id) {
   try {
     await shopFetchId(id, 'DELETE');
     shoppingItems = shoppingItems.filter(i => i._id !== id);
+    SoundManager.delete();
     renderShopping();
   } catch (err) {
     alert('Failed to delete shopping item: ' + err.message);
@@ -672,15 +901,83 @@ shopList.addEventListener('dblclick', (e) => {
 matrix.addEventListener('change', (e) => {
   if (e.target.classList.contains('todo-checkbox')) {
     const item = e.target.closest('.todo-item');
-    if (item) toggleTodo(item.dataset.id, e.target.checked);
+    if (item) {
+      SoundManager[e.target.checked ? 'check' : 'uncheck']();
+      toggleTodo(item.dataset.id, e.target.checked);
+    }
   }
 });
 
 shopList.addEventListener('change', (e) => {
   if (e.target.classList.contains('shop-checkbox')) {
     const item = e.target.closest('.shop-item');
-    if (item) toggleShoppingItem(item.dataset.id, e.target.checked);
+    if (item) {
+      SoundManager[e.target.checked ? 'check' : 'uncheck']();
+      toggleShoppingItem(item.dataset.id, e.target.checked);
+    }
   }
+});
+
+/* ── Drag and Drop ── */
+
+matrix.addEventListener('dragstart', (e) => {
+  if (e.target.closest('.todo-checkbox') || e.target.closest('.todo-delete')) {
+    e.preventDefault();
+    return;
+  }
+  const item = e.target.closest('.todo-item');
+  if (!item) { e.preventDefault(); return; }
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', item.dataset.id);
+  item.classList.add('dragging');
+});
+
+matrix.addEventListener('dragend', () => {
+  document.querySelectorAll('.todo-item.dragging').forEach(el => el.classList.remove('dragging'));
+  document.querySelectorAll('.quadrant.drag-over').forEach(el => el.classList.remove('drag-over'));
+});
+
+matrix.addEventListener('dragover', (e) => {
+  const quadrant = e.target.closest('.quadrant');
+  if (!quadrant) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  quadrant.classList.add('drag-over');
+});
+
+matrix.addEventListener('dragleave', (e) => {
+  const quadrant = e.target.closest('.quadrant');
+  if (!quadrant) return;
+  if (e.relatedTarget && quadrant.contains(e.relatedTarget)) return;
+  quadrant.classList.remove('drag-over');
+});
+
+matrix.addEventListener('drop', (e) => {
+  e.preventDefault();
+  document.querySelectorAll('.quadrant.drag-over').forEach(el => el.classList.remove('drag-over'));
+  document.querySelectorAll('.todo-item.dragging').forEach(el => el.classList.remove('dragging'));
+
+  const quadrant = e.target.closest('.quadrant');
+  if (!quadrant) return;
+
+  const todoId = e.dataTransfer.getData('text/plain');
+  if (!todoId) return;
+
+  const qClass = Array.from(quadrant.classList).find(c => /^q[1-4]$/.test(c));
+  if (!qClass) return;
+
+  const targetTag = QUADRANTS.find(q => q.key === qClass).tag;
+  const todo = todos.find(t => t._id === todoId);
+  if (!todo) return;
+
+  const currentTag = getCurrentTag(todo.title);
+  if (currentTag === targetTag) return;
+
+  const cleanTitle = stripTag(todo.title);
+  const newTitle = targetTag ? `${cleanTitle} ${targetTag}` : cleanTitle;
+
+  SoundManager.drop();
+  renameTodo(todoId, newTitle);
 });
 
 filterBtns.forEach(btn => {
@@ -704,6 +1001,21 @@ tabBtns.forEach(btn => {
   });
 });
 
+/* ── Search ── */
+
+const todoSearch = document.getElementById('todo-search');
+const shopSearch = document.getElementById('shop-search');
+
+todoSearch.addEventListener('input', () => {
+  todoSearchQuery = todoSearch.value;
+  render();
+});
+
+shopSearch.addEventListener('input', () => {
+  shopSearchQuery = shopSearch.value;
+  renderShopping();
+});
+
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     if (editModal.style.display === 'flex') closeEditModal();
@@ -721,5 +1033,7 @@ document.addEventListener('keydown', (e) => {
 
 /* ── Init ── */
 
+loadRpgState();
+renderRpgBadge();
 switchTab(activeTab);
 loadTodos();
