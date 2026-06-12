@@ -417,17 +417,8 @@ function render() {
     return new Date(a.dueDate) - new Date(b.dueDate);
   });
 
-  if (currentFilter === 'all') {
-    for (const q of ['q2', 'q3', 'q4']) {
-      const urgent = grouped[q].filter(t => {
-        if (!t.dueDate) return false;
-        const days = (new Date(t.dueDate) - Date.now()) / 86400000;
-        return days >= 0 && days <= 2;
-      });
-      grouped.q1.push(...urgent);
-      grouped[q] = grouped[q].filter(t => !urgent.includes(t));
-    }
-  }
+  // Note: tasks stay in their assigned quadrant regardless of due date.
+  // Due dates are visible in the task meta text for scheduling awareness.
 
   matrix.innerHTML = QUADRANTS.map(q => `
     <div class="quadrant ${q.key}">
