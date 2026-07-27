@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ELSA — Work Knowledge Base</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .elsa-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+      }
+
+      .elsa-header h1 {
+        font-size: 1.75rem;
+        letter-spacing: -0.5px;
+      }
+
+      .elsa-header .sub {
+        display: block;
+        font-size: 0.7rem;
+        font-weight: 400;
+        color: var(--text-tertiary);
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        margin-top: 2px;
+      }
+
+      .elsa-header-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .back-link {
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+        text-decoration: none;
+        padding: 6px 14px;
+        border: 1px solid var(--border-subtle);
+        border-radius: 20px;
+        transition: all var(--transition-fast);
+      }
+
+      .back-link:hover {
+        color: var(--text-secondary);
+        border-color: var(--text-tertiary);
+      }
+
+      .elsa-cat-filters {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 1.25rem;
+        flex-wrap: wrap;
+      }
+
+      .cat-filter {
+        padding: 0.35rem 0.75rem;
+        border: 1px solid var(--border-subtle);
+        background: transparent;
+        font-family: inherit;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--text-tertiary);
+        cursor: pointer;
+        transition: all var(--transition);
+        border-radius: 20px;
+      }
+
+      .cat-filter:hover {
+        border-color: var(--text-tertiary);
+        color: var(--text-secondary);
+      }
+
+      .cat-filter.active {
+        color: var(--bg-primary);
+        background: var(--text-primary);
+        border-color: var(--text-primary);
+        font-weight: 600;
+      }
+
+      .cat-filter-dot {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        margin-right: 4px;
+        vertical-align: middle;
+      }
+
+      .elsa-card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 14px;
+        margin-bottom: 2rem;
+      }
+
+      .elsa-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 1.25rem;
+        transition: border-color var(--transition), box-shadow var(--transition);
+        position: relative;
+        overflow: hidden;
+        animation: fadeIn 0.25s ease;
+      }
+
+      .elsa-card:hover {
+        border-color: var(--border);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .elsa-card-cat {
+        display: inline-block;
+        font-size: 0.55rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 2px 10px;
+        border-radius: 20px;
+        margin-bottom: 0.6rem;
+      }
+
+      .elsa-card-title {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        line-height: 1.3;
+      }
+
+      .elsa-card-content {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .elsa-card-content ul,
+      .elsa-card-content ol {
+        padding-left: 1.2rem;
+        margin: 0.3rem 0;
+      }
+
+      .elsa-card-content li {
+        margin-bottom: 0.2rem;
+      }
+
+      .elsa-card-actions {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        gap: 4px;
+        opacity: 0;
+        transition: opacity var(--transition-fast);
+      }
+
+      .elsa-card:hover .elsa-card-actions {
+        opacity: 1;
+      }
+
+      .card-action-btn {
+        width: 28px;
+        height: 28px;
+        border: none;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--text-tertiary);
+        font-size: 0.8rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--transition-fast);
+      }
+
+      .card-action-btn:hover {
+        background: var(--bg-hover);
+        color: var(--text-primary);
+      }
+
+      .card-action-btn.danger:hover {
+        background: var(--red-bg);
+        color: var(--red);
+      }
+
+      .elsa-empty {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 3rem 1rem;
+        color: var(--text-tertiary);
+        font-size: 0.85rem;
+        font-style: italic;
+      }
+
+      .elsa-empty strong {
+        color: var(--text-secondary);
+        font-style: normal;
+      }
+
+      .elsa-count {
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+        margin-bottom: 1rem;
+      }
+
+      #elsa-add-btn {
+        position: fixed;
+        bottom: 28px;
+        right: 28px;
+        width: 56px;
+        height: 56px;
+        border: none;
+        border-radius: 50%;
+        background: var(--text-primary);
+        color: var(--bg-primary);
+        font-size: 1.8rem;
+        font-weight: 300;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(242, 242, 247, 0.2);
+        transition: all var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        line-height: 1;
+      }
+
+      #elsa-add-btn:hover {
+        transform: scale(1.1) translateY(-2px);
+        box-shadow: 0 8px 30px rgba(242, 242, 247, 0.25);
+      }
+
+      #elsa-add-btn:active {
+        transform: scale(0.95);
+        box-shadow: 0 2px 10px rgba(242, 242, 247, 0.15);
+      }
+
+      .modal-card textarea {
+        width: 100%;
+        min-height: 140px;
+        padding: 0.85rem 0.75rem;
+        border: 1.5px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        font-family: inherit;
+        font-size: 0.9rem;
+        outline: none;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        transition: border-color var(--transition), box-shadow var(--transition);
+        resize: vertical;
+        line-height: 1.5;
+      }
+
+      .modal-card textarea:focus {
+        border-color: var(--text-tertiary);
+        box-shadow: 0 0 0 3px rgba(174, 174, 178, 0.1);
+      }
+
+      .modal-card textarea::placeholder {
+        color: var(--text-muted);
+      }
+
+      .modal-card select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1.5px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        font-family: inherit;
+        font-size: 0.85rem;
+        background: var(--bg-primary);
+        color: var(--text-secondary);
+        outline: none;
+        cursor: pointer;
+        transition: border-color var(--transition);
+        margin-bottom: 0.75rem;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23636366' d='M6 8.825L1.175 4 2.238 2.938 6 6.7 9.763 2.937 10.825 4z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        padding-right: 32px;
+      }
+
+      .modal-card select:focus {
+        border-color: var(--text-tertiary);
+      }
+
+      @media (max-width: 640px) {
+        .elsa-card-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .elsa-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 12px;
+        }
+
+        #elsa-add-btn {
+          bottom: 20px;
+          right: 20px;
+          width: 48px;
+          height: 48px;
+          font-size: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="elsa-header">
+        <div>
+          <h1>ELSA</h1>
+          <span class="sub">Work Knowledge Base</span>
+        </div>
+        <div class="elsa-header-actions">
+          <a href="index.html" class="back-link">← Back to App</a>
+        </div>
+      </div>
+
+      <div class="elsa-cat-filters" id="cat-filters">
+        <button class="cat-filter active" data-cat="all">All</button>
+        <button class="cat-filter" data-cat="role">
+          <span class="cat-filter-dot" style="background:#0a84ff"></span>Role
+        </button>
+        <button class="cat-filter" data-cat="project">
+          <span class="cat-filter-dot" style="background:#30d158"></span>Projects
+        </button>
+        <button class="cat-filter" data-cat="workflow">
+          <span class="cat-filter-dot" style="background:#ff9f0a"></span>Workflows
+        </button>
+        <button class="cat-filter" data-cat="note">
+          <span class="cat-filter-dot" style="background:#bf5af2"></span>Notes
+        </button>
+      </div>
+
+      <input type="text" id="elsa-search" class="search-input" placeholder="Search cards..." />
+
+      <div class="elsa-count" id="elsa-count">0 cards</div>
+
+      <div class="elsa-card-grid" id="elsa-card-grid">
+        <div class="elsa-empty">No cards yet. Tap <strong>+</strong> to add your first one.</div>
+      </div>
+    </div>
+
+    <button id="elsa-add-btn" title="Add card">+</button>
+
+    <div id="elsa-modal" class="modal-overlay" style="display:none">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 id="modal-title">New Card</h3>
+          <button class="modal-close" id="modal-close">✕</button>
+        </div>
+        <input type="text" id="card-title-input" placeholder="Card title" />
+        <select id="card-cat-input">
+          <option value="role">Role &amp; Responsibilities</option>
+          <option value="project">Projects &amp; Tasks</option>
+          <option value="workflow">Workflows &amp; SOPs</option>
+          <option value="note">General Notes</option>
+        </select>
+        <textarea id="card-content-input" placeholder="Write your notes, workflows, SOPs, or any info here..."></textarea>
+        <button class="edit-save-btn" id="card-save-btn">Save</button>
+      </div>
+    </div>
+
+    <script>
+      const CATEGORIES = [
+        { key: 'role',     label: 'Role & Responsibilities', color: '#0a84ff' },
+        { key: 'project',  label: 'Projects & Tasks',        color: '#30d158' },
+        { key: 'workflow', label: 'Workflows & SOPs',        color: '#ff9f0a' },
+        { key: 'note',     label: 'General Notes',           color: '#bf5af2' },
+      ];
+
+      const STORAGE_KEY = 'meor-elsa-cards';
+
+      let cards = [];
+      let activeCat = 'all';
+      let searchQuery = '';
+      let editingId = null;
+
+      const grid = document.getElementById('elsa-card-grid');
+      const countEl = document.getElementById('elsa-count');
+      const searchEl = document.getElementById('elsa-search');
+      const catFilters = document.getElementById('cat-filters');
+      const addBtn = document.getElementById('elsa-add-btn');
+      const modal = document.getElementById('elsa-modal');
+      const modalTitle = document.getElementById('modal-title');
+      const modalClose = document.getElementById('modal-close');
+      const titleInput = document.getElementById('card-title-input');
+      const catInput = document.getElementById('card-cat-input');
+      const contentInput = document.getElementById('card-content-input');
+      const saveBtn = document.getElementById('card-save-btn');
+
+      function loadCards() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          cards = raw ? JSON.parse(raw) : [];
+        } catch { cards = []; }
+      }
+
+      function saveCards() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+      }
+
+      function getCat(key) {
+        return CATEGORIES.find(c => c.key === key) || CATEGORIES[3];
+      }
+
+      function formatContent(text) {
+        let html = text
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+        html = html.replace(/^## (.+)$/gm, '<h4 style="font-size:0.9rem;font-weight:600;color:#f2f2f7;margin:0.6rem 0 0.3rem">$1</h4>');
+        html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+        html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul style="padding-left:1.2rem;margin:0.3rem 0">$&</ul>');
+        html = html.replace(/\*\*(.+?)\*\*/g, '<strong style="color:#f2f2f7">$1</strong>');
+        html = html.replace(/\n\n/g, '</p><p style="margin:0.5rem 0">');
+        html = html.replace(/\n/g, '<br/>');
+        return '<p style="margin:0">' + html + '</p>';
+      }
+
+      function render() {
+        const filtered = cards.filter(c => {
+          if (activeCat !== 'all' && c.category !== activeCat) return false;
+          if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            const match = c.title.toLowerCase().includes(q) || c.content.toLowerCase().includes(q);
+            if (!match) return false;
+          }
+          return true;
+        });
+
+        countEl.textContent = filtered.length + ' card' + (filtered.length !== 1 ? 's' : '');
+
+        if (filtered.length === 0) {
+          grid.innerHTML = '<div class="elsa-empty">' +
+            (cards.length === 0
+              ? 'No cards yet. Tap <strong>+</strong> to add your first one.'
+              : 'No cards match your filters.') +
+            '</div>';
+          return;
+        }
+
+        grid.innerHTML = filtered.map(c => {
+          const cat = getCat(c.category);
+          const date = new Date(c.updatedAt || c.createdAt);
+          const dateStr = date.toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' });
+          return `
+            <article class="elsa-card" data-id="${c.id}">
+              <div class="elsa-card-actions">
+                <button class="card-action-btn" data-action="edit" data-id="${c.id}" title="Edit">✎</button>
+                <button class="card-action-btn danger" data-action="delete" data-id="${c.id}" title="Delete">✕</button>
+              </div>
+              <div class="elsa-card-cat" style="background:${cat.color}22;color:${cat.color}">${cat.label}</div>
+              <h2 class="elsa-card-title">${c.title}</h2>
+              <div class="elsa-card-content">${formatContent(c.content)}</div>
+              <div style="margin-top:0.6rem;font-size:0.6rem;color:var(--text-muted)">${dateStr}</div>
+            </article>
+          `;
+        }).join('');
+
+        document.querySelectorAll('[data-action="edit"]').forEach(btn => {
+          btn.addEventListener('click', () => openEdit(btn.dataset.id));
+        });
+        document.querySelectorAll('[data-action="delete"]').forEach(btn => {
+          btn.addEventListener('click', () => deleteCard(btn.dataset.id));
+        });
+      }
+
+      function addCard(title, category, content) {
+        const card = {
+          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+          title,
+          category,
+          content,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        };
+        cards.push(card);
+        saveCards();
+        render();
+      }
+
+      function updateCard(id, title, category, content) {
+        const card = cards.find(c => c.id === id);
+        if (!card) return;
+        card.title = title;
+        card.category = category;
+        card.content = content;
+        card.updatedAt = Date.now();
+        saveCards();
+        render();
+      }
+
+      function deleteCard(id) {
+        if (!confirm('Delete this card?')) return;
+        cards = cards.filter(c => c.id !== id);
+        saveCards();
+        render();
+      }
+
+      function openAdd() {
+        editingId = null;
+        modalTitle.textContent = 'New Card';
+        titleInput.value = '';
+        catInput.value = 'role';
+        contentInput.value = '';
+        modal.style.display = 'flex';
+        setTimeout(() => titleInput.focus(), 100);
+      }
+
+      function openEdit(id) {
+        const card = cards.find(c => c.id === id);
+        if (!card) return;
+        editingId = id;
+        modalTitle.textContent = 'Edit Card';
+        titleInput.value = card.title;
+        catInput.value = card.category;
+        contentInput.value = card.content;
+        modal.style.display = 'flex';
+        setTimeout(() => titleInput.focus(), 100);
+      }
+
+      function closeModal() {
+        modal.style.display = 'none';
+        editingId = null;
+      }
+
+      function saveCard() {
+        const title = titleInput.value.trim();
+        const category = catInput.value;
+        const content = contentInput.value.trim();
+        if (!title) { titleInput.focus(); return; }
+        if (editingId) {
+          updateCard(editingId, title, category, content);
+        } else {
+          addCard(title, category, content);
+        }
+        closeModal();
+      }
+
+      loadCards();
+      render();
+
+      catFilters.addEventListener('click', e => {
+        const btn = e.target.closest('.cat-filter');
+        if (!btn) return;
+        catFilters.querySelectorAll('.cat-filter').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeCat = btn.dataset.cat;
+        render();
+      });
+
+      searchEl.addEventListener('input', () => {
+        searchQuery = searchEl.value.trim();
+        render();
+      });
+
+      addBtn.addEventListener('click', openAdd);
+      modalClose.addEventListener('click', closeModal);
+      modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+      saveBtn.addEventListener('click', saveCard);
+
+      titleInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          contentInput.focus();
+        }
+      });
+
+      contentInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+          e.preventDefault();
+          saveCard();
+        }
+      });
+
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeModal();
+      });
+    </script>
+  </body>
+</html>
