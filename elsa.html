@@ -53,6 +53,25 @@
         border-color: var(--text-tertiary);
       }
 
+      .export-btn {
+        font-size: 0.7rem;
+        color: var(--text-tertiary);
+        padding: 6px 14px;
+        border: 1px solid var(--border-subtle);
+        border-radius: 20px;
+        background: transparent;
+        font-family: inherit;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        white-space: nowrap;
+      }
+
+      .export-btn:hover {
+        color: var(--text-secondary);
+        border-color: var(--text-tertiary);
+        background: var(--bg-hover);
+      }
+
       .elsa-cat-filters {
         display: flex;
         gap: 6px;
@@ -324,6 +343,8 @@
           <span class="sub">Work Knowledge Base</span>
         </div>
         <div class="elsa-header-actions">
+          <button class="export-btn" id="export-html-btn" title="Generate static HTML for Gemini Notebook">📄 Source Export</button>
+          <button class="export-btn" id="copy-text-btn" title="Copy all cards as text">📋 Copy Text</button>
           <a href="index.html" class="back-link">← Back to App</a>
         </div>
       </div>
@@ -374,14 +395,14 @@
     </div>
 
     <script>
+      const ELSA_API = 'https://scriptable-todo.onrender.com/api/elsa-cards';
+
       const CATEGORIES = [
         { key: 'role',     label: 'Role & Responsibilities', color: '#0a84ff' },
         { key: 'project',  label: 'Projects & Tasks',        color: '#30d158' },
         { key: 'workflow', label: 'Workflows & SOPs',        color: '#ff9f0a' },
         { key: 'note',     label: 'General Notes',           color: '#bf5af2' },
       ];
-
-      const STORAGE_KEY = 'meor-elsa-cards';
 
       let cards = [];
       let activeCat = 'all';
@@ -401,15 +422,23 @@
       const contentInput = document.getElementById('card-content-input');
       const saveBtn = document.getElementById('card-save-btn');
 
-      function loadCards() {
-        try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          cards = raw ? JSON.parse(raw) : [];
-        } catch { cards = []; }
+      async function fetchApi(path, options) {
+        const url = path ? `${ELSA_API}/${path}` : ELSA_API;
+        const res = await fetch(url, {
+          headers: { 'Content-Type': 'application/json' },
+          ...options,
+        });
+        if (!res.ok) throw new Error(`API error: ${res.status}`);
+        return res.json();
       }
 
-      function saveCards() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+      async function loadCards() {
+        try {
+          cards = await fetchApi();
+          render();
+        } catch {
+          grid.innerHTML = '<div class="elsa-empty">Failed to load cards. Check your connection.</div>';
+        }
       }
 
       function getCat(key) {
@@ -457,10 +486,10 @@
           const date = new Date(c.updatedAt || c.createdAt);
           const dateStr = date.toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' });
           return `
-            <article class="elsa-card" data-id="${c.id}">
+            <article class="elsa-card" data-id="${c._id}">
               <div class="elsa-card-actions">
-                <button class="card-action-btn" data-action="edit" data-id="${c.id}" title="Edit">✎</button>
-                <button class="card-action-btn danger" data-action="delete" data-id="${c.id}" title="Delete">✕</button>
+                <button class="card-action-btn" data-action="edit" data-id="${c._id}" title="Edit">✎</button>
+                <button class="card-action-btn danger" data-action="delete" data-id="${c._id}" title="Delete">✕</button>
               </div>
               <div class="elsa-card-cat" style="background:${cat.color}22;color:${cat.color}">${cat.label}</div>
               <h2 class="elsa-card-title">${c.title}</h2>
@@ -478,35 +507,29 @@
         });
       }
 
-      function addCard(title, category, content) {
-        const card = {
-          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-          title,
-          category,
-          content,
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
-        };
-        cards.push(card);
-        saveCards();
+      async function addCard(title, category, content) {
+        const saved = await fetchApi(null, {
+          method: 'POST',
+          body: JSON.stringify({ title, category, content }),
+        });
+        cards.unshift(saved);
         render();
       }
 
-      function updateCard(id, title, category, content) {
-        const card = cards.find(c => c.id === id);
-        if (!card) return;
-        card.title = title;
-        card.category = category;
-        card.content = content;
-        card.updatedAt = Date.now();
-        saveCards();
+      async function updateCard(id, title, category, content) {
+        const saved = await fetchApi(id, {
+          method: 'PUT',
+          body: JSON.stringify({ title, category, content }),
+        });
+        const idx = cards.findIndex(c => c._id === id);
+        if (idx !== -1) cards[idx] = saved;
         render();
       }
 
-      function deleteCard(id) {
+      async function deleteCard(id) {
         if (!confirm('Delete this card?')) return;
-        cards = cards.filter(c => c.id !== id);
-        saveCards();
+        await fetchApi(id, { method: 'DELETE' });
+        cards = cards.filter(c => c._id !== id);
         render();
       }
 
@@ -521,7 +544,7 @@
       }
 
       function openEdit(id) {
-        const card = cards.find(c => c.id === id);
+        const card = cards.find(c => c._id === id);
         if (!card) return;
         editingId = id;
         modalTitle.textContent = 'Edit Card';
@@ -537,21 +560,95 @@
         editingId = null;
       }
 
-      function saveCard() {
+      async function saveCard() {
         const title = titleInput.value.trim();
         const category = catInput.value;
         const content = contentInput.value.trim();
         if (!title) { titleInput.focus(); return; }
-        if (editingId) {
-          updateCard(editingId, title, category, content);
-        } else {
-          addCard(title, category, content);
+        try {
+          saveBtn.disabled = true;
+          saveBtn.textContent = 'Saving...';
+          if (editingId) {
+            await updateCard(editingId, title, category, content);
+          } else {
+            await addCard(title, category, content);
+          }
+          closeModal();
+        } catch {
+          alert('Failed to save card');
+        } finally {
+          saveBtn.disabled = false;
+          saveBtn.textContent = 'Save';
         }
-        closeModal();
+      }
+
+      function exportStaticHtml() {
+        if (cards.length === 0) { alert('Add some cards first.'); return; }
+        const cats = { role: 'Role & Responsibilities', project: 'Projects & Tasks', workflow: 'Workflows & SOPs', note: 'General Notes' };
+        const cardsHtml = cards.map(c => {
+          const cat = cats[c.category] || 'Note';
+          const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+            .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+            .replace(/^- (.+)$/gm,'<li>$1</li>')
+            .replace(/(<li>.*<\/li>\n?)+/g,'<ul>$&</ul>')
+            .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+            .replace(/\n\n/g,'</p><p>')
+            .replace(/\n/g,'<br/>');
+          return `<article>
+            <header><strong style="color:#0a84ff">${cat}</strong></header>
+            <h2 style="font-size:1.2rem;margin:0 0 0.3rem">${esc(c.title).replace(/<[^>]+>/g,'')}</h2>
+            <div><p>${esc(c.content)}</p></div>
+          </article>`;
+        }).join('\n');
+        const html = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ELSA — Work Knowledge Base (Export)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#121214;color:#f2f2f7;padding:2rem;max-width:800px;margin:0 auto;line-height:1.6}
+h1{font-size:1.8rem;margin-bottom:0.3rem;letter-spacing:-0.5px}
+.sub{color:#636366;font-size:0.8rem;margin-bottom:2rem}
+article{background:#1e1e20;border:1px solid #2e2e32;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+h2{font-size:1.1rem;color:#f2f2f7;margin-bottom:0.5rem}
+p{color:#aeaeb2;font-size:0.9rem;margin:0.4rem 0}
+ul{padding-left:1.2rem;margin:0.3rem 0;color:#aeaeb2}
+li{margin-bottom:0.2rem}
+strong{color:#f2f2f7}
+header{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.4rem}
+</style>
+</head>
+<body>
+<h1>ELSA</h1>
+<div class="sub">Work Knowledge Base</div>
+${cardsHtml}
+</body>
+</html>`;
+        const blob = new Blob([html], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'elsa-export.html'; a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      function copyAsText() {
+        if (cards.length === 0) { alert('Add some cards first.'); return; }
+        const cats = { role: 'Role & Responsibilities', project: 'Projects & Tasks', workflow: 'Workflows & SOPs', note: 'General Notes' };
+        const text = cards.map(c => {
+          const cat = cats[c.category] || 'Note';
+          return `[${cat}] ${c.title}\n${c.content}\n`;
+        }).join('\n---\n');
+        navigator.clipboard.writeText(text).then(() => {
+          const btn = document.getElementById('copy-text-btn');
+          const orig = btn.textContent;
+          btn.textContent = 'Copied!';
+          setTimeout(() => btn.textContent = orig, 1500);
+        }).catch(() => alert('Failed to copy'));
       }
 
       loadCards();
-      render();
 
       catFilters.addEventListener('click', e => {
         const btn = e.target.closest('.cat-filter');
@@ -568,6 +665,8 @@
       });
 
       addBtn.addEventListener('click', openAdd);
+      document.getElementById('export-html-btn').addEventListener('click', exportStaticHtml);
+      document.getElementById('copy-text-btn').addEventListener('click', copyAsText);
       modalClose.addEventListener('click', closeModal);
       modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
       saveBtn.addEventListener('click', saveCard);
