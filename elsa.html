@@ -564,6 +564,124 @@
           font-size: 1.5rem;
         }
       }
+
+      /* Timesheet */
+      .ts-nav {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 1rem;
+      }
+
+      .ts-nav-btn {
+        width: 36px;
+        height: 36px;
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--text-secondary);
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--transition-fast);
+      }
+
+      .ts-nav-btn:hover {
+        border-color: var(--text-tertiary);
+        color: var(--text-primary);
+      }
+
+      .ts-date-input {
+        flex: 1;
+        padding: 0.5rem 0.75rem;
+        border: 1.5px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        font-family: inherit;
+        font-size: 0.85rem;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        outline: none;
+        transition: border-color var(--transition);
+        color-scheme: dark;
+      }
+
+      .ts-date-input:focus {
+        border-color: var(--text-tertiary);
+      }
+
+      .ts-count {
+        font-size: 0.7rem;
+        color: var(--text-tertiary);
+        margin-bottom: 0.75rem;
+      }
+
+      .ts-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 1rem;
+      }
+
+      .ts-entry {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 0.7rem 0.85rem;
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        animation: fadeIn 0.2s ease;
+      }
+
+      .ts-entry-time {
+        font-size: 0.7rem;
+        color: var(--text-tertiary);
+        white-space: nowrap;
+        min-width: 48px;
+        padding-top: 2px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .ts-entry-text {
+        flex: 1;
+        font-size: 0.9rem;
+        color: var(--text-primary);
+        line-height: 1.4;
+        word-break: break-word;
+      }
+
+      .ts-entry-delete {
+        width: 26px;
+        height: 26px;
+        border: none;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--text-tertiary);
+        font-size: 0.75rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.4;
+        transition: all var(--transition-fast);
+        flex-shrink: 0;
+      }
+
+      .ts-entry:hover .ts-entry-delete {
+        opacity: 1;
+      }
+
+      .ts-entry-delete:hover {
+        background: var(--red-bg);
+        color: var(--red);
+      }
+
+      .ts-input-row {
+        display: flex;
+        gap: 8px;
+      }
     </style>
   </head>
   <body>
@@ -618,6 +736,23 @@
             <div class="elsa-empty">No cards yet. Tap <strong>+</strong> to add your first one.</div>
           </div>
         </div>
+
+        <!-- Timesheet Panel -->
+        <div id="panel-timesheet" class="tab-panel">
+          <div class="ts-nav">
+            <button class="ts-nav-btn" id="ts-prev">←</button>
+            <input type="date" id="ts-date" class="ts-date-input" />
+            <button class="ts-nav-btn" id="ts-next">→</button>
+          </div>
+          <div class="ts-count" id="ts-count"></div>
+          <div class="ts-list" id="ts-list">
+            <div class="task-empty" id="ts-empty">No entries for this day.</div>
+          </div>
+          <div class="ts-input-row">
+            <input type="text" id="ts-input" class="task-input" placeholder="Log what you did..." />
+            <button id="ts-add-btn" class="task-add-btn">+</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -625,6 +760,10 @@
       <button class="tab-item active" data-tab="tasks">
         <span class="tab-icon">📋</span>
         <span class="tab-label">Tasks</span>
+      </button>
+      <button class="tab-item" data-tab="timesheet">
+        <span class="tab-icon">📅</span>
+        <span class="tab-label">Timesheet</span>
       </button>
       <button class="tab-item" data-tab="context">
         <span class="tab-icon">🧠</span>
@@ -658,6 +797,7 @@
       // ============================================================
       const ELSA_TASKS_API = 'https://scriptable-todo.onrender.com/api/elsa-tasks';
       const ELSA_API = 'https://scriptable-todo.onrender.com/api/elsacontext';
+      const TIMESHEET_API = 'https://scriptable-todo.onrender.com/api/timesheet';
 
       const CATEGORIES = [
         { key: 'role',     label: 'Role & Responsibilities', color: '#0a84ff' },
@@ -672,6 +812,8 @@
       let activeTab = 'tasks';
       let tasks = [];
       let cards = [];
+      let entries = [];
+      let tsDate = new Date();
       let activeCat = 'all';
       let searchQuery = '';
       let editingId = null;
@@ -682,6 +824,7 @@
       const tabBar = document.getElementById('tab-bar');
       const panelTasks = document.getElementById('panel-tasks');
       const panelContext = document.getElementById('panel-context');
+      const panelTimesheet = document.getElementById('panel-timesheet');
       const taskInput = document.getElementById('task-input');
       const taskAddBtn = document.getElementById('task-add-btn');
       const taskList = document.getElementById('task-list');
@@ -707,11 +850,13 @@
 
         tabBar.querySelectorAll('.tab-item').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
         panelTasks.classList.toggle('active', tab === 'tasks');
+        panelTimesheet.classList.toggle('active', tab === 'timesheet');
         panelContext.classList.toggle('active', tab === 'context');
 
         addBtn.style.display = tab === 'context' ? 'flex' : 'none';
 
         if (tab === 'context' && cards.length === 0) loadCards();
+        if (tab === 'timesheet') loadEntries();
 
         if (persist) {
           apiProgress(null, { method: 'PUT', body: JSON.stringify({ elsaTab: tab }) }).catch(() => {});
@@ -1064,6 +1209,87 @@ ${cardsHtml}
       }
 
       // ============================================================
+      // TIMESHEET
+      // ============================================================
+      const tsDateInput = document.getElementById('ts-date');
+      const tsPrev = document.getElementById('ts-prev');
+      const tsNext = document.getElementById('ts-next');
+      const tsList = document.getElementById('ts-list');
+      const tsCount = document.getElementById('ts-count');
+      const tsInput = document.getElementById('ts-input');
+      const tsAddBtn = document.getElementById('ts-add-btn');
+
+      function tsFormatDate(d) {
+        return d.toISOString().slice(0, 10);
+      }
+
+      function tsUpdateDateInput() {
+        tsDateInput.value = tsFormatDate(tsDate);
+      }
+
+      function tsChangeDate(offset) {
+        const d = new Date(tsDate);
+        d.setDate(d.getDate() + offset);
+        tsDate = d;
+        tsUpdateDateInput();
+        loadEntries();
+      }
+
+      async function loadEntries() {
+        const date = tsFormatDate(tsDate);
+        try {
+          const res = await fetch(TIMESHEET_API + '?date=' + date);
+          entries = await res.json();
+        } catch {
+          entries = [];
+        }
+        renderEntries();
+      }
+
+      function renderEntries() {
+        if (entries.length === 0) {
+          tsList.innerHTML = '<div class="task-empty">No entries for this day.</div>';
+          tsCount.textContent = '';
+          return;
+        }
+        tsCount.textContent = entries.length + ' entr' + (entries.length !== 1 ? 'ies' : 'y');
+        tsList.innerHTML = entries.map(e => {
+          const time = e.createdAt ? new Date(e.createdAt).toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' }) : '';
+          return '<div class="ts-entry" data-id="' + e._id + '">' +
+            '<span class="ts-entry-time">' + time + '</span>' +
+            '<span class="ts-entry-text">' + escapeHtml(e.text) + '</span>' +
+            '<button class="ts-entry-delete" data-action="ts-delete" data-id="' + e._id + '">✕</button>' +
+          '</div>';
+        }).join('');
+
+        tsList.querySelectorAll('[data-action="ts-delete"]').forEach(btn => {
+          btn.addEventListener('click', () => deleteEntry(btn.dataset.id));
+        });
+      }
+
+      async function addEntry(text) {
+        if (!text.trim()) return;
+        try {
+          const res = await fetch(TIMESHEET_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date: tsFormatDate(tsDate), text: text.trim() }),
+          });
+          const saved = await res.json();
+          entries.unshift(saved);
+          renderEntries();
+        } catch {}
+      }
+
+      async function deleteEntry(id) {
+        try {
+          await fetch(TIMESHEET_API + '/' + id, { method: 'DELETE' });
+          entries = entries.filter(e => e._id !== id);
+          renderEntries();
+        } catch {}
+      }
+
+      // ============================================================
       // INIT
       // ============================================================
       (async function init() {
@@ -1071,6 +1297,7 @@ ${cardsHtml}
           const progress = await apiProgress();
           if (progress.elsaTab) activeTab = progress.elsaTab;
         } catch {}
+        tsUpdateDateInput();
         switchTab(activeTab, false);
         loadTasks();
       })();
@@ -1095,6 +1322,25 @@ ${cardsHtml}
       modalClose.addEventListener('click', closeModal);
       modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
       saveBtn.addEventListener('click', saveCard);
+
+      tsDateInput.addEventListener('change', () => {
+        if (tsDateInput.value) {
+          tsDate = new Date(tsDateInput.value + 'T00:00:00');
+          loadEntries();
+        }
+      });
+      tsPrev.addEventListener('click', () => tsChangeDate(-1));
+      tsNext.addEventListener('click', () => tsChangeDate(1));
+      tsAddBtn.addEventListener('click', () => {
+        const v = tsInput.value.trim();
+        if (v) { addEntry(v); tsInput.value = ''; tsInput.focus(); }
+      });
+      tsInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          tsAddBtn.click();
+        }
+      });
 
       titleInput.addEventListener('keydown', e => {
         if (e.key === 'Enter') {
