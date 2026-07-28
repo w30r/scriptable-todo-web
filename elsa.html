@@ -2,14 +2,239 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ELSA — Work Knowledge Base</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>ELSA — Work Hub</title>
     <link
       rel="icon"
       href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>"
     />
     <link rel="stylesheet" href="styles.css" />
     <style>
+      :root {
+        --tab-bar-height: 60px;
+        --tab-bar-safe-bottom: env(safe-area-inset-bottom, 0px);
+      }
+
+      .container {
+        padding-bottom: calc(var(--tab-bar-height) + var(--tab-bar-safe-bottom) + 16px);
+      }
+
+      /* Tab Bar */
+      .tab-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        background: var(--bg-surface);
+        border-top: 1px solid var(--border);
+        z-index: 200;
+        padding: 6px 0 calc(6px + var(--tab-bar-safe-bottom));
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      .tab-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1px;
+        padding: 4px 8px;
+        border: none;
+        background: transparent;
+        color: var(--text-tertiary);
+        font-family: inherit;
+        font-size: 0.6rem;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        cursor: pointer;
+        transition: color var(--transition-fast);
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+      }
+
+      .tab-item.active {
+        color: var(--text-primary);
+      }
+
+      .tab-icon {
+        font-size: 1.3rem;
+        line-height: 1.3;
+      }
+
+      .tab-label {
+        text-transform: uppercase;
+      }
+
+      /* Tab Panels */
+      .tab-panel {
+        display: none;
+      }
+      .tab-panel.active {
+        display: block;
+        animation: fadeSlideIn 0.2s ease;
+      }
+
+      @keyframes fadeSlideIn {
+        from { opacity: 0.5; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      /* Tasks Panel */
+      .task-input-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 1rem;
+      }
+
+      .task-input {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: 1.5px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        font-family: inherit;
+        font-size: 0.9rem;
+        outline: none;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        transition: border-color var(--transition), box-shadow var(--transition);
+      }
+
+      .task-input:focus {
+        border-color: var(--text-tertiary);
+        box-shadow: 0 0 0 3px rgba(174, 174, 178, 0.1);
+      }
+
+      .task-input::placeholder {
+        color: var(--text-muted);
+      }
+
+      .task-add-btn {
+        width: 44px;
+        height: 44px;
+        border: none;
+        border-radius: var(--radius-md);
+        background: var(--text-primary);
+        color: var(--bg-primary);
+        font-size: 1.4rem;
+        font-weight: 300;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--transition-fast);
+        flex-shrink: 0;
+        line-height: 1;
+      }
+
+      .task-add-btn:hover {
+        opacity: 0.85;
+      }
+
+      .task-add-btn:active {
+        transform: scale(0.92);
+      }
+
+      .task-meta {
+        font-size: 0.7rem;
+        color: var(--text-tertiary);
+        margin-bottom: 0.75rem;
+      }
+
+      .task-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .task-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0.7rem 0.85rem;
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        transition: border-color var(--transition);
+        animation: fadeIn 0.2s ease;
+      }
+
+      .task-item:hover {
+        border-color: var(--border);
+      }
+
+      .task-toggle {
+        width: 22px;
+        height: 22px;
+        border: 2px solid var(--text-tertiary);
+        border-radius: 50%;
+        background: transparent;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.65rem;
+        color: transparent;
+        transition: all var(--transition-fast);
+        flex-shrink: 0;
+        padding: 0;
+      }
+
+      .task-toggle.done {
+        background: var(--text-primary);
+        border-color: var(--text-primary);
+        color: var(--bg-primary);
+      }
+
+      .task-title {
+        flex: 1;
+        font-size: 0.9rem;
+        color: var(--text-primary);
+        line-height: 1.3;
+        word-break: break-word;
+      }
+
+      .task-title.done {
+        text-decoration: line-through;
+        color: var(--text-tertiary);
+      }
+
+      .task-delete {
+        width: 26px;
+        height: 26px;
+        border: none;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--text-tertiary);
+        font-size: 0.75rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--transition-fast);
+        flex-shrink: 0;
+        opacity: 0.4;
+      }
+
+      .task-item:hover .task-delete {
+        opacity: 1;
+      }
+
+      .task-delete:hover {
+        background: var(--red-bg);
+        color: var(--red);
+      }
+
+      .task-empty {
+        text-align: center;
+        padding: 2.5rem 1rem;
+        color: var(--text-tertiary);
+        font-size: 0.85rem;
+        font-style: italic;
+      }
+
+      /* Existing header styles preserved */
       .elsa-header {
         display: flex;
         align-items: center;
@@ -72,6 +297,7 @@
         background: var(--bg-hover);
       }
 
+      /* Existing context styles */
       .elsa-cat-filters {
         display: flex;
         gap: 6px;
@@ -129,6 +355,11 @@
         position: relative;
         overflow: hidden;
         animation: fadeIn 0.25s ease;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
       }
 
       .elsa-card:hover {
@@ -234,7 +465,7 @@
 
       #elsa-add-btn {
         position: fixed;
-        bottom: 28px;
+        bottom: calc(28px + var(--tab-bar-height) + var(--tab-bar-safe-bottom));
         right: 28px;
         width: 56px;
         height: 56px;
@@ -326,7 +557,7 @@
         }
 
         #elsa-add-btn {
-          bottom: 20px;
+          bottom: calc(20px + var(--tab-bar-height) + var(--tab-bar-safe-bottom));
           right: 20px;
           width: 48px;
           height: 48px;
@@ -340,7 +571,7 @@
       <div class="elsa-header">
         <div>
           <h1>ELSA</h1>
-          <span class="sub">Work Knowledge Base</span>
+          <span class="sub">Work Hub</span>
         </div>
         <div class="elsa-header-actions">
           <a href="https://scriptable-todo.onrender.com/api/elsa-cards/export" target="_blank" class="export-btn" title="Server-rendered page - use this URL in Gemini Notebook">🌐 Gemini Source</a>
@@ -350,29 +581,55 @@
         </div>
       </div>
 
-      <div class="elsa-cat-filters" id="cat-filters">
-        <button class="cat-filter active" data-cat="all">All</button>
-        <button class="cat-filter" data-cat="role">
-          <span class="cat-filter-dot" style="background:#0a84ff"></span>Role
-        </button>
-        <button class="cat-filter" data-cat="project">
-          <span class="cat-filter-dot" style="background:#30d158"></span>Projects
-        </button>
-        <button class="cat-filter" data-cat="workflow">
-          <span class="cat-filter-dot" style="background:#ff9f0a"></span>Workflows
-        </button>
-        <button class="cat-filter" data-cat="note">
-          <span class="cat-filter-dot" style="background:#bf5af2"></span>Notes
-        </button>
+      <div id="tab-content">
+        <!-- Tasks Panel -->
+        <div id="panel-tasks" class="tab-panel">
+          <div class="task-input-row">
+            <input type="text" id="task-input" class="task-input" placeholder="Add a work task..." />
+            <button id="task-add-btn" class="task-add-btn">+</button>
+          </div>
+          <div class="task-meta" id="task-meta"></div>
+          <div class="task-list" id="task-list"></div>
+        </div>
+
+        <!-- Context Panel -->
+        <div id="panel-context" class="tab-panel">
+          <div class="elsa-cat-filters" id="cat-filters">
+            <button class="cat-filter active" data-cat="all">All</button>
+            <button class="cat-filter" data-cat="role">
+              <span class="cat-filter-dot" style="background:#0a84ff"></span>Role
+            </button>
+            <button class="cat-filter" data-cat="project">
+              <span class="cat-filter-dot" style="background:#30d158"></span>Projects
+            </button>
+            <button class="cat-filter" data-cat="workflow">
+              <span class="cat-filter-dot" style="background:#ff9f0a"></span>Workflows
+            </button>
+            <button class="cat-filter" data-cat="note">
+              <span class="cat-filter-dot" style="background:#bf5af2"></span>Notes
+            </button>
+          </div>
+
+          <input type="text" id="elsa-search" class="search-input" placeholder="Search cards..." />
+
+          <div class="elsa-count" id="elsa-count">0 cards</div>
+
+          <div class="elsa-card-grid" id="elsa-card-grid">
+            <div class="elsa-empty">No cards yet. Tap <strong>+</strong> to add your first one.</div>
+          </div>
+        </div>
       </div>
+    </div>
 
-      <input type="text" id="elsa-search" class="search-input" placeholder="Search cards..." />
-
-      <div class="elsa-count" id="elsa-count">0 cards</div>
-
-      <div class="elsa-card-grid" id="elsa-card-grid">
-        <div class="elsa-empty">No cards yet. Tap <strong>+</strong> to add your first one.</div>
-      </div>
+    <div class="tab-bar" id="tab-bar">
+      <button class="tab-item active" data-tab="tasks">
+        <span class="tab-icon">📋</span>
+        <span class="tab-label">Tasks</span>
+      </button>
+      <button class="tab-item" data-tab="context">
+        <span class="tab-icon">🧠</span>
+        <span class="tab-label">Context</span>
+      </button>
     </div>
 
     <button id="elsa-add-btn" title="Add card">+</button>
@@ -396,7 +653,12 @@
     </div>
 
     <script>
+      // ============================================================
+      // CONSTANTS
+      // ============================================================
+      const TODOS_API = 'https://scriptable-todo.onrender.com/api/todos';
       const ELSA_API = 'https://scriptable-todo.onrender.com/api/elsa-cards';
+      const WORK_TAG = '!work';
 
       const CATEGORIES = [
         { key: 'role',     label: 'Role & Responsibilities', color: '#0a84ff' },
@@ -405,16 +667,31 @@
         { key: 'note',     label: 'General Notes',           color: '#bf5af2' },
       ];
 
+      // ============================================================
+      // STATE
+      // ============================================================
+      let activeTab = 'tasks';
+      let tasks = [];
       let cards = [];
       let activeCat = 'all';
       let searchQuery = '';
       let editingId = null;
 
+      // ============================================================
+      // DOM REFS
+      // ============================================================
+      const tabBar = document.getElementById('tab-bar');
+      const panelTasks = document.getElementById('panel-tasks');
+      const panelContext = document.getElementById('panel-context');
+      const taskInput = document.getElementById('task-input');
+      const taskAddBtn = document.getElementById('task-add-btn');
+      const taskList = document.getElementById('task-list');
+      const taskMeta = document.getElementById('task-meta');
+      const addBtn = document.getElementById('elsa-add-btn');
       const grid = document.getElementById('elsa-card-grid');
       const countEl = document.getElementById('elsa-count');
       const searchEl = document.getElementById('elsa-search');
       const catFilters = document.getElementById('cat-filters');
-      const addBtn = document.getElementById('elsa-add-btn');
       const modal = document.getElementById('elsa-modal');
       const modalTitle = document.getElementById('modal-title');
       const modalClose = document.getElementById('modal-close');
@@ -423,6 +700,151 @@
       const contentInput = document.getElementById('card-content-input');
       const saveBtn = document.getElementById('card-save-btn');
 
+      // ============================================================
+      // TAB SWITCHING
+      // ============================================================
+      function switchTab(tab, persist = true) {
+        activeTab = tab;
+
+        tabBar.querySelectorAll('.tab-item').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+        panelTasks.classList.toggle('active', tab === 'tasks');
+        panelContext.classList.toggle('active', tab === 'context');
+
+        addBtn.style.display = tab === 'context' ? 'flex' : 'none';
+
+        if (tab === 'context' && cards.length === 0) loadCards();
+
+        if (persist) {
+          apiProgress(null, { method: 'PUT', body: JSON.stringify({ elsaTab: tab }) }).catch(() => {});
+        }
+      }
+
+      async function apiProgress(path, options) {
+        const url = 'https://scriptable-todo.onrender.com/api/progress';
+        const full = path ? `${url}/${path}` : url;
+        const res = await fetch(full, {
+          headers: { 'Content-Type': 'application/json' },
+          ...options,
+        });
+        if (!res.ok) throw new Error('API error');
+        return res.json();
+      }
+
+      tabBar.addEventListener('click', e => {
+        const tabItem = e.target.closest('.tab-item');
+        if (tabItem && tabItem.dataset.tab !== activeTab) {
+          switchTab(tabItem.dataset.tab);
+        }
+      });
+
+      // ============================================================
+      // TASKS
+      // ============================================================
+      function stripWorkTag(title) {
+        return title.replace(new RegExp('\\s*' + WORK_TAG.replace('!', '!') + '\\s*', 'gi'), '').trim();
+      }
+
+      function apiTodos(path, options) {
+        const url = path ? `${TODOS_API}/${path}` : TODOS_API;
+        return fetch(url, {
+          headers: { 'Content-Type': 'application/json' },
+          ...options,
+        }).then(r => { if (!r.ok) throw new Error('API error'); return r.json(); });
+      }
+
+      async function loadTasks() {
+        try {
+          const all = await apiTodos();
+          tasks = all.filter(t => t.title && t.title.includes(WORK_TAG));
+          renderTasks();
+        } catch {
+          taskList.innerHTML = '<div class="task-empty">Failed to load tasks.</div>';
+        }
+      }
+
+      function renderTasks() {
+        if (tasks.length === 0) {
+          taskList.innerHTML = '<div class="task-empty">No work tasks yet. Add one above.</div>';
+          taskMeta.textContent = '';
+          return;
+        }
+
+        const sorted = [...tasks].sort((a, b) => {
+          if (a.completed !== b.completed) return a.completed ? 1 : -1;
+          return 0;
+        });
+
+        const done = tasks.filter(t => t.completed).length;
+        taskMeta.textContent = `${tasks.length} task${tasks.length !== 1 ? 's' : ''}${done ? `, ${done} done` : ''}`;
+
+        taskList.innerHTML = sorted.map(t => {
+          const isDone = t.completed;
+          const displayTitle = stripWorkTag(t.title);
+          return `
+            <div class="task-item" data-id="${t._id}">
+              <button class="task-toggle${isDone ? ' done' : ''}" data-action="toggle" data-id="${t._id}">${isDone ? '✓' : ''}</button>
+              <span class="task-title${isDone ? ' done' : ''}">${escapeHtml(displayTitle)}</span>
+              <button class="task-delete" data-action="delete" data-id="${t._id}">✕</button>
+            </div>
+          `;
+        }).join('');
+
+        taskList.querySelectorAll('[data-action="toggle"]').forEach(btn => {
+          btn.addEventListener('click', () => toggleTask(btn.dataset.id));
+        });
+        taskList.querySelectorAll('[data-action="delete"]').forEach(btn => {
+          btn.addEventListener('click', () => deleteTask(btn.dataset.id));
+        });
+      }
+
+      function escapeHtml(s) {
+        const div = document.createElement('div');
+        div.textContent = s;
+        return div.innerHTML;
+      }
+
+      async function addTask(title) {
+        const clean = stripWorkTag(title);
+        if (!clean) return;
+        const saved = await apiTodos(null, {
+          method: 'POST',
+          body: JSON.stringify({ title: clean + ' ' + WORK_TAG }),
+        });
+        tasks.unshift(saved);
+        renderTasks();
+      }
+
+      async function toggleTask(id) {
+        const t = tasks.find(x => x._id === id);
+        if (!t) return;
+        const updated = await apiTodos(id, {
+          method: 'PUT',
+          body: JSON.stringify({ completed: !t.completed }),
+        });
+        Object.assign(t, updated);
+        renderTasks();
+      }
+
+      async function deleteTask(id) {
+        await apiTodos(id, { method: 'DELETE' });
+        tasks = tasks.filter(t => t._id !== id);
+        renderTasks();
+      }
+
+      taskAddBtn.addEventListener('click', () => {
+        const v = taskInput.value.trim();
+        if (v) { addTask(v); taskInput.value = ''; taskInput.focus(); }
+      });
+      taskInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          taskAddBtn.click();
+        }
+      });
+
+      // ============================================================
+      // CONTEXT (elsa-cards)
+      // ============================================================
       async function fetchApi(path, options) {
         const url = path ? `${ELSA_API}/${path}` : ELSA_API;
         const res = await fetch(url, {
@@ -436,7 +858,7 @@
       async function loadCards() {
         try {
           cards = await fetchApi();
-          render();
+          renderCards();
         } catch {
           grid.innerHTML = '<div class="elsa-empty">Failed to load cards. Check your connection.</div>';
         }
@@ -460,7 +882,7 @@
         return '<p style="margin:0">' + html + '</p>';
       }
 
-      function render() {
+      function renderCards() {
         const filtered = cards.filter(c => {
           if (activeCat !== 'all' && c.category !== activeCat) return false;
           if (searchQuery) {
@@ -514,7 +936,7 @@
           body: JSON.stringify({ title, category, content }),
         });
         cards.unshift(saved);
-        render();
+        renderCards();
       }
 
       async function updateCard(id, title, category, content) {
@@ -524,14 +946,14 @@
         });
         const idx = cards.findIndex(c => c._id === id);
         if (idx !== -1) cards[idx] = saved;
-        render();
+        renderCards();
       }
 
       async function deleteCard(id) {
         if (!confirm('Delete this card?')) return;
         await fetchApi(id, { method: 'DELETE' });
         cards = cards.filter(c => c._id !== id);
-        render();
+        renderCards();
       }
 
       function openAdd() {
@@ -649,7 +1071,17 @@ ${cardsHtml}
         }).catch(() => alert('Failed to copy'));
       }
 
-      loadCards();
+      // ============================================================
+      // INIT
+      // ============================================================
+      (async function init() {
+        try {
+          const progress = await apiProgress();
+          if (progress.elsaTab) activeTab = progress.elsaTab;
+        } catch {}
+        switchTab(activeTab, false);
+        loadTasks();
+      })();
 
       catFilters.addEventListener('click', e => {
         const btn = e.target.closest('.cat-filter');
@@ -657,12 +1089,12 @@ ${cardsHtml}
         catFilters.querySelectorAll('.cat-filter').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         activeCat = btn.dataset.cat;
-        render();
+        renderCards();
       });
 
       searchEl.addEventListener('input', () => {
         searchQuery = searchEl.value.trim();
-        render();
+        renderCards();
       });
 
       addBtn.addEventListener('click', openAdd);
