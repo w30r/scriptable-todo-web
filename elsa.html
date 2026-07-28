@@ -574,7 +574,7 @@
           <span class="sub">Work Hub</span>
         </div>
         <div class="elsa-header-actions">
-          <a href="https://scriptable-todo.onrender.com/api/elsa-cards/export" target="_blank" class="export-btn" title="Server-rendered page - use this URL in Gemini Notebook">🌐 Gemini Source</a>
+          <a href="https://scriptable-todo.onrender.com/api/elsacontext/export" target="_blank" class="export-btn" title="Server-rendered page - use this URL in Gemini Notebook">🌐 Gemini Source</a>
           <button class="export-btn" id="export-html-btn" title="Generate static HTML for Gemini Notebook">📄 Source Export</button>
           <button class="export-btn" id="copy-text-btn" title="Copy all cards as text">📋 Copy Text</button>
           <a href="index.html" class="back-link">← Back to App</a>
@@ -657,7 +657,7 @@
       // CONSTANTS
       // ============================================================
       const ELSA_TASKS_API = 'https://scriptable-todo.onrender.com/api/elsa-tasks';
-      const ELSA_API = 'https://scriptable-todo.onrender.com/api/elsa-cards';
+      const ELSA_API = 'https://scriptable-todo.onrender.com/api/elsacontext';
 
       const CATEGORIES = [
         { key: 'role',     label: 'Role & Responsibilities', color: '#0a84ff' },
@@ -835,7 +835,7 @@
       });
 
       // ============================================================
-      // CONTEXT (elsa-cards)
+      // CONTEXT (elsacontext)
       // ============================================================
       async function fetchApi(path, options) {
         const url = path ? `${ELSA_API}/${path}` : ELSA_API;
