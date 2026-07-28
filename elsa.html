@@ -656,9 +656,8 @@
       // ============================================================
       // CONSTANTS
       // ============================================================
-      const TODOS_API = 'https://scriptable-todo.onrender.com/api/todos';
+      const ELSA_TASKS_API = 'https://scriptable-todo.onrender.com/api/elsa-tasks';
       const ELSA_API = 'https://scriptable-todo.onrender.com/api/elsa-cards';
-      const WORK_TAG = '!work';
 
       const CATEGORIES = [
         { key: 'role',     label: 'Role & Responsibilities', color: '#0a84ff' },
@@ -740,12 +739,8 @@
       // ============================================================
       // TASKS
       // ============================================================
-      function stripWorkTag(title) {
-        return title.replace(new RegExp('\\s*' + WORK_TAG.replace('!', '!') + '\\s*', 'gi'), '').trim();
-      }
-
-      function apiTodos(path, options) {
-        const url = path ? `${TODOS_API}/${path}` : TODOS_API;
+      function apiElsaTasks(path, options) {
+        const url = path ? `${ELSA_TASKS_API}/${path}` : ELSA_TASKS_API;
         return fetch(url, {
           headers: { 'Content-Type': 'application/json' },
           ...options,
@@ -754,8 +749,7 @@
 
       async function loadTasks() {
         try {
-          const all = await apiTodos();
-          tasks = all.filter(t => t.title && t.title.includes(WORK_TAG));
+          tasks = await apiElsaTasks();
           renderTasks();
         } catch {
           taskList.innerHTML = '<div class="task-empty">Failed to load tasks.</div>';
@@ -779,11 +773,10 @@
 
         taskList.innerHTML = sorted.map(t => {
           const isDone = t.completed;
-          const displayTitle = stripWorkTag(t.title);
           return `
             <div class="task-item" data-id="${t._id}">
               <button class="task-toggle${isDone ? ' done' : ''}" data-action="toggle" data-id="${t._id}">${isDone ? '✓' : ''}</button>
-              <span class="task-title${isDone ? ' done' : ''}">${escapeHtml(displayTitle)}</span>
+              <span class="task-title${isDone ? ' done' : ''}">${escapeHtml(t.title)}</span>
               <button class="task-delete" data-action="delete" data-id="${t._id}">✕</button>
             </div>
           `;
@@ -804,11 +797,10 @@
       }
 
       async function addTask(title) {
-        const clean = stripWorkTag(title);
-        if (!clean) return;
-        const saved = await apiTodos(null, {
+        if (!title.trim()) return;
+        const saved = await apiElsaTasks(null, {
           method: 'POST',
-          body: JSON.stringify({ title: clean + ' ' + WORK_TAG }),
+          body: JSON.stringify({ title: title.trim() }),
         });
         tasks.unshift(saved);
         renderTasks();
@@ -817,7 +809,7 @@
       async function toggleTask(id) {
         const t = tasks.find(x => x._id === id);
         if (!t) return;
-        const updated = await apiTodos(id, {
+        const updated = await apiElsaTasks(id, {
           method: 'PUT',
           body: JSON.stringify({ completed: !t.completed }),
         });
@@ -826,7 +818,7 @@
       }
 
       async function deleteTask(id) {
-        await apiTodos(id, { method: 'DELETE' });
+        await apiElsaTasks(id, { method: 'DELETE' });
         tasks = tasks.filter(t => t._id !== id);
         renderTasks();
       }
