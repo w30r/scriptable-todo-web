@@ -391,6 +391,8 @@ function render() {
   if (todos.length === 0) {
     matrix.innerHTML = '<div class="loading">No todos yet. Add one above!</div>';
     todoCount.textContent = '0 items left';
+    const monthEl = document.getElementById('month-count');
+    if (monthEl) monthEl.textContent = '0';
     return;
   }
 
@@ -454,6 +456,8 @@ function render() {
 
   const activeCount = todos.filter(t => !t.completed).length;
   todoCount.textContent = `${activeCount} item${activeCount !== 1 ? 's' : ''} left`;
+  const monthEl = document.getElementById('month-count');
+  if (monthEl) monthEl.textContent = String(activeCount);
 
   const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
   const doneToday = todos.filter(t => t.completed && new Date(t.updatedAt) >= todayStart).length;
@@ -515,6 +519,7 @@ function renderShopping() {
                 <span class="shop-name">${escapeHtml(item.name)}</span>
                 <span class="shop-cat-badge" style="--cat-color: ${cat.color}">${cat.label}</span>
               </div>
+              <button class="shop-edit" title="Edit">✎</button>
               <button class="shop-delete" title="Delete">✕</button>
             </div>
           `).join('')}
@@ -968,16 +973,8 @@ function renderCalendar() {
     `);
   }
 
-  grid.innerHTML = grid.querySelectorAll('.cal-day-header').length
-    ? grid.querySelector('.cal-day-header').outerHTML + cells.join('')
-    : cells.join('');
-
-  // Keep day headers
-  const headers = grid.querySelectorAll('.cal-day-header');
-  if (headers.length === 0) {
-    const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    grid.innerHTML = dayNames.map(d => `<div class="cal-day-header">${d}</div>`).join('') + cells.join('');
-  }
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  grid.innerHTML = dayNames.map(d => `<div class="cal-day-header">${d}</div>`).join('') + cells.join('');
 }
 
 /* ── Pomodoro Timer ── */
@@ -1119,7 +1116,7 @@ function renderStats() {
     const start = new Date(d); start.setHours(0, 0, 0, 0);
     const end = new Date(d); end.setHours(23, 59, 59, 999);
     const count = todos.filter(t => t.completed && new Date(t.updatedAt) >= start && new Date(t.updatedAt) <= end).length;
-    const dayLabel = i === 0 ? 'Today' : i === 1 ? 'Yest' : days[d.getDay()];
+    const dayLabel = i === 0 ? 'Today' : i === 1 ? 'Yday' : days[d.getDay()];
     weekData.push({ label: dayLabel, count, max: 0 });
   }
   const maxWeek = Math.max(...weekData.map(d => d.count), 1);
@@ -1267,6 +1264,10 @@ shopList.addEventListener('click', (e) => {
   if (e.target.classList.contains('shop-delete')) {
     const item = e.target.closest('.shop-item');
     if (item) deleteShoppingItem(item.dataset.id);
+  }
+  if (e.target.classList.contains('shop-edit')) {
+    const item = e.target.closest('.shop-item');
+    if (item && !item.classList.contains('editing')) startShopEdit(item);
   }
 });
 

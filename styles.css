@@ -17,6 +17,7 @@
   --text-secondary: #aeaeb2;
   --text-tertiary: #636366;
   --text-muted: #48484a;
+  --white: #ffffff;
   --red: #ff453a;
   --red-bg: rgba(255, 69, 58, 0.12);
   --green: #30d158;
@@ -34,6 +35,7 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 4px 12px rgba(242, 242, 247, 0.15);
   --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -263,7 +265,6 @@ header h1 {
   border-color: var(--text-tertiary);
 }
 
-#add-btn,
 #shop-add-btn {
   padding: 0.75rem 1.5rem;
   border: none;
@@ -278,20 +279,17 @@ header h1 {
   transition: all var(--transition);
 }
 
-#add-btn:hover,
 #shop-add-btn:hover {
-  background: #ffffff;
+  background: var(--white);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(242, 242, 247, 0.15);
+  box-shadow: var(--shadow-glow);
 }
 
-#add-btn:active,
 #shop-add-btn:active {
   transform: scale(0.97);
   box-shadow: none;
 }
 
-#add-btn:disabled,
 #shop-add-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
@@ -654,13 +652,46 @@ header h1 {
 }
 
 .todo-item:hover .todo-delete,
-.shop-item:hover .shop-delete {
+.shop-item:hover .shop-delete,
+.shop-item:hover .shop-edit {
   opacity: 1;
 }
 
 .todo-delete:hover,
 .shop-delete:hover {
   background: var(--red-bg);
+}
+
+.shop-edit {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--blue);
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+  opacity: 0;
+  margin-top: 1px;
+}
+
+.shop-edit:hover {
+  background: var(--blue-bg);
+}
+
+@media (hover: none) {
+  .todo-delete,
+  .shop-delete,
+  .shop-edit {
+    opacity: 1;
+    width: 40px;
+    height: 40px;
+  }
 }
 
 /* ── Stats ── */
@@ -709,7 +740,7 @@ header h1 {
 
 .clear-btn:hover {
   background: var(--red-bg);
-  border-color: rgba(255, 69, 58, 0.2);
+  border-color: var(--red-bg);
 }
 
 /* ── Pomodoro Timer ── */
@@ -882,7 +913,7 @@ header h1 {
   padding: 3px 10px;
   border-radius: 20px;
   background: var(--cat-color, var(--text-tertiary));
-  color: #fff;
+  color: var(--bg-primary);
   flex-shrink: 0;
   letter-spacing: 0.3px;
   text-transform: uppercase;
@@ -990,7 +1021,7 @@ header h1 {
   text-overflow: ellipsis;
   cursor: pointer;
   transition: background var(--transition-fast);
-  color: #fff;
+  color: var(--bg-primary);
 }
 
 .cal-task-dot.overdue { background: var(--red); }
@@ -1236,7 +1267,7 @@ header h1 {
   margin-bottom: 1.25rem;
 }
 
-.modal-header h3 {
+.modal-header h2 {
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--text-primary);
@@ -1375,9 +1406,9 @@ header h1 {
 }
 
 .edit-save-btn:hover {
-  background: #ffffff;
+  background: var(--white);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(242, 242, 247, 0.15);
+  box-shadow: var(--shadow-glow);
 }
 
 .edit-save-btn:active {

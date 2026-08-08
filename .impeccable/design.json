@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-08T00:00:00.000Z",
+  "title": "Design System: Second Brain",
+  "extensions": {
+    "colorMeta": {
+      "mint": { "role": "primary", "displayName": "Mint", "canonical": "#7be3c9", "tonalRamp": ["#0b3329", "#0e4a3a", "#12624a", "#18795c", "#28956f", "#4fb28a", "#86d0b0", "#c4eddd"] },
+      "mint-soft": { "role": "primary", "displayName": "Mint Soft", "canonical": "#b6f2dd", "tonalRamp": ["#163d2f", "#1c5643", "#237057", "#2b8a6b", "#3fa484", "#63bd9e", "#94d7c0", "#cbf0e3"] },
+      "banner-mint": { "role": "primary", "displayName": "Banner Mint", "canonical": "#9bf0d3", "tonalRamp": ["#123a2c", "#175345", "#1d6d5e", "#258773", "#35a189", "#5dbda3", "#92d9c5", "#caf2e6"] },
+      "banner-sky": { "role": "primary", "displayName": "Banner Sky", "canonical": "#74c8e8", "tonalRamp": ["#0e2e44", "#144764", "#1a6184", "#227aa6", "#3094c8", "#5db0e0", "#92ccee", "#cbe9f8"] },
+      "green": { "role": "secondary", "displayName": "Accent Green", "canonical": "#30d158", "tonalRamp": ["#0a2e14", "#0f4a1f", "#14662a", "#198235", "#2ca047", "#3fbf5e", "#74d98c", "#b6efc3"] },
+      "blue": { "role": "secondary", "displayName": "Accent Blue", "canonical": "#0a84ff", "tonalRamp": ["#03264a", "#063e73", "#09569c", "#0b6fc6", "#1787ea", "#3fa3ff", "#7fc2ff", "#c2e0ff"] },
+      "orange": { "role": "secondary", "displayName": "Accent Orange", "canonical": "#ff9f0a", "tonalRamp": ["#4a2c02", "#6f4307", "#955a0a", "#b9720e", "#dc8b13", "#f5a62e", "#ffc264", "#ffdfa8"] },
+      "purple": { "role": "secondary", "displayName": "Accent Purple", "canonical": "#bf5af2", "tonalRamp": ["#331452", "#4d1f79", "#682a9f", "#8335c4", "#9e4ee0", "#b574f2", "#cd9cff", "#e6ccff"] },
+      "red": { "role": "secondary", "displayName": "Accent Red", "canonical": "#ff453a", "tonalRamp": ["#4a0d08", "#701509", "#961d0d", "#bc2713", "#e03a23", "#f75a41", "#ff8a72", "#ffc0b0"] },
+      "coral": { "role": "tertiary", "displayName": "Coral", "canonical": "#ffc3b2", "tonalRamp": ["#4a1408", "#70210e", "#963016", "#bc411d", "#e05a2b", "#ff7c4f", "#ffa585", "#ffd6c2"] },
+      "coral-soft": { "role": "tertiary", "displayName": "Coral Soft", "canonical": "#ffd9cc", "tonalRamp": ["#4f1e10", "#702c16", "#91391d", "#b34a24", "#d5642e", "#f2874f", "#ffb18a", "#ffdcc9"] },
+      "q2-mint": { "role": "tertiary", "displayName": "Leaf Mint", "canonical": "#b6eccd", "tonalRamp": ["#12301f", "#1b4a30", "#246541", "#2e8052", "#54a073", "#7cc094", "#a6dbb6", "#d4f2de"] },
+      "q2-mint-soft": { "role": "tertiary", "displayName": "Leaf Mint Soft", "canonical": "#d9f6e2", "tonalRamp": ["#173a27", "#20533a", "#296d4e", "#338763", "#5aa67f", "#82c39b", "#aeddbd", "#dcf2e5"] },
+      "sky": { "role": "tertiary", "displayName": "Sky", "canonical": "#b2d6ff", "tonalRamp": ["#10294a", "#173f73", "#1e569b", "#266dc4", "#3a86e2", "#6aa8f5", "#9bc7ff", "#d0e4ff"] },
+      "sky-soft": { "role": "tertiary", "displayName": "Sky Soft", "canonical": "#d8eaff", "tonalRamp": ["#16304f", "#1d4775", "#255e9c", "#2d76c4", "#418fe2", "#71adf5", "#a4cbff", "#d6e6ff"] },
+      "lavender": { "role": "tertiary", "displayName": "Lavender", "canonical": "#d2c2ff", "tonalRamp": ["#221447", "#342064", "#472d82", "#5a3aa0", "#7453c4", "#957be3", "#b9a6f5", "#dfd6ff"] },
+      "lavender-soft": { "role": "tertiary", "displayName": "Lavender Soft", "canonical": "#e9e2ff", "tonalRamp": ["#271a4d", "#3a2870", "#4d3694", "#6045b8", "#7a5ed8", "#9b83ee", "#c0adf8", "#e4daff"] },
+      "icon-yellow": { "role": "tertiary", "displayName": "Capsule Yellow", "canonical": "#ffe66d", "tonalRamp": ["#4a3d05", "#6f5c08", "#957b0c", "#ba9a12", "#dfb71c", "#f5d244", "#ffea82", "#fff5c4"] },
+      "icon-pink": { "role": "tertiary", "displayName": "Capsule Pink", "canonical": "#ffc8d6", "tonalRamp": ["#4a1220", "#701c31", "#962742", "#bc3355", "#e04a6c", "#f76f8d", "#ffa3b8", "#ffd8e0"] },
+      "obsidian-bg": { "role": "neutral", "displayName": "Obsidian Ground", "canonical": "#0d0d0f", "tonalRamp": ["#000000", "#070708", "#0d0d0f", "#131316", "#19191d", "#202024", "#27272b", "#2f2f34"] },
+      "surface": { "role": "neutral", "displayName": "Surface", "canonical": "#1c1c20", "tonalRamp": ["#0b0b0d", "#121214", "#1c1c20", "#26262a", "#303036", "#3a3a41", "#45454c", "#515159"] },
+      "surface-soft": { "role": "neutral", "displayName": "Surface Soft", "canonical": "#232327", "tonalRamp": ["#121214", "#19191d", "#232327", "#2d2d32", "#38383e", "#43434a", "#4e4e56", "#5b5b63"] },
+      "glass": { "role": "neutral", "displayName": "Glass", "canonical": "rgba(28, 28, 32, 0.72)", "tonalRamp": ["#0b0b0d", "#121216", "#1c1c20", "#24242a", "#2c2c33", "#34343c", "#3c3c45", "#44444e"] },
+      "glass-border": { "role": "neutral", "displayName": "Glass Border", "canonical": "rgba(255, 255, 255, 0.08)", "tonalRamp": ["rgba(255,255,255,0.02)", "rgba(255,255,255,0.04)", "rgba(255,255,255,0.06)", "rgba(255,255,255,0.08)", "rgba(255,255,255,0.12)", "rgba(255,255,255,0.18)", "rgba(255,255,255,0.26)", "rgba(255,255,255,0.38)"] },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#111111", "tonalRamp": ["#000000", "#0a0a0a", "#111111", "#1f1f1f", "#2e2e2e", "#3d3d3d", "#4c4c4c", "#5b5b5b"] },
+      "ink-faint": { "role": "neutral", "displayName": "Ink Faint", "canonical": "rgba(17, 17, 17, 0.6)", "tonalRamp": ["rgba(17,17,17,0.1)", "rgba(17,17,17,0.2)", "rgba(17,17,17,0.3)", "rgba(17,17,17,0.4)", "rgba(17,17,17,0.5)", "rgba(17,17,17,0.6)", "rgba(17,17,17,0.72)", "rgba(17,17,17,0.85)"] },
+      "text-primary": { "role": "neutral", "displayName": "Text Primary", "canonical": "#f2f2f7", "tonalRamp": ["#3a3a40", "#5f5f67", "#85858f", "#a6a6b0", "#c2c2cb", "#dcdce2", "#ededf1", "#f2f2f7"] },
+      "text-secondary": { "role": "neutral", "displayName": "Text Secondary", "canonical": "#aeaeb2", "tonalRamp": ["#33333a", "#4d4d55", "#676770", "#7e7e88", "#9b9ba2", "#aeaeb2", "#c6c6cb", "#e2e2e6"] },
+      "text-tertiary": { "role": "neutral", "displayName": "Text Tertiary", "canonical": "#8e8e93", "tonalRamp": ["#2f2f35", "#45454c", "#5c5c64", "#73737c", "#8e8e93", "#a3a3a9", "#bdbdc2", "#dcdce0"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Hero headline with the live month count — the only line that carries −0.03em tracking." },
+      "headline": { "displayName": "Headline", "purpose": "Large 22px numerals in the stats dashboard boxes." },
+      "title": { "displayName": "Title", "purpose": "Modal headers and the hero avatar monogram (19px, −0.02em)." },
+      "body": { "displayName": "Body", "purpose": "Base text: inputs at 15px/1.45, task titles at 600/14.5px, meta at 500/11.5px." },
+      "label": { "displayName": "Label", "purpose": "Uppercase micro-caps 9.5–13px, weight 600–700, tracking 0.04–0.08em — dock labels, card pills, filter capsules, section headers." }
+    },
+    "shadows": [
+      { "name": "card", "value": "0 12px 30px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3)", "purpose": "Resting elevation for the hero banner and the four pastel quadrant cards." },
+      { "name": "float", "value": "0 16px 40px rgba(0, 0, 0, 0.5)", "purpose": "Highest floating layer: the glass dock and modal cards." },
+      { "name": "add", "value": "0 10px 26px rgba(0, 0, 0, 0.45)", "purpose": "The dock's raised white add button." },
+      { "name": "notch", "value": "0 6px 18px rgba(0, 0, 0, 0.32)", "purpose": "Small controls popping off their surface: the banner notch button, the RPG badge, the pomodoro bar." },
+      { "name": "badge", "value": "0 6px 16px rgba(0, 0, 0, 0.28)", "purpose": "Ambient lift for the dark RPG badge pill." }
+    ],
+    "motion": [
+      { "name": "ease-spring", "value": "cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Dominant easing: transform hover lifts, active scales, progress/XP fill widths, modalUp entrance, level pulse." },
+      { "name": "ease-standard", "value": "ease 0.2s", "purpose": "Color/background state transitions (borders, fills, text)." },
+      { "name": "duration-micro", "value": "0.15s", "purpose": "Tap-scale micro-interactions (active states)." },
+      { "name": "duration-modal", "value": "0.28s", "purpose": "Bottom-sheet modalUp entrance." },
+      { "name": "duration-fill", "value": "0.5s", "purpose": "Progress and XP bar width animation (spring ease)." },
+      { "name": "duration-pulse", "value": "0.6s", "purpose": "Level-up pulse: scale 1 → 1.25 → 1." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px", "purpose": "Matrix stacks to one column; container tightens to 14px 12px 128px; XP bar shortens to 80px; shopping input row stacks." },
+      { "name": "wide", "value": "1200px", "purpose": "Container widens from 720px to 760px." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Mint-to-sky gradient pill with ink text; the app's single affirmative-action button (Add, Save).",
+      "html": "<button class=\"ds-btn-primary\">Add</button>",
+      "css": ".ds-btn-primary{border:none;border-radius:var(--radius-pill,999px);background:linear-gradient(135deg,var(--mint),#74c8e8);color:var(--ink);font-family:inherit;font-size:15px;font-weight:700;padding:12px 18px;cursor:pointer;transition:transform .15s ease,filter .2s ease}.ds-btn-primary:hover{filter:brightness(1.06);transform:translateY(-1px)}.ds-btn-primary:active{transform:scale(.96)}.ds-btn-primary:focus-visible{outline:3px solid var(--mint);outline-offset:2px}"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input-search",
+      "description": "Dark field with a glass hairline; mint border on focus. Pill variant used for search.",
+      "html": "<input class=\"ds-input\" placeholder=\"What needs to be done?\" aria-label=\"Task title\">",
+      "css": ".ds-input{width:100%;font-family:inherit;font-size:15px;color:var(--text-primary);background:var(--surface-soft);border:1px solid var(--glass-border);border-radius:var(--radius-sm,14px);padding:12px 14px;outline:none;transition:border-color .2s ease,background .2s ease}.ds-input::placeholder{color:var(--text-tertiary)}.ds-input:focus{border-color:var(--mint);background:var(--surface)}.ds-input:focus-visible{outline:3px solid var(--mint);outline-offset:2px}"
+    },
+    {
+      "name": "Filter Capsule",
+      "kind": "chip",
+      "refersTo": "chip-active",
+      "description": "Tall dark capsule with a pastel icon well and micro-caps label; active state carries the mint border.",
+      "html": "<button class=\"ds-filter-capsule active\" aria-pressed=\"true\"><span class=\"ds-filter-icon\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 6h11M9 12h11M9 18h11\"/><path d=\"M3.5 6l1.5 1.5L8 4M3.5 12l1.5 1.5L8 10M3.5 18l1.5 1.5L8 16\"/></svg></span><span class=\"ds-filter-label\">All</span></button>",
+      "css": ".ds-filter-capsule{flex:1;display:flex;flex-direction:column;align-items:center;gap:9px;padding:14px 8px 12px;background:#222226;border:1px solid transparent;border-radius:var(--radius-md,20px);color:inherit;font-family:inherit;cursor:pointer;transition:transform .18s cubic-bezier(.22,1,.36,1),border-color .2s ease,background .2s ease}.ds-filter-capsule:hover{transform:translateY(-2px)}.ds-filter-capsule.active{border-color:var(--mint);background:#2b2b30}.ds-filter-icon{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:rgba(17,17,17,.85);background:var(--mint-soft)}.ds-filter-icon svg{width:19px;height:19px}.ds-filter-label{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-secondary)}.ds-filter-capsule.active .ds-filter-label{color:var(--text-primary)}.ds-filter-capsule:focus-visible{outline:3px solid var(--mint);outline-offset:2px}"
+    },
+    {
+      "name": "Pill Chip",
+      "kind": "chip",
+      "refersTo": "chip-active",
+      "description": "One-line dark pill chip; active flips to mint fill with ink text (shopping category filter, clear buttons).",
+      "html": "<button class=\"ds-chip active\" aria-pressed=\"true\">Grocery</button>",
+      "css": ".ds-chip{border:1px solid var(--glass-border);background:var(--surface);color:var(--text-secondary);border-radius:var(--radius-pill,999px);padding:8px 14px;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;transition:background .2s ease,color .2s ease,border-color .2s ease}.ds-chip:hover{color:var(--text-primary)}.ds-chip.active{color:var(--ink);background:var(--mint);border-color:transparent}.ds-chip:focus-visible{outline:3px solid var(--mint);outline-offset:2px}"
+    },
+    {
+      "name": "Quadrant Card",
+      "kind": "card",
+      "refersTo": "quadrant-q1",
+      "description": "Pastel gradient Eisenhower card with a dark label pill, sublabel, and live count badge.",
+      "html": "<section class=\"ds-quadrant q1\"><div class=\"ds-quadrant-head\"><div><span class=\"ds-quadrant-label\">Do First</span><span class=\"ds-quadrant-sub\">Urgent &amp; Important</span></div><span class=\"ds-quadrant-count\">2</span></div><div class=\"ds-quadrant-list\"></div></section>",
+      "css": ".ds-quadrant{border-radius:var(--radius-lg,26px);padding:16px;display:flex;flex-direction:column;gap:12px;border:1px solid rgba(17,17,17,.06);box-shadow:var(--shadow-card);transition:transform .2s cubic-bezier(.22,1,.36,1)}.ds-quadrant:hover{transform:translateY(-2px)}.ds-quadrant.q1{background:linear-gradient(180deg,#ffd9cc 0%,#ffc3b2 100%)}.ds-quadrant.q2{background:linear-gradient(180deg,#d9f6e2 0%,#b6eccd 100%)}.ds-quadrant.q3{background:linear-gradient(180deg,#d8eaff 0%,#b2d6ff 100%)}.ds-quadrant.q4{background:linear-gradient(180deg,#e9e2ff 0%,#d2c2ff 100%)}.ds-quadrant-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.ds-quadrant-label{display:inline-block;background:rgba(17,17,17,.9);color:#f5f5f5;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:var(--radius-pill,999px)}.ds-quadrant-sub{display:block;margin-top:4px;font-size:12px;font-weight:500;color:var(--ink-faint)}.ds-quadrant-count{min-width:30px;height:30px;padding:0 8px;border-radius:var(--radius-pill,999px);background:rgba(17,17,17,.9);color:#f5f5f5;display:grid;place-items:center;font-size:13px;font-weight:700}.ds-quadrant-list{display:flex;flex-direction:column;gap:8px;min-height:44px}.ds-quadrant:focus-within{outline:3px solid var(--mint);outline-offset:2px}"
+    },
+    {
+      "name": "Todo Item",
+      "kind": "card",
+      "refersTo": "quadrant-q1",
+      "description": "Translucent white chip on a pastel card: round checkbox, ink title, meta, hover-revealed delete.",
+      "html": "<div class=\"ds-todo-item\"><input type=\"checkbox\" class=\"ds-todo-check\" aria-label=\"Mark done\"><div class=\"ds-todo-body\"><span class=\"ds-todo-title\">Review design tokens</span><span class=\"ds-todo-meta\">2h ago · Due today</span></div><button class=\"ds-todo-delete\" aria-label=\"Delete\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"><path d=\"M6 6l12 12M18 6L6 18\"/></svg></button></div>",
+      "css": ".ds-todo-item{display:flex;align-items:flex-start;gap:10px;padding:10px 10px 10px 8px;background:rgba(255,255,255,.38);border:1px solid rgba(17,17,17,.08);border-radius:var(--radius-sm,14px);transition:background .18s ease}.ds-todo-item:hover{background:rgba(255,255,255,.58)}.ds-todo-check{appearance:none;-webkit-appearance:none;flex:none;width:20px;height:20px;margin:1px 0 0;border-radius:50%;border:2px solid rgba(17,17,17,.45);background:transparent;cursor:pointer;transition:background .2s ease,border-color .2s ease,transform .15s ease}.ds-todo-check:hover{transform:scale(1.12)}.ds-todo-check:checked{background:var(--ink);border-color:var(--ink)}.ds-todo-check:checked::after{content:'';display:block;width:10px;height:5px;margin:3px auto 0;border:solid var(--mint);border-width:0 0 2.2px 2.2px;transform:rotate(-45deg)}.ds-todo-check:focus-visible{outline:3px solid var(--mint);outline-offset:2px}.ds-todo-body{flex:1;min-width:0;display:flex;flex-direction:column}.ds-todo-title{font-size:14.5px;font-weight:600;color:var(--ink);word-break:break-word}.ds-todo-meta{margin-top:2px;font-size:11.5px;font-weight:500;color:var(--ink-faint)}.ds-todo-delete{flex:none;width:28px;height:28px;margin-top:2px;border-radius:50%;color:rgba(17,17,17,.75);background:rgba(17,17,17,.08);border:none;display:grid;place-items:center;cursor:pointer;opacity:0;transition:opacity .18s ease,background .18s ease,color .18s ease}.ds-todo-item:hover .ds-todo-delete{opacity:1}.ds-todo-delete:hover{background:rgba(17,17,17,.85);color:#fff}.ds-todo-delete:focus-visible{opacity:1;outline:3px solid var(--mint);outline-offset:2px}.ds-todo-delete svg{width:13px;height:13px}"
+    },
+    {
+      "name": "Progress Bar",
+      "kind": "custom",
+      "refersTo": "quadrant-q1",
+      "description": "Horizontal bright-on-dark progress: pill track with accent-colored fill (per-quadrant and category charts).",
+      "html": "<div class=\"ds-progress\"><span class=\"ds-progress-label\">Schedule</span><div class=\"ds-progress-track\"><div class=\"ds-progress-fill q2\" style=\"width:62%\"></div></div><span class=\"ds-progress-count\">13</span></div>",
+      "css": ".ds-progress{display:flex;flex-direction:column;gap:8px}.ds-progress-label{font-size:12px;font-weight:600;color:var(--text-secondary)}.ds-progress-track{position:relative;height:12px;border-radius:var(--radius-pill,999px);background:var(--surface-soft);overflow:hidden}.ds-progress-fill{height:100%;border-radius:var(--radius-pill,999px);background:var(--green);transition:width .5s cubic-bezier(.22,1,.36,1)}.ds-progress-fill.q1{background:var(--red)}.ds-progress-fill.q2{background:var(--green)}.ds-progress-fill.q3{background:var(--blue)}.ds-progress-fill.q4{background:var(--purple)}.ds-progress-count{font-size:12px;font-weight:700;color:var(--text-primary)}"
+    },
+    {
+      "name": "Glass Dock",
+      "kind": "nav",
+      "refersTo": "nav-tab",
+      "description": "Floating bottom nav: glass blur 22px, mint active tab, raised white add button between destinations.",
+      "html": "<nav class=\"ds-dock\" aria-label=\"Primary\"><button class=\"ds-dock-tab active\" aria-pressed=\"true\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 10.5 12 3l9 7.5\"/><path d=\"M5 9.5V21h14V9.5\"/></svg><span class=\"ds-dock-label\">TODO</span></button><button class=\"ds-dock-tab\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 4h2l2.5 11h10.5l2-7H6.5\"/><circle cx=\"9.5\" cy=\"20\" r=\"1.4\"/><circle cx=\"17\" cy=\"20\" r=\"1.4\"/></svg><span class=\"ds-dock-label\">SHOPPING</span></button><button class=\"ds-dock-add\" aria-label=\"Add task\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\"/></svg></button><button class=\"ds-dock-tab\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"5\" width=\"18\" height=\"16\" rx=\"3\"/><path d=\"M3 10h18M8 3v4M16 3v4\"/></svg><span class=\"ds-dock-label\">CALENDAR</span></button></nav>",
+      "css": ".ds-dock{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);width:min(calc(100% - 28px),500px);display:flex;align-items:center;justify-content:space-around;gap:6px;padding:8px 10px 9px;background:var(--glass);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);border:1px solid var(--glass-border);border-radius:var(--radius-xl,32px);box-shadow:var(--shadow-float);z-index:40}.ds-dock-tab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 10px;border:none;background:none;border-radius:var(--radius-md,20px);color:var(--text-tertiary);font-family:inherit;cursor:pointer;transition:color .2s ease,background .2s ease,transform .15s ease}.ds-dock-tab:hover{color:var(--text-secondary);transform:translateY(-1px)}.ds-dock-tab.active{color:var(--mint);background:rgba(123,227,201,.1)}.ds-dock-tab:focus-visible{outline:3px solid var(--mint);outline-offset:2px}.ds-dock-tab svg{width:22px;height:22px}.ds-dock-label{font-size:9.5px;font-weight:700;letter-spacing:.08em}.ds-dock-add{flex:none;width:58px;height:58px;margin-top:-26px;border:none;border-radius:50%;background:#fff;color:#111;display:grid;place-items:center;box-shadow:0 10px 26px rgba(0,0,0,.45);cursor:pointer;transition:transform .18s cubic-bezier(.22,1,.36,1)}.ds-dock-add:hover{transform:scale(1.07)}.ds-dock-add:active{transform:scale(.94)}.ds-dock-add:focus-visible{outline:3px solid var(--mint);outline-offset:2px}.ds-dock-add svg{width:26px;height:26px}"
+    },
+    {
+      "name": "Hero Banner",
+      "kind": "custom",
+      "refersTo": "rpg-badge",
+      "description": "The signature pastel gradient banner: greeting, avatar, display headline with live count, RPG badge, and the notch stats button.",
+      "html": "<header class=\"ds-hero\"><div class=\"ds-hero-inner\"><div class=\"ds-hero-top\"><p class=\"ds-hero-greet\">Hello, Meor</p><span class=\"ds-hero-avatar\" aria-hidden=\"true\">M</span></div><h1 class=\"ds-hero-title\">You Have <span class=\"ds-hero-count\">12</span> Tasks in This Month</h1><div class=\"ds-hero-foot\"><div class=\"ds-rpg\"><span class=\"ds-rpg-level\">Lv. 4</span><div class=\"ds-rpg-track\"><div class=\"ds-rpg-fill\" style=\"width:62%\"></div></div><span class=\"ds-rpg-streak\">6d</span></div><button class=\"ds-hero-notch\" aria-label=\"View stats\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M4 20v-6M10 20V6M16 20v-9M20 20H4\"/></svg></button></div></div></header>",
+      "css": ".ds-hero{position:relative;border-radius:var(--radius-xl,32px);background:linear-gradient(135deg,#9bf0d3 0%,#7be3c9 40%,#74c8e8 100%);box-shadow:var(--shadow-card)}.ds-hero::after{content:'';position:absolute;right:0;bottom:0;width:56px;height:56px;border-radius:50%;background:var(--bg);z-index:1}.ds-hero-inner{position:relative;z-index:2;padding:18px 22px 22px}.ds-hero-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.ds-hero-greet{margin:0;font-size:15px;font-weight:500;color:var(--ink-faint);letter-spacing:.01em}.ds-hero-avatar{width:44px;height:44px;border-radius:50%;border:2px solid rgba(17,17,17,.35);background:linear-gradient(135deg,#ffd9a0,#ff9d9d);color:var(--ink);display:grid;place-items:center;font-size:19px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.18)}.ds-hero-title{margin:0;font-size:clamp(26px,6vw,32px);font-weight:800;line-height:1.15;letter-spacing:-.03em;color:var(--ink);max-width:16ch}.ds-hero-count{display:inline-block;padding:0 2px;border-radius:8px;background:rgba(17,17,17,.1)}.ds-hero-foot{display:flex;align-items:flex-end;justify-content:space-between;margin-top:16px}.ds-rpg{display:inline-flex;align-items:center;gap:10px;background:rgba(17,17,17,.88);border-radius:var(--radius-pill,999px);padding:8px 14px 8px 16px;box-shadow:0 6px 16px rgba(0,0,0,.28)}.ds-rpg-level{font-size:13px;font-weight:700;color:var(--mint);white-space:nowrap}.ds-rpg-track{width:110px;height:6px;border-radius:var(--radius-pill,999px);background:rgba(255,255,255,.16);overflow:hidden}.ds-rpg-fill{height:100%;border-radius:var(--radius-pill,999px);background:linear-gradient(90deg,var(--mint),#9bf0d3);transition:width .5s cubic-bezier(.22,1,.36,1)}.ds-rpg-streak{font-size:12px;font-weight:600;color:var(--text-secondary);white-space:nowrap}.ds-hero-notch{position:absolute;right:3px;bottom:3px;z-index:3;width:50px;height:50px;border:none;border-radius:50%;background:rgba(17,17,17,.92);color:#fff;display:grid;place-items:center;box-shadow:0 6px 18px rgba(0,0,0,.32);cursor:pointer;transition:transform .18s cubic-bezier(.22,1,.36,1)}.ds-hero-notch:hover{transform:scale(1.06)}.ds-hero-notch:active{transform:scale(.96)}.ds-hero-notch:focus-visible{outline:3px solid var(--mint);outline-offset:2px}.ds-hero-notch svg{width:22px;height:22px}"
+    },
+    {
+      "name": "Streak Grid",
+      "kind": "custom",
+      "refersTo": "input-search",
+      "description": "30-day activity grid: 14px squares with 3px gaps, active days mint, today outlined in mint.",
+      "html": "<div class=\"ds-streak\" role=\"img\" aria-label=\"30-day activity streak\"><span class=\"ds-streak-cell\"></span><span class=\"ds-streak-cell active\"></span><span class=\"ds-streak-cell active\"></span><span class=\"ds-streak-cell\"></span><span class=\"ds-streak-cell today\"></span></div>",
+      "css": ".ds-streak{display:grid;grid-template-columns:repeat(5,1fr);gap:3px}.ds-streak-cell{aspect-ratio:1;border-radius:5px;background:var(--surface-soft);transition:background .15s ease}.ds-streak-cell.active{background:var(--mint)}.ds-streak-cell.today{outline:2px solid var(--mint);outline-offset:1px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Obsidian Companion",
+    "overview": "A personal second brain carried like a pocket notebook laid on a slab of dark obsidian. The page is a single column on a deep near-black ground (#0d0d0f); the only full-bleed color moment is the pastel gradient hero banner, and every interactive surface above the ground is either a pastel card carrying dark ink text or a dark-glass control. The density is low and the rhythm is calm: one banner, three filter capsules, four quadrant cards, a stats row, and a floating glass dock that keeps every destination one thumb away even on desktop.\n\nThe world was restyled from a prior flat-dark dashboard identity, and it refuses that grammar outright. There is no browser-tab strip, no dashboard grid of chrome cards, no toolbars. Navigation lives in a floating glass dock with a raised white add button; the Eisenhower matrix is four warm pastel cards you can drag tasks between; the hero's bottom-right corner is scooped out by a page-colored notch that nests the stats button. The result reads as a handheld companion — a pinned, pastel-toned user brief — rather than a management console.\n\nTwo divergences between the intended direction and the build are recorded as build truth. Per-quadrant live progress bars did not land on the quadrant cards themselves: the cards carry a live task-count badge, while live progress appears as the XP fill inside the hero's RPG badge and as per-quadrant hbar fills in the stats dashboard. And the JS-driven unicode glyphs on the pomodoro/delete/close/calendar-nav buttons exist because their labels swap at runtime; they are a carried defect, not a system rule.",
+    "keyCharacteristics": [
+      "One-column obsidian surface with a single pastel-gradient hero banner, scooped at the bottom-right.",
+      "Pastel-tinted quadrant cards (coral / mint / sky / lavender) carrying dark ink (#111) text.",
+      "Bright mint progress fills and a bright green accent on dark tracks — progress never renders pale-on-pale.",
+      "A floating glass dock (backdrop blur, 8% white hairline) as the only persistent navigation.",
+      "Squircle corner language scaled to surface size (14–32px), pills reserved for one-line controls.",
+      "Stroke-drawn inline SVG icons (2px, round caps); no filled glyph fonts."
+    ],
+    "rules": [
+      { "name": "The Ink-on-Pastel Rule", "body": "Pastel surfaces carry only dark ink (#111) text; the white/dark text ramp is reserved for dark surfaces. The moment a fill is pastel, its foreground must be ink — and bright iOS accents never sit on pastel fills as text.", "section": "colors" },
+      { "name": "The One-Accent Rule", "body": "Mint is the only brand accent. It signals active, selected, today, and progress. Green/blue/orange/purple/red are functional status colors (done, upcoming, focus, category, destructive) — they never compete for brand attention on a pastel surface.", "section": "colors" },
+      { "name": "The Bright-Fill Rule", "body": "Progress reads bright-on-dark, never pale-on-pale: mint-to-sky gradients or accent green (#30d158) on dark tracks. A pastel card never carries a progress fill.", "section": "colors" },
+      { "name": "The Display-Only Tracking Rule", "body": "Negative letter-spacing is reserved for display/headline/title type (hero −0.03em, numerals and modal headers −0.02em). Body and meta text never go below 0 tracking; labels track positive (0.04–0.08em) and uppercase.", "section": "typography" },
+      { "name": "The Micro-Caps Rule", "body": "Short status labels are uppercase micro-caps: 9.5–13px, weight 600–700, tracking 0.04–0.08em. They never render in sentence case, and never in display weight.", "section": "typography" },
+      { "name": "The Glass-Restraint Rule", "body": "Backdrop blur appears on exactly the glass family: the dock (22px), the pomodoro and calendar nav bars (16px), and the modal overlay (10px over rgba(13,13,15,0.84)). Cards and inputs are solid fills plus shadow — blur is for floating chrome, never for content surfaces.", "section": "elevation" },
+      { "name": "The Squircle Scale Rule", "body": "Corner radius follows surface size — items 14px, rows/capsules 20px, cards 26px, shell surfaces 32px. A small control never wears a shell radius and a large surface never wears an item radius; pills only for one-line controls and progress tracks.", "section": "shapes" }
+    ],
+    "dos": [
+      "Do keep the ground obsidian and the pastels on top: pastel fills and bright accents live only on elevated cards and the banner, never on the page background.",
+      "Do put ink (#111) text on every pastel surface, and the dark text ramp on every dark surface.",
+      "Do use mint for active/selected/today/progress, and reserve green/blue/orange/purple/red for functional status.",
+      "Do render progress bright-on-dark (mint/sky gradients or accent green on dark tracks).",
+      "Do scale corner radius with surface size (14/20/26/32px) and use pills for one-line controls and tracks.",
+      "Do draw icons as inline 2px-stroke round-cap SVGs with stroke=\"currentColor\".",
+      "Do give every interactive control a 3px mint :focus-visible outline with 2px offset."
+    ],
+    "donts": [
+      "Don't reintroduce the old flat-dark dashboard grammar: no browser-tab strip, no dashboard chrome grid, no toolbar.",
+      "Don't put bright iOS accents or white text on pastel fills — pastel carries ink only.",
+      "Don't use blur on content surfaces; backdrop-filter belongs to the dock, glass bars, and modal overlay.",
+      "Don't apply negative letter-spacing below the display/headline/title tier.",
+      "Don't set corner radius in single digits or mix a pill and a squircle within one component's radius family.",
+      "Don't add a second brand accent to compete with mint."
+    ]
+  }
+}
