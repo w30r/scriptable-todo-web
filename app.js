@@ -1,6 +1,9 @@
-const API_BASE = 'https://scriptable-todo.onrender.com/api/todos';
-const SHOP_API = 'https://scriptable-todo.onrender.com/api/shopping';
-const PROGRESS_API = 'https://scriptable-todo.onrender.com/api/progress';
+const PRIMARY_ORIGIN = 'https://bibimpapi-hp.tailb6d709.ts.net';
+const FALLBACK_ORIGIN = 'https://scriptable-todo.onrender.com';
+
+const API_BASE = `${PRIMARY_ORIGIN}/api/todos`;
+const SHOP_API = `${PRIMARY_ORIGIN}/api/shopping`;
+const PROGRESS_API = `${PRIMARY_ORIGIN}/api/progress`;
 
 const QUADRANTS = [
   { key: 'q1', tag: '!ui',   title: 'Do First',    sub: 'Urgent & Important' },
@@ -336,14 +339,29 @@ function formatDueDate(iso) {
 }
 
 async function fetchWithTimeout(url, options, timeout = 3000) {
-  const ctrl = new AbortController();
-  const id = setTimeout(() => ctrl.abort(), timeout);
+  // If the URL points at the primary origin, derive the matching fallback URL.
+  const fallbackUrl = url.startsWith(PRIMARY_ORIGIN)
+    ? FALLBACK_ORIGIN + url.slice(PRIMARY_ORIGIN.length)
+    : null;
+
+  const attempt = async (target) => {
+    const ctrl = new AbortController();
+    const id = setTimeout(() => ctrl.abort(), timeout);
+    try {
+      const res = await fetch(target, { ...options, signal: ctrl.signal });
+      if (!res.ok) throw new Error(`API error: ${res.status}`);
+      return res.json();
+    } finally {
+      clearTimeout(id);
+    }
+  };
+
   try {
-    const res = await fetch(url, { ...options, signal: ctrl.signal });
-    if (!res.ok) throw new Error(`API error: ${res.status}`);
-    return res.json();
-  } finally {
-    clearTimeout(id);
+    return await attempt(url);
+  } catch (err) {
+    // Primary unavailable — retry against the Render-hosted backend.
+    if (fallbackUrl) return attempt(fallbackUrl);
+    throw err;
   }
 }
 

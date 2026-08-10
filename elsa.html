@@ -692,7 +692,7 @@
           <span class="sub">Work Hub</span>
         </div>
         <div class="elsa-header-actions">
-          <a href="https://scriptable-todo.onrender.com/api/elsacontext/export" target="_blank" class="export-btn" title="Server-rendered page - use this URL in Gemini Notebook">🌐 Gemini Source</a>
+          <a href="https://bibimpapi-hp.tailb6d709.ts.net/api/elsacontext/export" target="_blank" class="export-btn" id="gemini-source-link" title="Server-rendered page - use this URL in Gemini Notebook">🌐 Gemini Source</a>
           <button class="export-btn" id="export-html-btn" title="Generate static HTML for Gemini Notebook">📄 Source Export</button>
           <button class="export-btn" id="copy-text-btn" title="Copy all cards as text">📋 Copy Text</button>
           <a href="index.html" class="back-link">← Back to App</a>
@@ -795,9 +795,31 @@
       // ============================================================
       // CONSTANTS
       // ============================================================
-      const ELSA_TASKS_API = 'https://scriptable-todo.onrender.com/api/elsa-tasks';
-      const ELSA_API = 'https://scriptable-todo.onrender.com/api/elsacontext';
-      const TIMESHEET_API = 'https://scriptable-todo.onrender.com/api/timesheet';
+      const PRIMARY_ORIGIN = 'https://bibimpapi-hp.tailb6d709.ts.net';
+      const FALLBACK_ORIGIN = 'https://scriptable-todo.onrender.com';
+
+      const ELSA_TASKS_API = PRIMARY_ORIGIN + '/api/elsa-tasks';
+      const ELSA_API = PRIMARY_ORIGIN + '/api/elsacontext';
+      const TIMESHEET_API = PRIMARY_ORIGIN + '/api/timesheet';
+      const PROGRESS_API = PRIMARY_ORIGIN + '/api/progress';
+
+      // Try the primary (tailnet) origin first, fall back to the Render-hosted
+      // backend if the primary is unreachable or returns an error.
+      function fetchWithFallback(url, options) {
+        const fallbackUrl = url.indexOf(PRIMARY_ORIGIN) === 0
+          ? FALLBACK_ORIGIN + url.slice(PRIMARY_ORIGIN.length)
+          : null;
+        return fetch(url, options).then(res => {
+          if (res.ok) return res;
+          throw new Error('API error: ' + res.status);
+        }).catch(err => {
+          if (!fallbackUrl) throw err;
+          return fetch(fallbackUrl, options).then(res => {
+            if (res.ok) return res;
+            throw new Error('API error: ' + res.status);
+          });
+        });
+      }
 
       const CATEGORIES = [
         { key: 'role',     label: 'Role & Responsibilities', color: '#0a84ff' },
@@ -864,9 +886,9 @@
       }
 
       async function apiProgress(path, options) {
-        const url = 'https://scriptable-todo.onrender.com/api/progress';
+        const url = PROGRESS_API;
         const full = path ? `${url}/${path}` : url;
-        const res = await fetch(full, {
+        const res = await fetchWithFallback(full, {
           headers: { 'Content-Type': 'application/json' },
           ...options,
         });
@@ -886,7 +908,7 @@
       // ============================================================
       function apiElsaTasks(path, options) {
         const url = path ? `${ELSA_TASKS_API}/${path}` : ELSA_TASKS_API;
-        return fetch(url, {
+        return fetchWithFallback(url, {
           headers: { 'Content-Type': 'application/json' },
           ...options,
         }).then(r => { if (!r.ok) throw new Error('API error'); return r.json(); });
@@ -984,7 +1006,7 @@
       // ============================================================
       async function fetchApi(path, options) {
         const url = path ? `${ELSA_API}/${path}` : ELSA_API;
-        const res = await fetch(url, {
+        const res = await fetchWithFallback(url, {
           headers: { 'Content-Type': 'application/json' },
           ...options,
         });
@@ -1238,7 +1260,7 @@ ${cardsHtml}
       async function loadEntries() {
         const date = tsFormatDate(tsDate);
         try {
-          const res = await fetch(TIMESHEET_API + '?date=' + date);
+          const res = await fetchWithFallback(TIMESHEET_API + '?date=' + date);
           entries = await res.json();
         } catch {
           entries = [];
@@ -1270,7 +1292,7 @@ ${cardsHtml}
       async function addEntry(text) {
         if (!text.trim()) return;
         try {
-          const res = await fetch(TIMESHEET_API, {
+          const res = await fetchWithFallback(TIMESHEET_API, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ date: tsFormatDate(tsDate), text: text.trim() }),
@@ -1283,7 +1305,7 @@ ${cardsHtml}
 
       async function deleteEntry(id) {
         try {
-          await fetch(TIMESHEET_API + '/' + id, { method: 'DELETE' });
+          await fetchWithFallback(TIMESHEET_API + '/' + id, { method: 'DELETE' });
           entries = entries.filter(e => e._id !== id);
           renderEntries();
         } catch {}
@@ -1322,6 +1344,15 @@ ${cardsHtml}
       modalClose.addEventListener('click', closeModal);
       modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
       saveBtn.addEventListener('click', saveCard);
+
+      document.getElementById('gemini-source-link').addEventListener('click', function (e) {
+        e.preventDefault();
+        const primary = ELSA_API + '/export';
+        const fallback = FALLBACK_ORIGIN + '/api/elsacontext/export';
+        fetch(primary, { method: 'HEAD' }).then(r => {
+          window.open(r.ok ? primary : fallback, '_blank');
+        }).catch(() => window.open(fallback, '_blank'));
+      });
 
       tsDateInput.addEventListener('change', () => {
         if (tsDateInput.value) {
