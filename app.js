@@ -1,4 +1,4 @@
-const PRIMARY_ORIGIN = 'https://bibimpapi-hp.tailb6d709.ts.net';
+const PRIMARY_ORIGIN = 'https://app.meorsyamil.com/';
 const FALLBACK_ORIGIN = 'https://scriptable-todo.onrender.com';
 
 const API_BASE = `${PRIMARY_ORIGIN}/api/todos`;
