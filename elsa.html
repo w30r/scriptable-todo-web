@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
     <title>ELSA — Work Hub</title>
     <link
       rel="icon"
@@ -16,7 +19,9 @@
       }
 
       .container {
-        padding-bottom: calc(var(--tab-bar-height) + var(--tab-bar-safe-bottom) + 16px);
+        padding-bottom: calc(
+          var(--tab-bar-height) + var(--tab-bar-safe-bottom) + 16px
+        );
       }
 
       /* Tab Bar */
@@ -77,8 +82,14 @@
       }
 
       @keyframes fadeSlideIn {
-        from { opacity: 0.5; transform: translateY(6px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+          opacity: 0.5;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       /* Tasks Panel */
@@ -98,7 +109,9 @@
         outline: none;
         background: var(--bg-primary);
         color: var(--text-primary);
-        transition: border-color var(--transition), box-shadow var(--transition);
+        transition:
+          border-color var(--transition),
+          box-shadow var(--transition);
       }
 
       .task-input:focus {
@@ -351,15 +364,23 @@
         border: 1px solid var(--border);
         border-radius: var(--radius-md);
         padding: 1.25rem;
-        transition: border-color var(--transition), box-shadow var(--transition);
+        transition:
+          border-color var(--transition),
+          box-shadow var(--transition);
         position: relative;
         overflow: hidden;
         animation: fadeIn 0.25s ease;
       }
 
       @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(4px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+          opacity: 0;
+          transform: translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       .elsa-card:hover {
@@ -506,7 +527,9 @@
         outline: none;
         background: var(--bg-primary);
         color: var(--text-primary);
-        transition: border-color var(--transition), box-shadow var(--transition);
+        transition:
+          border-color var(--transition),
+          box-shadow var(--transition);
         resize: vertical;
         line-height: 1.5;
       }
@@ -557,7 +580,9 @@
         }
 
         #elsa-add-btn {
-          bottom: calc(20px + var(--tab-bar-height) + var(--tab-bar-safe-bottom));
+          bottom: calc(
+            20px + var(--tab-bar-height) + var(--tab-bar-safe-bottom)
+          );
           right: 20px;
           width: 48px;
           height: 48px;
@@ -692,9 +717,28 @@
           <span class="sub">Work Hub</span>
         </div>
         <div class="elsa-header-actions">
-          <a href="https://bibimpapi-hp.tailb6d709.ts.net/api/elsacontext/export" target="_blank" class="export-btn" id="gemini-source-link" title="Server-rendered page - use this URL in Gemini Notebook">🌐 Gemini Source</a>
-          <button class="export-btn" id="export-html-btn" title="Generate static HTML for Gemini Notebook">📄 Source Export</button>
-          <button class="export-btn" id="copy-text-btn" title="Copy all cards as text">📋 Copy Text</button>
+          <a
+            href="https://app.meorsyamil.com/api/elsacontext/export"
+            target="_blank"
+            class="export-btn"
+            id="gemini-source-link"
+            title="Server-rendered page - use this URL in Gemini Notebook"
+            >🌐 Gemini Source</a
+          >
+          <button
+            class="export-btn"
+            id="export-html-btn"
+            title="Generate static HTML for Gemini Notebook"
+          >
+            📄 Source Export
+          </button>
+          <button
+            class="export-btn"
+            id="copy-text-btn"
+            title="Copy all cards as text"
+          >
+            📋 Copy Text
+          </button>
           <a href="index.html" class="back-link">← Back to App</a>
         </div>
       </div>
@@ -703,7 +747,12 @@
         <!-- Tasks Panel -->
         <div id="panel-tasks" class="tab-panel">
           <div class="task-input-row">
-            <input type="text" id="task-input" class="task-input" placeholder="Add a work task..." />
+            <input
+              type="text"
+              id="task-input"
+              class="task-input"
+              placeholder="Add a work task..."
+            />
             <button id="task-add-btn" class="task-add-btn">+</button>
           </div>
           <div class="task-meta" id="task-meta"></div>
@@ -715,25 +764,36 @@
           <div class="elsa-cat-filters" id="cat-filters">
             <button class="cat-filter active" data-cat="all">All</button>
             <button class="cat-filter" data-cat="role">
-              <span class="cat-filter-dot" style="background:#0a84ff"></span>Role
+              <span class="cat-filter-dot" style="background: #0a84ff"></span
+              >Role
             </button>
             <button class="cat-filter" data-cat="project">
-              <span class="cat-filter-dot" style="background:#30d158"></span>Projects
+              <span class="cat-filter-dot" style="background: #30d158"></span
+              >Projects
             </button>
             <button class="cat-filter" data-cat="workflow">
-              <span class="cat-filter-dot" style="background:#ff9f0a"></span>Workflows
+              <span class="cat-filter-dot" style="background: #ff9f0a"></span
+              >Workflows
             </button>
             <button class="cat-filter" data-cat="note">
-              <span class="cat-filter-dot" style="background:#bf5af2"></span>Notes
+              <span class="cat-filter-dot" style="background: #bf5af2"></span
+              >Notes
             </button>
           </div>
 
-          <input type="text" id="elsa-search" class="search-input" placeholder="Search cards..." />
+          <input
+            type="text"
+            id="elsa-search"
+            class="search-input"
+            placeholder="Search cards..."
+          />
 
           <div class="elsa-count" id="elsa-count">0 cards</div>
 
           <div class="elsa-card-grid" id="elsa-card-grid">
-            <div class="elsa-empty">No cards yet. Tap <strong>+</strong> to add your first one.</div>
+            <div class="elsa-empty">
+              No cards yet. Tap <strong>+</strong> to add your first one.
+            </div>
           </div>
         </div>
 
@@ -749,7 +809,12 @@
             <div class="task-empty" id="ts-empty">No entries for this day.</div>
           </div>
           <div class="ts-input-row">
-            <input type="text" id="ts-input" class="task-input" placeholder="Log what you did..." />
+            <input
+              type="text"
+              id="ts-input"
+              class="task-input"
+              placeholder="Log what you did..."
+            />
             <button id="ts-add-btn" class="task-add-btn">+</button>
           </div>
         </div>
@@ -773,7 +838,7 @@
 
     <button id="elsa-add-btn" title="Add card">+</button>
 
-    <div id="elsa-modal" class="modal-overlay" style="display:none">
+    <div id="elsa-modal" class="modal-overlay" style="display: none">
       <div class="modal-card">
         <div class="modal-header">
           <h3 id="modal-title">New Card</h3>
@@ -786,7 +851,10 @@
           <option value="workflow">Workflows &amp; SOPs</option>
           <option value="note">General Notes</option>
         </select>
-        <textarea id="card-content-input" placeholder="Write your notes, workflows, SOPs, or any info here..."></textarea>
+        <textarea
+          id="card-content-input"
+          placeholder="Write your notes, workflows, SOPs, or any info here..."
+        ></textarea>
         <button class="edit-save-btn" id="card-save-btn">Save</button>
       </div>
     </div>
@@ -795,74 +863,77 @@
       // ============================================================
       // CONSTANTS
       // ============================================================
-      const PRIMARY_ORIGIN = 'https://bibimpapi-hp.tailb6d709.ts.net';
-      const FALLBACK_ORIGIN = 'https://scriptable-todo.onrender.com';
+      const PRIMARY_ORIGIN = "https://app.meorsyamil.com";
+      const FALLBACK_ORIGIN = "https://scriptable-todo.onrender.com";
 
-      const ELSA_TASKS_API = PRIMARY_ORIGIN + '/api/elsa-tasks';
-      const ELSA_API = PRIMARY_ORIGIN + '/api/elsacontext';
-      const TIMESHEET_API = PRIMARY_ORIGIN + '/api/timesheet';
-      const PROGRESS_API = PRIMARY_ORIGIN + '/api/progress';
+      const ELSA_TASKS_API = PRIMARY_ORIGIN + "/api/elsa-tasks";
+      const ELSA_API = PRIMARY_ORIGIN + "/api/elsacontext";
+      const TIMESHEET_API = PRIMARY_ORIGIN + "/api/timesheet";
+      const PROGRESS_API = PRIMARY_ORIGIN + "/api/progress";
 
       // Try the primary (tailnet) origin first, fall back to the Render-hosted
       // backend if the primary is unreachable or returns an error.
       function fetchWithFallback(url, options) {
-        const fallbackUrl = url.indexOf(PRIMARY_ORIGIN) === 0
-          ? FALLBACK_ORIGIN + url.slice(PRIMARY_ORIGIN.length)
-          : null;
-        return fetch(url, options).then(res => {
-          if (res.ok) return res;
-          throw new Error('API error: ' + res.status);
-        }).catch(err => {
-          if (!fallbackUrl) throw err;
-          return fetch(fallbackUrl, options).then(res => {
+        const fallbackUrl =
+          url.indexOf(PRIMARY_ORIGIN) === 0
+            ? FALLBACK_ORIGIN + url.slice(PRIMARY_ORIGIN.length)
+            : null;
+        return fetch(url, options)
+          .then((res) => {
             if (res.ok) return res;
-            throw new Error('API error: ' + res.status);
+            throw new Error("API error: " + res.status);
+          })
+          .catch((err) => {
+            if (!fallbackUrl) throw err;
+            return fetch(fallbackUrl, options).then((res) => {
+              if (res.ok) return res;
+              throw new Error("API error: " + res.status);
+            });
           });
-        });
       }
 
       const CATEGORIES = [
-        { key: 'role',     label: 'Role & Responsibilities', color: '#0a84ff' },
-        { key: 'project',  label: 'Projects & Tasks',        color: '#30d158' },
-        { key: 'workflow', label: 'Workflows & SOPs',        color: '#ff9f0a' },
-        { key: 'note',     label: 'General Notes',           color: '#bf5af2' },
+        { key: "role", label: "Role & Responsibilities", color: "#0a84ff" },
+        { key: "project", label: "Projects & Tasks", color: "#30d158" },
+        { key: "workflow", label: "Workflows & SOPs", color: "#ff9f0a" },
+        { key: "note", label: "General Notes", color: "#bf5af2" },
       ];
 
       // ============================================================
       // STATE
       // ============================================================
-      let activeTab = 'tasks';
+      let activeTab = "tasks";
       let tasks = [];
       let cards = [];
       let entries = [];
       let tsDate = new Date();
-      let activeCat = 'all';
-      let searchQuery = '';
+      let activeCat = "all";
+      let searchQuery = "";
       let editingId = null;
 
       // ============================================================
       // DOM REFS
       // ============================================================
-      const tabBar = document.getElementById('tab-bar');
-      const panelTasks = document.getElementById('panel-tasks');
-      const panelContext = document.getElementById('panel-context');
-      const panelTimesheet = document.getElementById('panel-timesheet');
-      const taskInput = document.getElementById('task-input');
-      const taskAddBtn = document.getElementById('task-add-btn');
-      const taskList = document.getElementById('task-list');
-      const taskMeta = document.getElementById('task-meta');
-      const addBtn = document.getElementById('elsa-add-btn');
-      const grid = document.getElementById('elsa-card-grid');
-      const countEl = document.getElementById('elsa-count');
-      const searchEl = document.getElementById('elsa-search');
-      const catFilters = document.getElementById('cat-filters');
-      const modal = document.getElementById('elsa-modal');
-      const modalTitle = document.getElementById('modal-title');
-      const modalClose = document.getElementById('modal-close');
-      const titleInput = document.getElementById('card-title-input');
-      const catInput = document.getElementById('card-cat-input');
-      const contentInput = document.getElementById('card-content-input');
-      const saveBtn = document.getElementById('card-save-btn');
+      const tabBar = document.getElementById("tab-bar");
+      const panelTasks = document.getElementById("panel-tasks");
+      const panelContext = document.getElementById("panel-context");
+      const panelTimesheet = document.getElementById("panel-timesheet");
+      const taskInput = document.getElementById("task-input");
+      const taskAddBtn = document.getElementById("task-add-btn");
+      const taskList = document.getElementById("task-list");
+      const taskMeta = document.getElementById("task-meta");
+      const addBtn = document.getElementById("elsa-add-btn");
+      const grid = document.getElementById("elsa-card-grid");
+      const countEl = document.getElementById("elsa-count");
+      const searchEl = document.getElementById("elsa-search");
+      const catFilters = document.getElementById("cat-filters");
+      const modal = document.getElementById("elsa-modal");
+      const modalTitle = document.getElementById("modal-title");
+      const modalClose = document.getElementById("modal-close");
+      const titleInput = document.getElementById("card-title-input");
+      const catInput = document.getElementById("card-cat-input");
+      const contentInput = document.getElementById("card-content-input");
+      const saveBtn = document.getElementById("card-save-btn");
 
       // ============================================================
       // TAB SWITCHING
@@ -870,18 +941,23 @@
       function switchTab(tab, persist = true) {
         activeTab = tab;
 
-        tabBar.querySelectorAll('.tab-item').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-        panelTasks.classList.toggle('active', tab === 'tasks');
-        panelTimesheet.classList.toggle('active', tab === 'timesheet');
-        panelContext.classList.toggle('active', tab === 'context');
+        tabBar
+          .querySelectorAll(".tab-item")
+          .forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
+        panelTasks.classList.toggle("active", tab === "tasks");
+        panelTimesheet.classList.toggle("active", tab === "timesheet");
+        panelContext.classList.toggle("active", tab === "context");
 
-        addBtn.style.display = tab === 'context' ? 'flex' : 'none';
+        addBtn.style.display = tab === "context" ? "flex" : "none";
 
-        if (tab === 'context' && cards.length === 0) loadCards();
-        if (tab === 'timesheet') loadEntries();
+        if (tab === "context" && cards.length === 0) loadCards();
+        if (tab === "timesheet") loadEntries();
 
         if (persist) {
-          apiProgress(null, { method: 'PUT', body: JSON.stringify({ elsaTab: tab }) }).catch(() => {});
+          apiProgress(null, {
+            method: "PUT",
+            body: JSON.stringify({ elsaTab: tab }),
+          }).catch(() => {});
         }
       }
 
@@ -889,15 +965,15 @@
         const url = PROGRESS_API;
         const full = path ? `${url}/${path}` : url;
         const res = await fetchWithFallback(full, {
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
           ...options,
         });
-        if (!res.ok) throw new Error('API error');
+        if (!res.ok) throw new Error("API error");
         return res.json();
       }
 
-      tabBar.addEventListener('click', e => {
-        const tabItem = e.target.closest('.tab-item');
+      tabBar.addEventListener("click", (e) => {
+        const tabItem = e.target.closest(".tab-item");
         if (tabItem && tabItem.dataset.tab !== activeTab) {
           switchTab(tabItem.dataset.tab);
         }
@@ -909,9 +985,12 @@
       function apiElsaTasks(path, options) {
         const url = path ? `${ELSA_TASKS_API}/${path}` : ELSA_TASKS_API;
         return fetchWithFallback(url, {
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
           ...options,
-        }).then(r => { if (!r.ok) throw new Error('API error'); return r.json(); });
+        }).then((r) => {
+          if (!r.ok) throw new Error("API error");
+          return r.json();
+        });
       }
 
       async function loadTasks() {
@@ -919,14 +998,16 @@
           tasks = await apiElsaTasks();
           renderTasks();
         } catch {
-          taskList.innerHTML = '<div class="task-empty">Failed to load tasks.</div>';
+          taskList.innerHTML =
+            '<div class="task-empty">Failed to load tasks.</div>';
         }
       }
 
       function renderTasks() {
         if (tasks.length === 0) {
-          taskList.innerHTML = '<div class="task-empty">No work tasks yet. Add one above.</div>';
-          taskMeta.textContent = '';
+          taskList.innerHTML =
+            '<div class="task-empty">No work tasks yet. Add one above.</div>';
+          taskMeta.textContent = "";
           return;
         }
 
@@ -935,30 +1016,32 @@
           return 0;
         });
 
-        const done = tasks.filter(t => t.completed).length;
-        taskMeta.textContent = `${tasks.length} task${tasks.length !== 1 ? 's' : ''}${done ? `, ${done} done` : ''}`;
+        const done = tasks.filter((t) => t.completed).length;
+        taskMeta.textContent = `${tasks.length} task${tasks.length !== 1 ? "s" : ""}${done ? `, ${done} done` : ""}`;
 
-        taskList.innerHTML = sorted.map(t => {
-          const isDone = t.completed;
-          return `
+        taskList.innerHTML = sorted
+          .map((t) => {
+            const isDone = t.completed;
+            return `
             <div class="task-item" data-id="${t._id}">
-              <button class="task-toggle${isDone ? ' done' : ''}" data-action="toggle" data-id="${t._id}">${isDone ? '✓' : ''}</button>
-              <span class="task-title${isDone ? ' done' : ''}">${escapeHtml(t.title)}</span>
+              <button class="task-toggle${isDone ? " done" : ""}" data-action="toggle" data-id="${t._id}">${isDone ? "✓" : ""}</button>
+              <span class="task-title${isDone ? " done" : ""}">${escapeHtml(t.title)}</span>
               <button class="task-delete" data-action="delete" data-id="${t._id}">✕</button>
             </div>
           `;
-        }).join('');
+          })
+          .join("");
 
-        taskList.querySelectorAll('[data-action="toggle"]').forEach(btn => {
-          btn.addEventListener('click', () => toggleTask(btn.dataset.id));
+        taskList.querySelectorAll('[data-action="toggle"]').forEach((btn) => {
+          btn.addEventListener("click", () => toggleTask(btn.dataset.id));
         });
-        taskList.querySelectorAll('[data-action="delete"]').forEach(btn => {
-          btn.addEventListener('click', () => deleteTask(btn.dataset.id));
+        taskList.querySelectorAll('[data-action="delete"]').forEach((btn) => {
+          btn.addEventListener("click", () => deleteTask(btn.dataset.id));
         });
       }
 
       function escapeHtml(s) {
-        const div = document.createElement('div');
+        const div = document.createElement("div");
         div.textContent = s;
         return div.innerHTML;
       }
@@ -966,7 +1049,7 @@
       async function addTask(title) {
         if (!title.trim()) return;
         const saved = await apiElsaTasks(null, {
-          method: 'POST',
+          method: "POST",
           body: JSON.stringify({ title: title.trim() }),
         });
         tasks.unshift(saved);
@@ -974,10 +1057,10 @@
       }
 
       async function toggleTask(id) {
-        const t = tasks.find(x => x._id === id);
+        const t = tasks.find((x) => x._id === id);
         if (!t) return;
         const updated = await apiElsaTasks(id, {
-          method: 'PUT',
+          method: "PUT",
           body: JSON.stringify({ completed: !t.completed }),
         });
         Object.assign(t, updated);
@@ -985,17 +1068,21 @@
       }
 
       async function deleteTask(id) {
-        await apiElsaTasks(id, { method: 'DELETE' });
-        tasks = tasks.filter(t => t._id !== id);
+        await apiElsaTasks(id, { method: "DELETE" });
+        tasks = tasks.filter((t) => t._id !== id);
         renderTasks();
       }
 
-      taskAddBtn.addEventListener('click', () => {
+      taskAddBtn.addEventListener("click", () => {
         const v = taskInput.value.trim();
-        if (v) { addTask(v); taskInput.value = ''; taskInput.focus(); }
+        if (v) {
+          addTask(v);
+          taskInput.value = "";
+          taskInput.focus();
+        }
       });
-      taskInput.addEventListener('keydown', e => {
-        if (e.key === 'Enter') {
+      taskInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
           e.preventDefault();
           taskAddBtn.click();
         }
@@ -1007,7 +1094,7 @@
       async function fetchApi(path, options) {
         const url = path ? `${ELSA_API}/${path}` : ELSA_API;
         const res = await fetchWithFallback(url, {
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
           ...options,
         });
         if (!res.ok) throw new Error(`API error: ${res.status}`);
@@ -1019,55 +1106,74 @@
           cards = await fetchApi();
           renderCards();
         } catch {
-          grid.innerHTML = '<div class="elsa-empty">Failed to load cards. Check your connection.</div>';
+          grid.innerHTML =
+            '<div class="elsa-empty">Failed to load cards. Check your connection.</div>';
         }
       }
 
       function getCat(key) {
-        return CATEGORIES.find(c => c.key === key) || CATEGORIES[3];
+        return CATEGORIES.find((c) => c.key === key) || CATEGORIES[3];
       }
 
       function formatContent(text) {
         let html = text
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;');
-        html = html.replace(/^## (.+)$/gm, '<h4 style="font-size:0.9rem;font-weight:600;color:#f2f2f7;margin:0.6rem 0 0.3rem">$1</h4>');
-        html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
-        html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul style="padding-left:1.2rem;margin:0.3rem 0">$&</ul>');
-        html = html.replace(/\*\*(.+?)\*\*/g, '<strong style="color:#f2f2f7">$1</strong>');
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+        html = html.replace(
+          /^## (.+)$/gm,
+          '<h4 style="font-size:0.9rem;font-weight:600;color:#f2f2f7;margin:0.6rem 0 0.3rem">$1</h4>',
+        );
+        html = html.replace(/^- (.+)$/gm, "<li>$1</li>");
+        html = html.replace(
+          /(<li>.*<\/li>\n?)+/g,
+          '<ul style="padding-left:1.2rem;margin:0.3rem 0">$&</ul>',
+        );
+        html = html.replace(
+          /\*\*(.+?)\*\*/g,
+          '<strong style="color:#f2f2f7">$1</strong>',
+        );
         html = html.replace(/\n\n/g, '</p><p style="margin:0.5rem 0">');
-        html = html.replace(/\n/g, '<br/>');
-        return '<p style="margin:0">' + html + '</p>';
+        html = html.replace(/\n/g, "<br/>");
+        return '<p style="margin:0">' + html + "</p>";
       }
 
       function renderCards() {
-        const filtered = cards.filter(c => {
-          if (activeCat !== 'all' && c.category !== activeCat) return false;
+        const filtered = cards.filter((c) => {
+          if (activeCat !== "all" && c.category !== activeCat) return false;
           if (searchQuery) {
             const q = searchQuery.toLowerCase();
-            const match = c.title.toLowerCase().includes(q) || c.content.toLowerCase().includes(q);
+            const match =
+              c.title.toLowerCase().includes(q) ||
+              c.content.toLowerCase().includes(q);
             if (!match) return false;
           }
           return true;
         });
 
-        countEl.textContent = filtered.length + ' card' + (filtered.length !== 1 ? 's' : '');
+        countEl.textContent =
+          filtered.length + " card" + (filtered.length !== 1 ? "s" : "");
 
         if (filtered.length === 0) {
-          grid.innerHTML = '<div class="elsa-empty">' +
+          grid.innerHTML =
+            '<div class="elsa-empty">' +
             (cards.length === 0
-              ? 'No cards yet. Tap <strong>+</strong> to add your first one.'
-              : 'No cards match your filters.') +
-            '</div>';
+              ? "No cards yet. Tap <strong>+</strong> to add your first one."
+              : "No cards match your filters.") +
+            "</div>";
           return;
         }
 
-        grid.innerHTML = filtered.map(c => {
-          const cat = getCat(c.category);
-          const date = new Date(c.updatedAt || c.createdAt);
-          const dateStr = date.toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' });
-          return `
+        grid.innerHTML = filtered
+          .map((c) => {
+            const cat = getCat(c.category);
+            const date = new Date(c.updatedAt || c.createdAt);
+            const dateStr = date.toLocaleDateString("en-MY", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            });
+            return `
             <article class="elsa-card" data-id="${c._id}">
               <div class="elsa-card-actions">
                 <button class="card-action-btn" data-action="edit" data-id="${c._id}" title="Edit">✎</button>
@@ -1079,19 +1185,20 @@
               <div style="margin-top:0.6rem;font-size:0.6rem;color:var(--text-muted)">${dateStr}</div>
             </article>
           `;
-        }).join('');
+          })
+          .join("");
 
-        document.querySelectorAll('[data-action="edit"]').forEach(btn => {
-          btn.addEventListener('click', () => openEdit(btn.dataset.id));
+        document.querySelectorAll('[data-action="edit"]').forEach((btn) => {
+          btn.addEventListener("click", () => openEdit(btn.dataset.id));
         });
-        document.querySelectorAll('[data-action="delete"]').forEach(btn => {
-          btn.addEventListener('click', () => deleteCard(btn.dataset.id));
+        document.querySelectorAll('[data-action="delete"]').forEach((btn) => {
+          btn.addEventListener("click", () => deleteCard(btn.dataset.id));
         });
       }
 
       async function addCard(title, category, content) {
         const saved = await fetchApi(null, {
-          method: 'POST',
+          method: "POST",
           body: JSON.stringify({ title, category, content }),
         });
         cards.unshift(saved);
@@ -1100,45 +1207,45 @@
 
       async function updateCard(id, title, category, content) {
         const saved = await fetchApi(id, {
-          method: 'PUT',
+          method: "PUT",
           body: JSON.stringify({ title, category, content }),
         });
-        const idx = cards.findIndex(c => c._id === id);
+        const idx = cards.findIndex((c) => c._id === id);
         if (idx !== -1) cards[idx] = saved;
         renderCards();
       }
 
       async function deleteCard(id) {
-        if (!confirm('Delete this card?')) return;
-        await fetchApi(id, { method: 'DELETE' });
-        cards = cards.filter(c => c._id !== id);
+        if (!confirm("Delete this card?")) return;
+        await fetchApi(id, { method: "DELETE" });
+        cards = cards.filter((c) => c._id !== id);
         renderCards();
       }
 
       function openAdd() {
         editingId = null;
-        modalTitle.textContent = 'New Card';
-        titleInput.value = '';
-        catInput.value = 'role';
-        contentInput.value = '';
-        modal.style.display = 'flex';
+        modalTitle.textContent = "New Card";
+        titleInput.value = "";
+        catInput.value = "role";
+        contentInput.value = "";
+        modal.style.display = "flex";
         setTimeout(() => titleInput.focus(), 100);
       }
 
       function openEdit(id) {
-        const card = cards.find(c => c._id === id);
+        const card = cards.find((c) => c._id === id);
         if (!card) return;
         editingId = id;
-        modalTitle.textContent = 'Edit Card';
+        modalTitle.textContent = "Edit Card";
         titleInput.value = card.title;
         catInput.value = card.category;
         contentInput.value = card.content;
-        modal.style.display = 'flex';
+        modal.style.display = "flex";
         setTimeout(() => titleInput.focus(), 100);
       }
 
       function closeModal() {
-        modal.style.display = 'none';
+        modal.style.display = "none";
         editingId = null;
       }
 
@@ -1146,10 +1253,13 @@
         const title = titleInput.value.trim();
         const category = catInput.value;
         const content = contentInput.value.trim();
-        if (!title) { titleInput.focus(); return; }
+        if (!title) {
+          titleInput.focus();
+          return;
+        }
         try {
           saveBtn.disabled = true;
-          saveBtn.textContent = 'Saving...';
+          saveBtn.textContent = "Saving...";
           if (editingId) {
             await updateCard(editingId, title, category, content);
           } else {
@@ -1157,31 +1267,45 @@
           }
           closeModal();
         } catch {
-          alert('Failed to save card');
+          alert("Failed to save card");
         } finally {
           saveBtn.disabled = false;
-          saveBtn.textContent = 'Save';
+          saveBtn.textContent = "Save";
         }
       }
 
       function exportStaticHtml() {
-        if (cards.length === 0) { alert('Add some cards first.'); return; }
-        const cats = { role: 'Role & Responsibilities', project: 'Projects & Tasks', workflow: 'Workflows & SOPs', note: 'General Notes' };
-        const cardsHtml = cards.map(c => {
-          const cat = cats[c.category] || 'Note';
-          const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-            .replace(/^## (.+)$/gm,'<h2>$1</h2>')
-            .replace(/^- (.+)$/gm,'<li>$1</li>')
-            .replace(/(<li>.*<\/li>\n?)+/g,'<ul>$&</ul>')
-            .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-            .replace(/\n\n/g,'</p><p>')
-            .replace(/\n/g,'<br/>');
-          return `<article>
+        if (cards.length === 0) {
+          alert("Add some cards first.");
+          return;
+        }
+        const cats = {
+          role: "Role & Responsibilities",
+          project: "Projects & Tasks",
+          workflow: "Workflows & SOPs",
+          note: "General Notes",
+        };
+        const cardsHtml = cards
+          .map((c) => {
+            const cat = cats[c.category] || "Note";
+            const esc = (s) =>
+              s
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/^## (.+)$/gm, "<h2>$1</h2>")
+                .replace(/^- (.+)$/gm, "<li>$1</li>")
+                .replace(/(<li>.*<\/li>\n?)+/g, "<ul>$&</ul>")
+                .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+                .replace(/\n\n/g, "</p><p>")
+                .replace(/\n/g, "<br/>");
+            return `<article>
             <header><strong style="color:#0a84ff">${cat}</strong></header>
-            <h2 style="font-size:1.2rem;margin:0 0 0.3rem">${esc(c.title).replace(/<[^>]+>/g,'')}</h2>
+            <h2 style="font-size:1.2rem;margin:0 0 0.3rem">${esc(c.title).replace(/<[^>]+>/g, "")}</h2>
             <div><p>${esc(c.content)}</p></div>
           </article>`;
-        }).join('\n');
+          })
+          .join("\n");
         const html = `<!doctype html>
 <html lang="en">
 <head>
@@ -1208,38 +1332,53 @@ header{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.5px;margin-bot
 ${cardsHtml}
 </body>
 </html>`;
-        const blob = new Blob([html], { type: 'text/html' });
+        const blob = new Blob([html], { type: "text/html" });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = 'elsa-export.html'; a.click();
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "elsa-export.html";
+        a.click();
         URL.revokeObjectURL(url);
       }
 
       function copyAsText() {
-        if (cards.length === 0) { alert('Add some cards first.'); return; }
-        const cats = { role: 'Role & Responsibilities', project: 'Projects & Tasks', workflow: 'Workflows & SOPs', note: 'General Notes' };
-        const text = cards.map(c => {
-          const cat = cats[c.category] || 'Note';
-          return `[${cat}] ${c.title}\n${c.content}\n`;
-        }).join('\n---\n');
-        navigator.clipboard.writeText(text).then(() => {
-          const btn = document.getElementById('copy-text-btn');
-          const orig = btn.textContent;
-          btn.textContent = 'Copied!';
-          setTimeout(() => btn.textContent = orig, 1500);
-        }).catch(() => alert('Failed to copy'));
+        if (cards.length === 0) {
+          alert("Add some cards first.");
+          return;
+        }
+        const cats = {
+          role: "Role & Responsibilities",
+          project: "Projects & Tasks",
+          workflow: "Workflows & SOPs",
+          note: "General Notes",
+        };
+        const text = cards
+          .map((c) => {
+            const cat = cats[c.category] || "Note";
+            return `[${cat}] ${c.title}\n${c.content}\n`;
+          })
+          .join("\n---\n");
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            const btn = document.getElementById("copy-text-btn");
+            const orig = btn.textContent;
+            btn.textContent = "Copied!";
+            setTimeout(() => (btn.textContent = orig), 1500);
+          })
+          .catch(() => alert("Failed to copy"));
       }
 
       // ============================================================
       // TIMESHEET
       // ============================================================
-      const tsDateInput = document.getElementById('ts-date');
-      const tsPrev = document.getElementById('ts-prev');
-      const tsNext = document.getElementById('ts-next');
-      const tsList = document.getElementById('ts-list');
-      const tsCount = document.getElementById('ts-count');
-      const tsInput = document.getElementById('ts-input');
-      const tsAddBtn = document.getElementById('ts-add-btn');
+      const tsDateInput = document.getElementById("ts-date");
+      const tsPrev = document.getElementById("ts-prev");
+      const tsNext = document.getElementById("ts-next");
+      const tsList = document.getElementById("ts-list");
+      const tsCount = document.getElementById("ts-count");
+      const tsInput = document.getElementById("ts-input");
+      const tsAddBtn = document.getElementById("ts-add-btn");
 
       function tsFormatDate(d) {
         return d.toISOString().slice(0, 10);
@@ -1260,7 +1399,7 @@ ${cardsHtml}
       async function loadEntries() {
         const date = tsFormatDate(tsDate);
         try {
-          const res = await fetchWithFallback(TIMESHEET_API + '?date=' + date);
+          const res = await fetchWithFallback(TIMESHEET_API + "?date=" + date);
           entries = await res.json();
         } catch {
           entries = [];
@@ -1270,22 +1409,41 @@ ${cardsHtml}
 
       function renderEntries() {
         if (entries.length === 0) {
-          tsList.innerHTML = '<div class="task-empty">No entries for this day.</div>';
-          tsCount.textContent = '';
+          tsList.innerHTML =
+            '<div class="task-empty">No entries for this day.</div>';
+          tsCount.textContent = "";
           return;
         }
-        tsCount.textContent = entries.length + ' entr' + (entries.length !== 1 ? 'ies' : 'y');
-        tsList.innerHTML = entries.map(e => {
-          const time = e.createdAt ? new Date(e.createdAt).toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' }) : '';
-          return '<div class="ts-entry" data-id="' + e._id + '">' +
-            '<span class="ts-entry-time">' + time + '</span>' +
-            '<span class="ts-entry-text">' + escapeHtml(e.text) + '</span>' +
-            '<button class="ts-entry-delete" data-action="ts-delete" data-id="' + e._id + '">✕</button>' +
-          '</div>';
-        }).join('');
+        tsCount.textContent =
+          entries.length + " entr" + (entries.length !== 1 ? "ies" : "y");
+        tsList.innerHTML = entries
+          .map((e) => {
+            const time = e.createdAt
+              ? new Date(e.createdAt).toLocaleTimeString("en-MY", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "";
+            return (
+              '<div class="ts-entry" data-id="' +
+              e._id +
+              '">' +
+              '<span class="ts-entry-time">' +
+              time +
+              "</span>" +
+              '<span class="ts-entry-text">' +
+              escapeHtml(e.text) +
+              "</span>" +
+              '<button class="ts-entry-delete" data-action="ts-delete" data-id="' +
+              e._id +
+              '">✕</button>' +
+              "</div>"
+            );
+          })
+          .join("");
 
-        tsList.querySelectorAll('[data-action="ts-delete"]').forEach(btn => {
-          btn.addEventListener('click', () => deleteEntry(btn.dataset.id));
+        tsList.querySelectorAll('[data-action="ts-delete"]').forEach((btn) => {
+          btn.addEventListener("click", () => deleteEntry(btn.dataset.id));
         });
       }
 
@@ -1293,9 +1451,12 @@ ${cardsHtml}
         if (!text.trim()) return;
         try {
           const res = await fetchWithFallback(TIMESHEET_API, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ date: tsFormatDate(tsDate), text: text.trim() }),
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              date: tsFormatDate(tsDate),
+              text: text.trim(),
+            }),
           });
           const saved = await res.json();
           entries.unshift(saved);
@@ -1305,8 +1466,10 @@ ${cardsHtml}
 
       async function deleteEntry(id) {
         try {
-          await fetchWithFallback(TIMESHEET_API + '/' + id, { method: 'DELETE' });
-          entries = entries.filter(e => e._id !== id);
+          await fetchWithFallback(TIMESHEET_API + "/" + id, {
+            method: "DELETE",
+          });
+          entries = entries.filter((e) => e._id !== id);
           renderEntries();
         } catch {}
       }
@@ -1324,71 +1487,87 @@ ${cardsHtml}
         loadTasks();
       })();
 
-      catFilters.addEventListener('click', e => {
-        const btn = e.target.closest('.cat-filter');
+      catFilters.addEventListener("click", (e) => {
+        const btn = e.target.closest(".cat-filter");
         if (!btn) return;
-        catFilters.querySelectorAll('.cat-filter').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        catFilters
+          .querySelectorAll(".cat-filter")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
         activeCat = btn.dataset.cat;
         renderCards();
       });
 
-      searchEl.addEventListener('input', () => {
+      searchEl.addEventListener("input", () => {
         searchQuery = searchEl.value.trim();
         renderCards();
       });
 
-      addBtn.addEventListener('click', openAdd);
-      document.getElementById('export-html-btn').addEventListener('click', exportStaticHtml);
-      document.getElementById('copy-text-btn').addEventListener('click', copyAsText);
-      modalClose.addEventListener('click', closeModal);
-      modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
-      saveBtn.addEventListener('click', saveCard);
-
-      document.getElementById('gemini-source-link').addEventListener('click', function (e) {
-        e.preventDefault();
-        const primary = ELSA_API + '/export';
-        const fallback = FALLBACK_ORIGIN + '/api/elsacontext/export';
-        fetch(primary, { method: 'HEAD' }).then(r => {
-          window.open(r.ok ? primary : fallback, '_blank');
-        }).catch(() => window.open(fallback, '_blank'));
+      addBtn.addEventListener("click", openAdd);
+      document
+        .getElementById("export-html-btn")
+        .addEventListener("click", exportStaticHtml);
+      document
+        .getElementById("copy-text-btn")
+        .addEventListener("click", copyAsText);
+      modalClose.addEventListener("click", closeModal);
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
       });
+      saveBtn.addEventListener("click", saveCard);
 
-      tsDateInput.addEventListener('change', () => {
+      document
+        .getElementById("gemini-source-link")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          const primary = ELSA_API + "/export";
+          const fallback = FALLBACK_ORIGIN + "/api/elsacontext/export";
+          fetch(primary, { method: "HEAD" })
+            .then((r) => {
+              window.open(r.ok ? primary : fallback, "_blank");
+            })
+            .catch(() => window.open(fallback, "_blank"));
+        });
+
+      tsDateInput.addEventListener("change", () => {
         if (tsDateInput.value) {
-          tsDate = new Date(tsDateInput.value + 'T00:00:00');
+          tsDate = new Date(tsDateInput.value + "T00:00:00");
           loadEntries();
         }
       });
-      tsPrev.addEventListener('click', () => tsChangeDate(-1));
-      tsNext.addEventListener('click', () => tsChangeDate(1));
-      tsAddBtn.addEventListener('click', () => {
+      tsPrev.addEventListener("click", () => tsChangeDate(-1));
+      tsNext.addEventListener("click", () => tsChangeDate(1));
+      tsAddBtn.addEventListener("click", () => {
         const v = tsInput.value.trim();
-        if (v) { addEntry(v); tsInput.value = ''; tsInput.focus(); }
+        if (v) {
+          addEntry(v);
+          tsInput.value = "";
+          tsInput.focus();
+        }
       });
-      tsInput.addEventListener('keydown', e => {
-        if (e.key === 'Enter') {
+      tsInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
           e.preventDefault();
           tsAddBtn.click();
         }
       });
 
-      titleInput.addEventListener('keydown', e => {
-        if (e.key === 'Enter') {
+      titleInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
           e.preventDefault();
           contentInput.focus();
         }
       });
 
-      contentInput.addEventListener('keydown', e => {
-        if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+      contentInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
           e.preventDefault();
           saveCard();
         }
       });
 
-      document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') closeModal();
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeModal();
       });
     </script>
   </body>
