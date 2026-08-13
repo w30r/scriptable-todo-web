@@ -1,5 +1,5 @@
-const PRIMARY_ORIGIN = "https://app.meorsyamil.com";
-const FALLBACK_ORIGIN = "https://scriptable-todo.onrender.com";
+const PRIMARY_ORIGIN = 'https://app.meorsyamil.com/';
+const FALLBACK_ORIGIN = 'https://scriptable-todo.onrender.com';
 
 const API_BASE = `${PRIMARY_ORIGIN}/api/todos`;
 const SHOP_API = `${PRIMARY_ORIGIN}/api/shopping`;
