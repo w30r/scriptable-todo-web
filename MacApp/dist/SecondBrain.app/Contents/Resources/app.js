@@ -6,10 +6,10 @@ const SHOP_API = `${PRIMARY_ORIGIN}/api/shopping`;
 const PROGRESS_API = `${PRIMARY_ORIGIN}/api/progress`;
 
 const QUADRANTS = [
-  { key: "q1", tag: "!ui", title: "Do First", sub: "Urgent & Important", icon: "M13 2 3 14h7l-1 8 10-12h-7l1-8z" },
-  { key: "q2", tag: "!nui", title: "Schedule", sub: "Not Urgent & Important", icon: "M3 9h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM8 3v4M16 3v4" },
-  { key: "q3", tag: "!uni", title: "Delegate", sub: "Urgent & Not Important", icon: "M17 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM10 20a7 7 0 0 1 14 0M9 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 20a6 6 0 0 1 12 0" },
-  { key: "q4", tag: "", title: "Eliminate", sub: "Not Urgent & Not Important", icon: "M18 6 6 18M6 6l12 12" },
+  { key: "q1", tag: "!ui", title: "Do First", sub: "Urgent & Important" },
+  { key: "q2", tag: "!nui", title: "Schedule", sub: "Not Urgent & Important" },
+  { key: "q3", tag: "!uni", title: "Delegate", sub: "Urgent & Not Important" },
+  { key: "q4", tag: "", title: "Eliminate", sub: "Not Urgent & Not Important" },
 ];
 
 const CATEGORIES = [
@@ -92,7 +92,6 @@ let shoppingItems = [];
 let currentFilter = localStorage.getItem("meor-filter") || "all";
 let activeTab = localStorage.getItem("meor-tab") || "todo";
 let shoppingFilter = localStorage.getItem("meor-shop-filter") || "all";
-let activeQuadrant = localStorage.getItem("meor-quadrant") || "q1";
 let todoSearchQuery = "";
 let shopSearchQuery = "";
 
@@ -429,6 +428,15 @@ async function progressFetch(method, body) {
 }
 
 function render() {
+  if (todos.length === 0) {
+    matrix.innerHTML =
+      '<div class="loading">No todos yet. Add one above!</div>';
+    todoCount.textContent = "0 items left";
+    const monthEl = document.getElementById("month-count");
+    if (monthEl) monthEl.textContent = "0";
+    return;
+  }
+
   const query = todoSearchQuery.toLowerCase().trim();
   const filtered = todos
     .filter((t) => {
@@ -457,20 +465,13 @@ function render() {
   // Note: tasks stay in their assigned quadrant regardless of due date.
   // Due dates are visible in the task meta text for scheduling awareness.
 
-  const cardHtml = QUADRANTS.map(
-    (q) => {
-      const isActive = q.key === activeQuadrant;
-      return `
-    <div class="quadrant ${q.key}${isActive ? " active" : ""}" data-quadrant="${q.key}"${isActive ? "" : ' style="display:none"'}>
+  matrix.innerHTML = QUADRANTS.map(
+    (q) => `
+    <div class="quadrant ${q.key}">
       <div class="quadrant-header">
         <div class="quadrant-title">
-          <span class="quadrant-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${q.icon}"/></svg>
-          </span>
-          <span class="quadrant-text">
-            <span class="label">${q.title}</span>
-            <span class="sublabel">${q.sub}</span>
-          </span>
+          <span class="label">${q.title}</span>
+          <span class="sublabel">${q.sub}</span>
         </div>
         <span class="badge">${grouped[q.key].length}</span>
       </div>
@@ -500,22 +501,8 @@ function render() {
         }
       </div>
     </div>
-  `;
-    },
+  `,
   ).join("");
-
-  const tabHtml = QUADRANTS.map(
-    (q) => `
-    <button class="deck-tab ${q.key}${q.key === activeQuadrant ? " active" : ""}" data-quadrant="${q.key}" type="button" aria-label="${q.title}">
-      <span class="quadrant-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${q.icon}"/></svg>
-      </span>
-      <span class="deck-tab-name">${q.title}</span>
-      <span class="deck-tab-count">${grouped[q.key].length}</span>
-    </button>`,
-  ).join("");
-
-  matrix.innerHTML = `<div class="deck-tabs">${tabHtml}</div>${cardHtml}`;
 
   const activeCount = todos.filter((t) => !t.completed).length;
   todoCount.textContent = `${activeCount} item${activeCount !== 1 ? "s" : ""} left`;
@@ -788,31 +775,6 @@ function setFilter(filter) {
   render();
 }
 
-function refreshDeck() {
-  matrix.querySelectorAll(".deck-tab").forEach((tab) => {
-    tab.classList.toggle("active", tab.dataset.quadrant === activeQuadrant);
-  });
-  matrix.querySelectorAll(".quadrant").forEach((el) => {
-    const wasActive = el.classList.contains("active");
-    const isActive = el.dataset.quadrant === activeQuadrant;
-    el.classList.toggle("active", isActive);
-    el.style.display = isActive ? "" : "none";
-    if (isActive && !wasActive) {
-      el.classList.remove("just-activated");
-      void el.offsetWidth;
-      el.classList.add("just-activated");
-    }
-  });
-}
-
-function setActiveQuadrant(key) {
-  if (key === activeQuadrant) return;
-  SoundManager.click();
-  activeQuadrant = key;
-  localStorage.setItem("meor-quadrant", key);
-  refreshDeck();
-}
-
 function applyShopFilterUI() {
   shopFilterBtns.forEach((b) => {
     b.classList.toggle("active", b.dataset.cat === shoppingFilter);
@@ -1018,9 +980,6 @@ addModal.addEventListener("click", (e) => {
 });
 
 floatAddBtn.addEventListener("click", openModal);
-
-const deckAddBtn = document.getElementById("deck-add-btn");
-if (deckAddBtn) deckAddBtn.addEventListener("click", openModal);
 
 /* ── Calendar ── */
 
@@ -1429,16 +1388,6 @@ shopForm.addEventListener("submit", (e) => {
 });
 
 matrix.addEventListener("click", (e) => {
-  const tab = e.target.closest(".deck-tab");
-  if (tab) {
-    setActiveQuadrant(tab.dataset.quadrant);
-    return;
-  }
-  const quad = e.target.closest(".quadrant");
-  if (quad && !quad.classList.contains("active")) {
-    setActiveQuadrant(quad.dataset.quadrant);
-    return;
-  }
   const item = e.target.closest(".todo-item");
   if (!item) return;
   if (e.target.classList.contains("todo-delete")) {
@@ -1511,41 +1460,41 @@ matrix.addEventListener("dragend", () => {
     .querySelectorAll(".todo-item.dragging")
     .forEach((el) => el.classList.remove("dragging"));
   document
-    .querySelectorAll(".quadrant.drag-over, .deck-tab.drag-over")
+    .querySelectorAll(".quadrant.drag-over")
     .forEach((el) => el.classList.remove("drag-over"));
 });
 
 matrix.addEventListener("dragover", (e) => {
-  const target = e.target.closest(".quadrant, .deck-tab");
-  if (!target) return;
+  const quadrant = e.target.closest(".quadrant");
+  if (!quadrant) return;
   e.preventDefault();
   e.dataTransfer.dropEffect = "move";
-  target.classList.add("drag-over");
+  quadrant.classList.add("drag-over");
 });
 
 matrix.addEventListener("dragleave", (e) => {
-  const target = e.target.closest(".quadrant, .deck-tab");
-  if (!target) return;
-  if (e.relatedTarget && target.contains(e.relatedTarget)) return;
-  target.classList.remove("drag-over");
+  const quadrant = e.target.closest(".quadrant");
+  if (!quadrant) return;
+  if (e.relatedTarget && quadrant.contains(e.relatedTarget)) return;
+  quadrant.classList.remove("drag-over");
 });
 
 matrix.addEventListener("drop", (e) => {
   e.preventDefault();
   document
-    .querySelectorAll(".quadrant.drag-over, .deck-tab.drag-over")
+    .querySelectorAll(".quadrant.drag-over")
     .forEach((el) => el.classList.remove("drag-over"));
   document
     .querySelectorAll(".todo-item.dragging")
     .forEach((el) => el.classList.remove("dragging"));
 
-  const target = e.target.closest(".quadrant, .deck-tab");
-  if (!target) return;
+  const quadrant = e.target.closest(".quadrant");
+  if (!quadrant) return;
 
   const todoId = e.dataTransfer.getData("text/plain");
   if (!todoId) return;
 
-  const qClass = Array.from(target.classList).find((c) => /^q[1-4]$/.test(c));
+  const qClass = Array.from(quadrant.classList).find((c) => /^q[1-4]$/.test(c));
   if (!qClass) return;
 
   const targetTag = QUADRANTS.find((q) => q.key === qClass).tag;
@@ -1559,10 +1508,6 @@ matrix.addEventListener("drop", (e) => {
   const newTitle = targetTag ? `${cleanTitle} ${targetTag}` : cleanTitle;
 
   SoundManager.drop();
-  if (qClass !== activeQuadrant) {
-    activeQuadrant = qClass;
-    localStorage.setItem("meor-quadrant", qClass);
-  }
   renameTodo(todoId, newTitle);
 });
 

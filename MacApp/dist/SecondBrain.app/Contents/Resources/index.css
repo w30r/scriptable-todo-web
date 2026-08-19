@@ -440,152 +440,25 @@ select:focus {
 
 /* ---------- Matrix / Quadrant cards ---------- */
 
-.matrix.deck {
-  display: block;
-  margin-bottom: 24px;
-}
-
-/* ---------- Folder tabs ---------- */
-
-.deck-tabs {
-  display: flex;
-  gap: 6px;
-  padding: 0 14px;
-  margin-bottom: -12px;
-  position: relative;
-  z-index: 2;
-}
-
-.deck-tab {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 9px 10px 22px;
-  border: none;
-  border-radius: 14px 14px 0 0;
-  background: rgba(255, 255, 255, 0.32);
-  color: rgba(17, 17, 17, 0.65);
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
-}
-
-.deck-tab:hover {
-  background: rgba(255, 255, 255, 0.55);
-  color: var(--ink);
-}
-
-.deck-tab.active {
-  background: var(--tab-bg);
-  color: var(--ink);
-  padding-bottom: 24px;
-}
-
-.deck-tab.q1 { --tab-bg: linear-gradient(180deg, #ffd9cc 0%, #ffc3b2 100%); }
-.deck-tab.q2 { --tab-bg: linear-gradient(180deg, #d9f6e2 0%, #b6eccd 100%); }
-.deck-tab.q3 { --tab-bg: linear-gradient(180deg, #d8eaff 0%, #b2d6ff 100%); }
-.deck-tab.q4 { --tab-bg: linear-gradient(180deg, #e9e2ff 0%, #d2c2ff 100%); }
-
-.deck-tab .quadrant-icon {
-  width: 18px;
-  height: 18px;
-  color: inherit;
-}
-
-.deck-tab .quadrant-icon svg {
-  width: 15px;
-  height: 15px;
-}
-
-.deck-tab-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.deck-tab-count {
-  font-size: 11px;
-  opacity: 0.7;
-  margin-left: 2px;
-}
-
-.deck-tab.drag-over {
-  outline: 3px dashed rgba(17, 17, 17, 0.55);
-  outline-offset: -3px;
-}
-
-.matrix .quadrant.active {
-  position: relative;
-  z-index: 1;
-  min-height: 180px;
-  padding: 16px;
-  gap: 12px;
-  cursor: default;
-}
-
-.matrix .quadrant.active.just-activated {
-  animation: cardExpand 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-@keyframes cardExpand {
-  from {
-    transform: translateY(-10px) scale(0.985);
-    opacity: 0.5;
-  }
-  to {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
-}
-
-/* ---------- Add task pill under deck ---------- */
-
-.deck-add-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 13px;
-  margin: 0 0 20px;
-  border: 1.5px dashed rgba(255, 255, 255, 0.22);
-  border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-secondary);
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.deck-add-btn svg {
-  width: 16px;
-  height: 16px;
-}
-
-.deck-add-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary);
-  transform: translateY(-1px);
-}
-
-.deck-add-btn:active {
-  transform: scale(0.98);
+.matrix {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
 
 .quadrant {
   border-radius: var(--radius-lg);
+  padding: 16px;
   display: flex;
   flex-direction: column;
+  gap: 12px;
   box-shadow: var(--shadow-card);
   border: 1px solid rgba(17, 17, 17, 0.06);
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease;
+}
+
+.quadrant:hover {
+  transform: translateY(-2px);
 }
 
 .quadrant.q1 {
@@ -622,28 +495,7 @@ select:focus {
 
 .quadrant-title {
   display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.quadrant-icon {
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
-  color: rgba(17, 17, 17, 0.85);
-}
-
-.quadrant-icon svg {
-  width: 18px;
-  height: 18px;
-}
-
-.quadrant-text {
-  display: flex;
   flex-direction: column;
-  align-items: flex-start;
   gap: 2px;
 }
 
@@ -1678,21 +1530,6 @@ select:focus {
 
   .matrix {
     grid-template-columns: 1fr;
-  }
-
-  .deck-tabs {
-    padding: 0 8px;
-    gap: 4px;
-  }
-
-  .deck-tab {
-    padding-left: 6px;
-    padding-right: 6px;
-    font-size: 11px;
-  }
-
-  .deck-tab-count {
-    display: none;
   }
 
   .hero-inner {

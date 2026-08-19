@@ -1,0 +1,1574 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>ELSA — Work Hub</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      :root {
+        --tab-bar-height: 60px;
+        --tab-bar-safe-bottom: env(safe-area-inset-bottom, 0px);
+      }
+
+      .container {
+        padding-bottom: calc(
+          var(--tab-bar-height) + var(--tab-bar-safe-bottom) + 16px
+        );
+      }
+
+      /* Tab Bar */
+      .tab-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        background: var(--bg-surface);
+        border-top: 1px solid var(--border);
+        z-index: 200;
+        padding: 6px 0 calc(6px + var(--tab-bar-safe-bottom));
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      .tab-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1px;
+        padding: 4px 8px;
+        border: none;
+        background: transparent;
+        color: var(--text-tertiary);
+        font-family: inherit;
+        font-size: 0.6rem;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        cursor: pointer;
+        transition: color var(--transition-fast);
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+      }
+
+      .tab-item.active {
+        color: var(--text-primary);
+      }
+
+      .tab-icon {
+        font-size: 1.3rem;
+        line-height: 1.3;
+      }
+
+      .tab-label {
+        text-transform: uppercase;
+      }
+
+      /* Tab Panels */
+      .tab-panel {
+        display: none;
+      }
+      .tab-panel.active {
+        display: block;
+        animation: fadeSlideIn 0.2s ease;
+      }
+
+      @keyframes fadeSlideIn {
+        from {
+          opacity: 0.5;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Tasks Panel */
+      .task-input-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 1rem;
+      }
+
+      .task-input {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: 1.5px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        font-family: inherit;
+        font-size: 0.9rem;
+        outline: none;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        transition:
+          border-color var(--transition),
+          box-shadow var(--transition);
+      }
+
+      .task-input:focus {
+        border-color: var(--text-tertiary);
+        box-shadow: 0 0 0 3px rgba(174, 174, 178, 0.1);
+      }
+
+      .task-input::placeholder {
+        color: var(--text-muted);
+      }
+
+      .task-add-btn {
+        width: 44px;
+        height: 44px;
+        border: none;
+        border-radius: var(--radius-md);
+        background: var(--text-primary);
+        color: var(--bg-primary);
+        font-size: 1.4rem;
+        font-weight: 300;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--transition-fast);
+        flex-shrink: 0;
+        line-height: 1;
+      }
+
+      .task-add-btn:hover {
+        opacity: 0.85;
+      }
+
+      .task-add-btn:active {
+        transform: scale(0.92);
+      }
+
+      .task-meta {
+        font-size: 0.7rem;
+        color: var(--text-tertiary);
+        margin-bottom: 0.75rem;
+      }
+
+      .task-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .task-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0.7rem 0.85rem;
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        transition: border-color var(--transition);
+        animation: fadeIn 0.2s ease;
+      }
+
+      .task-item:hover {
+        border-color: var(--border);
+      }
+
+      .task-toggle {
+        width: 22px;
+        height: 22px;
+        border: 2px solid var(--text-tertiary);
+        border-radius: 50%;
+        background: transparent;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.65rem;
+        color: transparent;
+        transition: all var(--transition-fast);
+        flex-shrink: 0;
+        padding: 0;
+      }
+
+      .task-toggle.done {
+        background: var(--text-primary);
+        border-color: var(--text-primary);
+        color: var(--bg-primary);
+      }
+
+      .task-title {
+        flex: 1;
+        font-size: 0.9rem;
+        color: var(--text-primary);
+        line-height: 1.3;
+        word-break: break-word;
+      }
+
+      .task-title.done {
+        text-decoration: line-through;
+        color: var(--text-tertiary);
+      }
+
+      .task-delete {
+        width: 26px;
+        height: 26px;
+        border: none;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--text-tertiary);
+        font-size: 0.75rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--transition-fast);
+        flex-shrink: 0;
+        opacity: 0.4;
+      }
+
+      .task-item:hover .task-delete {
+        opacity: 1;
+      }
+
+      .task-delete:hover {
+        background: var(--red-bg);
+        color: var(--red);
+      }
+
+      .task-empty {
+        text-align: center;
+        padding: 2.5rem 1rem;
+        color: var(--text-tertiary);
+        font-size: 0.85rem;
+        font-style: italic;
+      }
+
+      /* Existing header styles preserved */
+      .elsa-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+      }
+
+      .elsa-header h1 {
+        font-size: 1.75rem;
+        letter-spacing: -0.5px;
+      }
+
+      .elsa-header .sub {
+        display: block;
+        font-size: 0.7rem;
+        font-weight: 400;
+        color: var(--text-tertiary);
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        margin-top: 2px;
+      }
+
+      .elsa-header-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .back-link {
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+        text-decoration: none;
+        padding: 6px 14px;
+        border: 1px solid var(--border-subtle);
+        border-radius: 20px;
+        transition: all var(--transition-fast);
+      }
+
+      .back-link:hover {
+        color: var(--text-secondary);
+        border-color: var(--text-tertiary);
+      }
+
+      .export-btn {
+        font-size: 0.7rem;
+        color: var(--text-tertiary);
+        padding: 6px 14px;
+        border: 1px solid var(--border-subtle);
+        border-radius: 20px;
+        background: transparent;
+        font-family: inherit;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        white-space: nowrap;
+      }
+
+      .export-btn:hover {
+        color: var(--text-secondary);
+        border-color: var(--text-tertiary);
+        background: var(--bg-hover);
+      }
+
+      /* Existing context styles */
+      .elsa-cat-filters {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 1.25rem;
+        flex-wrap: wrap;
+      }
+
+      .cat-filter {
+        padding: 0.35rem 0.75rem;
+        border: 1px solid var(--border-subtle);
+        background: transparent;
+        font-family: inherit;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--text-tertiary);
+        cursor: pointer;
+        transition: all var(--transition);
+        border-radius: 20px;
+      }
+
+      .cat-filter:hover {
+        border-color: var(--text-tertiary);
+        color: var(--text-secondary);
+      }
+
+      .cat-filter.active {
+        color: var(--bg-primary);
+        background: var(--text-primary);
+        border-color: var(--text-primary);
+        font-weight: 600;
+      }
+
+      .cat-filter-dot {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        margin-right: 4px;
+        vertical-align: middle;
+      }
+
+      .elsa-card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 14px;
+        margin-bottom: 2rem;
+      }
+
+      .elsa-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 1.25rem;
+        transition:
+          border-color var(--transition),
+          box-shadow var(--transition);
+        position: relative;
+        overflow: hidden;
+        animation: fadeIn 0.25s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .elsa-card:hover {
+        border-color: var(--border);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .elsa-card-cat {
+        display: inline-block;
+        font-size: 0.55rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 2px 10px;
+        border-radius: 20px;
+        margin-bottom: 0.6rem;
+      }
+
+      .elsa-card-title {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        line-height: 1.3;
+      }
+
+      .elsa-card-content {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .elsa-card-content ul,
+      .elsa-card-content ol {
+        padding-left: 1.2rem;
+        margin: 0.3rem 0;
+      }
+
+      .elsa-card-content li {
+        margin-bottom: 0.2rem;
+      }
+
+      .elsa-card-actions {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        gap: 4px;
+        opacity: 0;
+        transition: opacity var(--transition-fast);
+      }
+
+      .elsa-card:hover .elsa-card-actions {
+        opacity: 1;
+      }
+
+      .card-action-btn {
+        width: 28px;
+        height: 28px;
+        border: none;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--text-tertiary);
+        font-size: 0.8rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--transition-fast);
+      }
+
+      .card-action-btn:hover {
+        background: var(--bg-hover);
+        color: var(--text-primary);
+      }
+
+      .card-action-btn.danger:hover {
+        background: var(--red-bg);
+        color: var(--red);
+      }
+
+      .elsa-empty {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 3rem 1rem;
+        color: var(--text-tertiary);
+        font-size: 0.85rem;
+        font-style: italic;
+      }
+
+      .elsa-empty strong {
+        color: var(--text-secondary);
+        font-style: normal;
+      }
+
+      .elsa-count {
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+        margin-bottom: 1rem;
+      }
+
+      #elsa-add-btn {
+        position: fixed;
+        bottom: calc(28px + var(--tab-bar-height) + var(--tab-bar-safe-bottom));
+        right: 28px;
+        width: 56px;
+        height: 56px;
+        border: none;
+        border-radius: 50%;
+        background: var(--text-primary);
+        color: var(--bg-primary);
+        font-size: 1.8rem;
+        font-weight: 300;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(242, 242, 247, 0.2);
+        transition: all var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        line-height: 1;
+      }
+
+      #elsa-add-btn:hover {
+        transform: scale(1.1) translateY(-2px);
+        box-shadow: 0 8px 30px rgba(242, 242, 247, 0.25);
+      }
+
+      #elsa-add-btn:active {
+        transform: scale(0.95);
+        box-shadow: 0 2px 10px rgba(242, 242, 247, 0.15);
+      }
+
+      .modal-card textarea {
+        width: 100%;
+        min-height: 140px;
+        padding: 0.85rem 0.75rem;
+        border: 1.5px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        font-family: inherit;
+        font-size: 0.9rem;
+        outline: none;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        transition:
+          border-color var(--transition),
+          box-shadow var(--transition);
+        resize: vertical;
+        line-height: 1.5;
+      }
+
+      .modal-card textarea:focus {
+        border-color: var(--text-tertiary);
+        box-shadow: 0 0 0 3px rgba(174, 174, 178, 0.1);
+      }
+
+      .modal-card textarea::placeholder {
+        color: var(--text-muted);
+      }
+
+      .modal-card select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1.5px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        font-family: inherit;
+        font-size: 0.85rem;
+        background: var(--bg-primary);
+        color: var(--text-secondary);
+        outline: none;
+        cursor: pointer;
+        transition: border-color var(--transition);
+        margin-bottom: 0.75rem;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23636366' d='M6 8.825L1.175 4 2.238 2.938 6 6.7 9.763 2.937 10.825 4z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        padding-right: 32px;
+      }
+
+      .modal-card select:focus {
+        border-color: var(--text-tertiary);
+      }
+
+      @media (max-width: 640px) {
+        .elsa-card-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .elsa-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 12px;
+        }
+
+        #elsa-add-btn {
+          bottom: calc(
+            20px + var(--tab-bar-height) + var(--tab-bar-safe-bottom)
+          );
+          right: 20px;
+          width: 48px;
+          height: 48px;
+          font-size: 1.5rem;
+        }
+      }
+
+      /* Timesheet */
+      .ts-nav {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 1rem;
+      }
+
+      .ts-nav-btn {
+        width: 36px;
+        height: 36px;
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--text-secondary);
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--transition-fast);
+      }
+
+      .ts-nav-btn:hover {
+        border-color: var(--text-tertiary);
+        color: var(--text-primary);
+      }
+
+      .ts-date-input {
+        flex: 1;
+        padding: 0.5rem 0.75rem;
+        border: 1.5px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        font-family: inherit;
+        font-size: 0.85rem;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        outline: none;
+        transition: border-color var(--transition);
+        color-scheme: dark;
+      }
+
+      .ts-date-input:focus {
+        border-color: var(--text-tertiary);
+      }
+
+      .ts-count {
+        font-size: 0.7rem;
+        color: var(--text-tertiary);
+        margin-bottom: 0.75rem;
+      }
+
+      .ts-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 1rem;
+      }
+
+      .ts-entry {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 0.7rem 0.85rem;
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        animation: fadeIn 0.2s ease;
+      }
+
+      .ts-entry-time {
+        font-size: 0.7rem;
+        color: var(--text-tertiary);
+        white-space: nowrap;
+        min-width: 48px;
+        padding-top: 2px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .ts-entry-text {
+        flex: 1;
+        font-size: 0.9rem;
+        color: var(--text-primary);
+        line-height: 1.4;
+        word-break: break-word;
+      }
+
+      .ts-entry-delete {
+        width: 26px;
+        height: 26px;
+        border: none;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--text-tertiary);
+        font-size: 0.75rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.4;
+        transition: all var(--transition-fast);
+        flex-shrink: 0;
+      }
+
+      .ts-entry:hover .ts-entry-delete {
+        opacity: 1;
+      }
+
+      .ts-entry-delete:hover {
+        background: var(--red-bg);
+        color: var(--red);
+      }
+
+      .ts-input-row {
+        display: flex;
+        gap: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="elsa-header">
+        <div>
+          <h1>ELSA</h1>
+          <span class="sub">Work Hub</span>
+        </div>
+        <div class="elsa-header-actions">
+          <a
+            href="https://app.meorsyamil.com/api/elsacontext/export"
+            target="_blank"
+            class="export-btn"
+            id="gemini-source-link"
+            title="Server-rendered page - use this URL in Gemini Notebook"
+            >🌐 Gemini Source</a
+          >
+          <button
+            class="export-btn"
+            id="export-html-btn"
+            title="Generate static HTML for Gemini Notebook"
+          >
+            📄 Source Export
+          </button>
+          <button
+            class="export-btn"
+            id="copy-text-btn"
+            title="Copy all cards as text"
+          >
+            📋 Copy Text
+          </button>
+          <a href="index.html" class="back-link">← Back to App</a>
+        </div>
+      </div>
+
+      <div id="tab-content">
+        <!-- Tasks Panel -->
+        <div id="panel-tasks" class="tab-panel">
+          <div class="task-input-row">
+            <input
+              type="text"
+              id="task-input"
+              class="task-input"
+              placeholder="Add a work task..."
+            />
+            <button id="task-add-btn" class="task-add-btn">+</button>
+          </div>
+          <div class="task-meta" id="task-meta"></div>
+          <div class="task-list" id="task-list"></div>
+        </div>
+
+        <!-- Context Panel -->
+        <div id="panel-context" class="tab-panel">
+          <div class="elsa-cat-filters" id="cat-filters">
+            <button class="cat-filter active" data-cat="all">All</button>
+            <button class="cat-filter" data-cat="role">
+              <span class="cat-filter-dot" style="background: #0a84ff"></span
+              >Role
+            </button>
+            <button class="cat-filter" data-cat="project">
+              <span class="cat-filter-dot" style="background: #30d158"></span
+              >Projects
+            </button>
+            <button class="cat-filter" data-cat="workflow">
+              <span class="cat-filter-dot" style="background: #ff9f0a"></span
+              >Workflows
+            </button>
+            <button class="cat-filter" data-cat="note">
+              <span class="cat-filter-dot" style="background: #bf5af2"></span
+              >Notes
+            </button>
+          </div>
+
+          <input
+            type="text"
+            id="elsa-search"
+            class="search-input"
+            placeholder="Search cards..."
+          />
+
+          <div class="elsa-count" id="elsa-count">0 cards</div>
+
+          <div class="elsa-card-grid" id="elsa-card-grid">
+            <div class="elsa-empty">
+              No cards yet. Tap <strong>+</strong> to add your first one.
+            </div>
+          </div>
+        </div>
+
+        <!-- Timesheet Panel -->
+        <div id="panel-timesheet" class="tab-panel">
+          <div class="ts-nav">
+            <button class="ts-nav-btn" id="ts-prev">←</button>
+            <input type="date" id="ts-date" class="ts-date-input" />
+            <button class="ts-nav-btn" id="ts-next">→</button>
+          </div>
+          <div class="ts-count" id="ts-count"></div>
+          <div class="ts-list" id="ts-list">
+            <div class="task-empty" id="ts-empty">No entries for this day.</div>
+          </div>
+          <div class="ts-input-row">
+            <input
+              type="text"
+              id="ts-input"
+              class="task-input"
+              placeholder="Log what you did..."
+            />
+            <button id="ts-add-btn" class="task-add-btn">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-bar" id="tab-bar">
+      <button class="tab-item active" data-tab="tasks">
+        <span class="tab-icon">📋</span>
+        <span class="tab-label">Tasks</span>
+      </button>
+      <button class="tab-item" data-tab="timesheet">
+        <span class="tab-icon">📅</span>
+        <span class="tab-label">Timesheet</span>
+      </button>
+      <button class="tab-item" data-tab="context">
+        <span class="tab-icon">🧠</span>
+        <span class="tab-label">Context</span>
+      </button>
+    </div>
+
+    <button id="elsa-add-btn" title="Add card">+</button>
+
+    <div id="elsa-modal" class="modal-overlay" style="display: none">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 id="modal-title">New Card</h3>
+          <button class="modal-close" id="modal-close">✕</button>
+        </div>
+        <input type="text" id="card-title-input" placeholder="Card title" />
+        <select id="card-cat-input">
+          <option value="role">Role &amp; Responsibilities</option>
+          <option value="project">Projects &amp; Tasks</option>
+          <option value="workflow">Workflows &amp; SOPs</option>
+          <option value="note">General Notes</option>
+        </select>
+        <textarea
+          id="card-content-input"
+          placeholder="Write your notes, workflows, SOPs, or any info here..."
+        ></textarea>
+        <button class="edit-save-btn" id="card-save-btn">Save</button>
+      </div>
+    </div>
+
+    <script>
+      // ============================================================
+      // CONSTANTS
+      // ============================================================
+      const PRIMARY_ORIGIN = "https://app.meorsyamil.com";
+      const FALLBACK_ORIGIN = "https://scriptable-todo.onrender.com";
+
+      const ELSA_TASKS_API = PRIMARY_ORIGIN + "/api/elsa-tasks";
+      const ELSA_API = PRIMARY_ORIGIN + "/api/elsacontext";
+      const TIMESHEET_API = PRIMARY_ORIGIN + "/api/timesheet";
+      const PROGRESS_API = PRIMARY_ORIGIN + "/api/progress";
+
+      // Try the primary (tailnet) origin first, fall back to the Render-hosted
+      // backend if the primary is unreachable or returns an error.
+      function fetchWithFallback(url, options) {
+        const fallbackUrl =
+          url.indexOf(PRIMARY_ORIGIN) === 0
+            ? FALLBACK_ORIGIN + url.slice(PRIMARY_ORIGIN.length)
+            : null;
+        return fetch(url, options)
+          .then((res) => {
+            if (res.ok) return res;
+            throw new Error("API error: " + res.status);
+          })
+          .catch((err) => {
+            if (!fallbackUrl) throw err;
+            return fetch(fallbackUrl, options).then((res) => {
+              if (res.ok) return res;
+              throw new Error("API error: " + res.status);
+            });
+          });
+      }
+
+      const CATEGORIES = [
+        { key: "role", label: "Role & Responsibilities", color: "#0a84ff" },
+        { key: "project", label: "Projects & Tasks", color: "#30d158" },
+        { key: "workflow", label: "Workflows & SOPs", color: "#ff9f0a" },
+        { key: "note", label: "General Notes", color: "#bf5af2" },
+      ];
+
+      // ============================================================
+      // STATE
+      // ============================================================
+      let activeTab = "tasks";
+      let tasks = [];
+      let cards = [];
+      let entries = [];
+      let tsDate = new Date();
+      let activeCat = "all";
+      let searchQuery = "";
+      let editingId = null;
+
+      // ============================================================
+      // DOM REFS
+      // ============================================================
+      const tabBar = document.getElementById("tab-bar");
+      const panelTasks = document.getElementById("panel-tasks");
+      const panelContext = document.getElementById("panel-context");
+      const panelTimesheet = document.getElementById("panel-timesheet");
+      const taskInput = document.getElementById("task-input");
+      const taskAddBtn = document.getElementById("task-add-btn");
+      const taskList = document.getElementById("task-list");
+      const taskMeta = document.getElementById("task-meta");
+      const addBtn = document.getElementById("elsa-add-btn");
+      const grid = document.getElementById("elsa-card-grid");
+      const countEl = document.getElementById("elsa-count");
+      const searchEl = document.getElementById("elsa-search");
+      const catFilters = document.getElementById("cat-filters");
+      const modal = document.getElementById("elsa-modal");
+      const modalTitle = document.getElementById("modal-title");
+      const modalClose = document.getElementById("modal-close");
+      const titleInput = document.getElementById("card-title-input");
+      const catInput = document.getElementById("card-cat-input");
+      const contentInput = document.getElementById("card-content-input");
+      const saveBtn = document.getElementById("card-save-btn");
+
+      // ============================================================
+      // TAB SWITCHING
+      // ============================================================
+      function switchTab(tab, persist = true) {
+        activeTab = tab;
+
+        tabBar
+          .querySelectorAll(".tab-item")
+          .forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
+        panelTasks.classList.toggle("active", tab === "tasks");
+        panelTimesheet.classList.toggle("active", tab === "timesheet");
+        panelContext.classList.toggle("active", tab === "context");
+
+        addBtn.style.display = tab === "context" ? "flex" : "none";
+
+        if (tab === "context" && cards.length === 0) loadCards();
+        if (tab === "timesheet") loadEntries();
+
+        if (persist) {
+          apiProgress(null, {
+            method: "PUT",
+            body: JSON.stringify({ elsaTab: tab }),
+          }).catch(() => {});
+        }
+      }
+
+      async function apiProgress(path, options) {
+        const url = PROGRESS_API;
+        const full = path ? `${url}/${path}` : url;
+        const res = await fetchWithFallback(full, {
+          headers: { "Content-Type": "application/json" },
+          ...options,
+        });
+        if (!res.ok) throw new Error("API error");
+        return res.json();
+      }
+
+      tabBar.addEventListener("click", (e) => {
+        const tabItem = e.target.closest(".tab-item");
+        if (tabItem && tabItem.dataset.tab !== activeTab) {
+          switchTab(tabItem.dataset.tab);
+        }
+      });
+
+      // ============================================================
+      // TASKS
+      // ============================================================
+      function apiElsaTasks(path, options) {
+        const url = path ? `${ELSA_TASKS_API}/${path}` : ELSA_TASKS_API;
+        return fetchWithFallback(url, {
+          headers: { "Content-Type": "application/json" },
+          ...options,
+        }).then((r) => {
+          if (!r.ok) throw new Error("API error");
+          return r.json();
+        });
+      }
+
+      async function loadTasks() {
+        try {
+          tasks = await apiElsaTasks();
+          renderTasks();
+        } catch {
+          taskList.innerHTML =
+            '<div class="task-empty">Failed to load tasks.</div>';
+        }
+      }
+
+      function renderTasks() {
+        if (tasks.length === 0) {
+          taskList.innerHTML =
+            '<div class="task-empty">No work tasks yet. Add one above.</div>';
+          taskMeta.textContent = "";
+          return;
+        }
+
+        const sorted = [...tasks].sort((a, b) => {
+          if (a.completed !== b.completed) return a.completed ? 1 : -1;
+          return 0;
+        });
+
+        const done = tasks.filter((t) => t.completed).length;
+        taskMeta.textContent = `${tasks.length} task${tasks.length !== 1 ? "s" : ""}${done ? `, ${done} done` : ""}`;
+
+        taskList.innerHTML = sorted
+          .map((t) => {
+            const isDone = t.completed;
+            return `
+            <div class="task-item" data-id="${t._id}">
+              <button class="task-toggle${isDone ? " done" : ""}" data-action="toggle" data-id="${t._id}">${isDone ? "✓" : ""}</button>
+              <span class="task-title${isDone ? " done" : ""}">${escapeHtml(t.title)}</span>
+              <button class="task-delete" data-action="delete" data-id="${t._id}">✕</button>
+            </div>
+          `;
+          })
+          .join("");
+
+        taskList.querySelectorAll('[data-action="toggle"]').forEach((btn) => {
+          btn.addEventListener("click", () => toggleTask(btn.dataset.id));
+        });
+        taskList.querySelectorAll('[data-action="delete"]').forEach((btn) => {
+          btn.addEventListener("click", () => deleteTask(btn.dataset.id));
+        });
+      }
+
+      function escapeHtml(s) {
+        const div = document.createElement("div");
+        div.textContent = s;
+        return div.innerHTML;
+      }
+
+      async function addTask(title) {
+        if (!title.trim()) return;
+        const saved = await apiElsaTasks(null, {
+          method: "POST",
+          body: JSON.stringify({ title: title.trim() }),
+        });
+        tasks.unshift(saved);
+        renderTasks();
+      }
+
+      async function toggleTask(id) {
+        const t = tasks.find((x) => x._id === id);
+        if (!t) return;
+        const updated = await apiElsaTasks(id, {
+          method: "PUT",
+          body: JSON.stringify({ completed: !t.completed }),
+        });
+        Object.assign(t, updated);
+        renderTasks();
+      }
+
+      async function deleteTask(id) {
+        await apiElsaTasks(id, { method: "DELETE" });
+        tasks = tasks.filter((t) => t._id !== id);
+        renderTasks();
+      }
+
+      taskAddBtn.addEventListener("click", () => {
+        const v = taskInput.value.trim();
+        if (v) {
+          addTask(v);
+          taskInput.value = "";
+          taskInput.focus();
+        }
+      });
+      taskInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          taskAddBtn.click();
+        }
+      });
+
+      // ============================================================
+      // CONTEXT (elsacontext)
+      // ============================================================
+      async function fetchApi(path, options) {
+        const url = path ? `${ELSA_API}/${path}` : ELSA_API;
+        const res = await fetchWithFallback(url, {
+          headers: { "Content-Type": "application/json" },
+          ...options,
+        });
+        if (!res.ok) throw new Error(`API error: ${res.status}`);
+        return res.json();
+      }
+
+      async function loadCards() {
+        try {
+          cards = await fetchApi();
+          renderCards();
+        } catch {
+          grid.innerHTML =
+            '<div class="elsa-empty">Failed to load cards. Check your connection.</div>';
+        }
+      }
+
+      function getCat(key) {
+        return CATEGORIES.find((c) => c.key === key) || CATEGORIES[3];
+      }
+
+      function formatContent(text) {
+        let html = text
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+        html = html.replace(
+          /^## (.+)$/gm,
+          '<h4 style="font-size:0.9rem;font-weight:600;color:#f2f2f7;margin:0.6rem 0 0.3rem">$1</h4>',
+        );
+        html = html.replace(/^- (.+)$/gm, "<li>$1</li>");
+        html = html.replace(
+          /(<li>.*<\/li>\n?)+/g,
+          '<ul style="padding-left:1.2rem;margin:0.3rem 0">$&</ul>',
+        );
+        html = html.replace(
+          /\*\*(.+?)\*\*/g,
+          '<strong style="color:#f2f2f7">$1</strong>',
+        );
+        html = html.replace(/\n\n/g, '</p><p style="margin:0.5rem 0">');
+        html = html.replace(/\n/g, "<br/>");
+        return '<p style="margin:0">' + html + "</p>";
+      }
+
+      function renderCards() {
+        const filtered = cards.filter((c) => {
+          if (activeCat !== "all" && c.category !== activeCat) return false;
+          if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            const match =
+              c.title.toLowerCase().includes(q) ||
+              c.content.toLowerCase().includes(q);
+            if (!match) return false;
+          }
+          return true;
+        });
+
+        countEl.textContent =
+          filtered.length + " card" + (filtered.length !== 1 ? "s" : "");
+
+        if (filtered.length === 0) {
+          grid.innerHTML =
+            '<div class="elsa-empty">' +
+            (cards.length === 0
+              ? "No cards yet. Tap <strong>+</strong> to add your first one."
+              : "No cards match your filters.") +
+            "</div>";
+          return;
+        }
+
+        grid.innerHTML = filtered
+          .map((c) => {
+            const cat = getCat(c.category);
+            const date = new Date(c.updatedAt || c.createdAt);
+            const dateStr = date.toLocaleDateString("en-MY", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            });
+            return `
+            <article class="elsa-card" data-id="${c._id}">
+              <div class="elsa-card-actions">
+                <button class="card-action-btn" data-action="edit" data-id="${c._id}" title="Edit">✎</button>
+                <button class="card-action-btn danger" data-action="delete" data-id="${c._id}" title="Delete">✕</button>
+              </div>
+              <div class="elsa-card-cat" style="background:${cat.color}22;color:${cat.color}">${cat.label}</div>
+              <h2 class="elsa-card-title">${c.title}</h2>
+              <div class="elsa-card-content">${formatContent(c.content)}</div>
+              <div style="margin-top:0.6rem;font-size:0.6rem;color:var(--text-muted)">${dateStr}</div>
+            </article>
+          `;
+          })
+          .join("");
+
+        document.querySelectorAll('[data-action="edit"]').forEach((btn) => {
+          btn.addEventListener("click", () => openEdit(btn.dataset.id));
+        });
+        document.querySelectorAll('[data-action="delete"]').forEach((btn) => {
+          btn.addEventListener("click", () => deleteCard(btn.dataset.id));
+        });
+      }
+
+      async function addCard(title, category, content) {
+        const saved = await fetchApi(null, {
+          method: "POST",
+          body: JSON.stringify({ title, category, content }),
+        });
+        cards.unshift(saved);
+        renderCards();
+      }
+
+      async function updateCard(id, title, category, content) {
+        const saved = await fetchApi(id, {
+          method: "PUT",
+          body: JSON.stringify({ title, category, content }),
+        });
+        const idx = cards.findIndex((c) => c._id === id);
+        if (idx !== -1) cards[idx] = saved;
+        renderCards();
+      }
+
+      async function deleteCard(id) {
+        if (!confirm("Delete this card?")) return;
+        await fetchApi(id, { method: "DELETE" });
+        cards = cards.filter((c) => c._id !== id);
+        renderCards();
+      }
+
+      function openAdd() {
+        editingId = null;
+        modalTitle.textContent = "New Card";
+        titleInput.value = "";
+        catInput.value = "role";
+        contentInput.value = "";
+        modal.style.display = "flex";
+        setTimeout(() => titleInput.focus(), 100);
+      }
+
+      function openEdit(id) {
+        const card = cards.find((c) => c._id === id);
+        if (!card) return;
+        editingId = id;
+        modalTitle.textContent = "Edit Card";
+        titleInput.value = card.title;
+        catInput.value = card.category;
+        contentInput.value = card.content;
+        modal.style.display = "flex";
+        setTimeout(() => titleInput.focus(), 100);
+      }
+
+      function closeModal() {
+        modal.style.display = "none";
+        editingId = null;
+      }
+
+      async function saveCard() {
+        const title = titleInput.value.trim();
+        const category = catInput.value;
+        const content = contentInput.value.trim();
+        if (!title) {
+          titleInput.focus();
+          return;
+        }
+        try {
+          saveBtn.disabled = true;
+          saveBtn.textContent = "Saving...";
+          if (editingId) {
+            await updateCard(editingId, title, category, content);
+          } else {
+            await addCard(title, category, content);
+          }
+          closeModal();
+        } catch {
+          alert("Failed to save card");
+        } finally {
+          saveBtn.disabled = false;
+          saveBtn.textContent = "Save";
+        }
+      }
+
+      function exportStaticHtml() {
+        if (cards.length === 0) {
+          alert("Add some cards first.");
+          return;
+        }
+        const cats = {
+          role: "Role & Responsibilities",
+          project: "Projects & Tasks",
+          workflow: "Workflows & SOPs",
+          note: "General Notes",
+        };
+        const cardsHtml = cards
+          .map((c) => {
+            const cat = cats[c.category] || "Note";
+            const esc = (s) =>
+              s
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/^## (.+)$/gm, "<h2>$1</h2>")
+                .replace(/^- (.+)$/gm, "<li>$1</li>")
+                .replace(/(<li>.*<\/li>\n?)+/g, "<ul>$&</ul>")
+                .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+                .replace(/\n\n/g, "</p><p>")
+                .replace(/\n/g, "<br/>");
+            return `<article>
+            <header><strong style="color:#0a84ff">${cat}</strong></header>
+            <h2 style="font-size:1.2rem;margin:0 0 0.3rem">${esc(c.title).replace(/<[^>]+>/g, "")}</h2>
+            <div><p>${esc(c.content)}</p></div>
+          </article>`;
+          })
+          .join("\n");
+        const html = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ELSA — Work Knowledge Base (Export)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#121214;color:#f2f2f7;padding:2rem;max-width:800px;margin:0 auto;line-height:1.6}
+h1{font-size:1.8rem;margin-bottom:0.3rem;letter-spacing:-0.5px}
+.sub{color:#636366;font-size:0.8rem;margin-bottom:2rem}
+article{background:#1e1e20;border:1px solid #2e2e32;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+h2{font-size:1.1rem;color:#f2f2f7;margin-bottom:0.5rem}
+p{color:#aeaeb2;font-size:0.9rem;margin:0.4rem 0}
+ul{padding-left:1.2rem;margin:0.3rem 0;color:#aeaeb2}
+li{margin-bottom:0.2rem}
+strong{color:#f2f2f7}
+header{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.4rem}
+</style>
+</head>
+<body>
+<h1>ELSA</h1>
+<div class="sub">Work Knowledge Base</div>
+${cardsHtml}
+</body>
+</html>`;
+        const blob = new Blob([html], { type: "text/html" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "elsa-export.html";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      function copyAsText() {
+        if (cards.length === 0) {
+          alert("Add some cards first.");
+          return;
+        }
+        const cats = {
+          role: "Role & Responsibilities",
+          project: "Projects & Tasks",
+          workflow: "Workflows & SOPs",
+          note: "General Notes",
+        };
+        const text = cards
+          .map((c) => {
+            const cat = cats[c.category] || "Note";
+            return `[${cat}] ${c.title}\n${c.content}\n`;
+          })
+          .join("\n---\n");
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            const btn = document.getElementById("copy-text-btn");
+            const orig = btn.textContent;
+            btn.textContent = "Copied!";
+            setTimeout(() => (btn.textContent = orig), 1500);
+          })
+          .catch(() => alert("Failed to copy"));
+      }
+
+      // ============================================================
+      // TIMESHEET
+      // ============================================================
+      const tsDateInput = document.getElementById("ts-date");
+      const tsPrev = document.getElementById("ts-prev");
+      const tsNext = document.getElementById("ts-next");
+      const tsList = document.getElementById("ts-list");
+      const tsCount = document.getElementById("ts-count");
+      const tsInput = document.getElementById("ts-input");
+      const tsAddBtn = document.getElementById("ts-add-btn");
+
+      function tsFormatDate(d) {
+        return d.toISOString().slice(0, 10);
+      }
+
+      function tsUpdateDateInput() {
+        tsDateInput.value = tsFormatDate(tsDate);
+      }
+
+      function tsChangeDate(offset) {
+        const d = new Date(tsDate);
+        d.setDate(d.getDate() + offset);
+        tsDate = d;
+        tsUpdateDateInput();
+        loadEntries();
+      }
+
+      async function loadEntries() {
+        const date = tsFormatDate(tsDate);
+        try {
+          const res = await fetchWithFallback(TIMESHEET_API + "?date=" + date);
+          entries = await res.json();
+        } catch {
+          entries = [];
+        }
+        renderEntries();
+      }
+
+      function renderEntries() {
+        if (entries.length === 0) {
+          tsList.innerHTML =
+            '<div class="task-empty">No entries for this day.</div>';
+          tsCount.textContent = "";
+          return;
+        }
+        tsCount.textContent =
+          entries.length + " entr" + (entries.length !== 1 ? "ies" : "y");
+        tsList.innerHTML = entries
+          .map((e) => {
+            const time = e.createdAt
+              ? new Date(e.createdAt).toLocaleTimeString("en-MY", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "";
+            return (
+              '<div class="ts-entry" data-id="' +
+              e._id +
+              '">' +
+              '<span class="ts-entry-time">' +
+              time +
+              "</span>" +
+              '<span class="ts-entry-text">' +
+              escapeHtml(e.text) +
+              "</span>" +
+              '<button class="ts-entry-delete" data-action="ts-delete" data-id="' +
+              e._id +
+              '">✕</button>' +
+              "</div>"
+            );
+          })
+          .join("");
+
+        tsList.querySelectorAll('[data-action="ts-delete"]').forEach((btn) => {
+          btn.addEventListener("click", () => deleteEntry(btn.dataset.id));
+        });
+      }
+
+      async function addEntry(text) {
+        if (!text.trim()) return;
+        try {
+          const res = await fetchWithFallback(TIMESHEET_API, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              date: tsFormatDate(tsDate),
+              text: text.trim(),
+            }),
+          });
+          const saved = await res.json();
+          entries.unshift(saved);
+          renderEntries();
+        } catch {}
+      }
+
+      async function deleteEntry(id) {
+        try {
+          await fetchWithFallback(TIMESHEET_API + "/" + id, {
+            method: "DELETE",
+          });
+          entries = entries.filter((e) => e._id !== id);
+          renderEntries();
+        } catch {}
+      }
+
+      // ============================================================
+      // INIT
+      // ============================================================
+      (async function init() {
+        try {
+          const progress = await apiProgress();
+          if (progress.elsaTab) activeTab = progress.elsaTab;
+        } catch {}
+        tsUpdateDateInput();
+        switchTab(activeTab, false);
+        loadTasks();
+      })();
+
+      catFilters.addEventListener("click", (e) => {
+        const btn = e.target.closest(".cat-filter");
+        if (!btn) return;
+        catFilters
+          .querySelectorAll(".cat-filter")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeCat = btn.dataset.cat;
+        renderCards();
+      });
+
+      searchEl.addEventListener("input", () => {
+        searchQuery = searchEl.value.trim();
+        renderCards();
+      });
+
+      addBtn.addEventListener("click", openAdd);
+      document
+        .getElementById("export-html-btn")
+        .addEventListener("click", exportStaticHtml);
+      document
+        .getElementById("copy-text-btn")
+        .addEventListener("click", copyAsText);
+      modalClose.addEventListener("click", closeModal);
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+      });
+      saveBtn.addEventListener("click", saveCard);
+
+      document
+        .getElementById("gemini-source-link")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          const primary = ELSA_API + "/export";
+          const fallback = FALLBACK_ORIGIN + "/api/elsacontext/export";
+          fetch(primary, { method: "HEAD" })
+            .then((r) => {
+              window.open(r.ok ? primary : fallback, "_blank");
+            })
+            .catch(() => window.open(fallback, "_blank"));
+        });
+
+      tsDateInput.addEventListener("change", () => {
+        if (tsDateInput.value) {
+          tsDate = new Date(tsDateInput.value + "T00:00:00");
+          loadEntries();
+        }
+      });
+      tsPrev.addEventListener("click", () => tsChangeDate(-1));
+      tsNext.addEventListener("click", () => tsChangeDate(1));
+      tsAddBtn.addEventListener("click", () => {
+        const v = tsInput.value.trim();
+        if (v) {
+          addEntry(v);
+          tsInput.value = "";
+          tsInput.focus();
+        }
+      });
+      tsInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          tsAddBtn.click();
+        }
+      });
+
+      titleInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          contentInput.focus();
+        }
+      });
+
+      contentInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+          e.preventDefault();
+          saveCard();
+        }
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeModal();
+      });
+    </script>
+  </body>
+</html>
