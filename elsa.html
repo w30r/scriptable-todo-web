@@ -155,6 +155,39 @@
         margin-bottom: 0.75rem;
       }
 
+      .task-filter {
+        display: inline-flex;
+        padding: 3px;
+        gap: 2px;
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        margin-bottom: 0.75rem;
+      }
+
+      .task-filter-btn {
+        padding: 0.3rem 0.85rem;
+        border: none;
+        border-radius: 16px;
+        background: transparent;
+        font-family: inherit;
+        font-size: 0.72rem;
+        font-weight: 500;
+        color: var(--text-tertiary);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+      }
+
+      .task-filter-btn:hover {
+        color: var(--text-secondary);
+      }
+
+      .task-filter-btn.active {
+        background: var(--text-primary);
+        color: var(--bg-primary);
+        font-weight: 600;
+      }
+
       .task-list {
         display: flex;
         flex-direction: column;
@@ -707,6 +740,96 @@
         display: flex;
         gap: 8px;
       }
+
+      /* Timesheet mini calendar */
+      .ts-cal {
+        max-width: 320px;
+        margin-bottom: 1rem;
+      }
+
+      .ts-cal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+      }
+
+      .ts-cal-head .ts-nav-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 0.85rem;
+      }
+
+      .ts-cal-title {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .ts-cal-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+      }
+
+      .ts-cal-dow {
+        text-align: center;
+        font-size: 0.6rem;
+        font-weight: 600;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        padding: 2px 0;
+      }
+
+      .ts-cal-day {
+        aspect-ratio: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        border: 1px solid transparent;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        font-family: inherit;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+      }
+
+      .ts-cal-day:hover {
+        background: var(--bg-hover);
+        color: var(--text-primary);
+      }
+
+      .ts-cal-day.other-month {
+        color: var(--text-muted);
+      }
+
+      .ts-cal-day.today {
+        border-color: var(--blue);
+        color: var(--blue);
+      }
+
+      .ts-cal-day.selected {
+        background: var(--text-primary);
+        border-color: var(--text-primary);
+        color: var(--bg-primary);
+        font-weight: 600;
+      }
+
+      .ts-cal-dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--blue);
+      }
+
+      .ts-cal-day.selected .ts-cal-dot {
+        background: var(--bg-primary);
+      }
     </style>
   </head>
   <body>
@@ -755,6 +878,12 @@
             />
             <button id="task-add-btn" class="task-add-btn">+</button>
           </div>
+          <div class="task-filter" id="task-filter">
+            <button class="task-filter-btn active" data-filter="all">All</button>
+            <button class="task-filter-btn" data-filter="undone">
+              Not done
+            </button>
+          </div>
           <div class="task-meta" id="task-meta"></div>
           <div class="task-list" id="task-list"></div>
         </div>
@@ -799,6 +928,28 @@
 
         <!-- Timesheet Panel -->
         <div id="panel-timesheet" class="tab-panel">
+          <div class="ts-cal">
+            <div class="ts-cal-head">
+              <button
+                class="ts-nav-btn"
+                id="ts-cal-prev"
+                type="button"
+                aria-label="Previous month"
+              >
+                ‹
+              </button>
+              <span class="ts-cal-title" id="ts-cal-title"></span>
+              <button
+                class="ts-nav-btn"
+                id="ts-cal-next"
+                type="button"
+                aria-label="Next month"
+              >
+                ›
+              </button>
+            </div>
+            <div class="ts-cal-grid" id="ts-cal-grid"></div>
+          </div>
           <div class="ts-nav">
             <button class="ts-nav-btn" id="ts-prev">←</button>
             <input type="date" id="ts-date" class="ts-date-input" />
@@ -910,6 +1061,7 @@
       let activeCat = "all";
       let searchQuery = "";
       let editingId = null;
+      let taskFilter = "all";
 
       // ============================================================
       // DOM REFS
@@ -922,6 +1074,7 @@
       const taskAddBtn = document.getElementById("task-add-btn");
       const taskList = document.getElementById("task-list");
       const taskMeta = document.getElementById("task-meta");
+      const taskFilterEl = document.getElementById("task-filter");
       const addBtn = document.getElementById("elsa-add-btn");
       const grid = document.getElementById("elsa-card-grid");
       const countEl = document.getElementById("elsa-count");
@@ -951,7 +1104,10 @@
         addBtn.style.display = tab === "context" ? "flex" : "none";
 
         if (tab === "context" && cards.length === 0) loadCards();
-        if (tab === "timesheet") loadEntries();
+        if (tab === "timesheet") {
+          loadEntries();
+          loadEntryDates();
+        }
 
         if (persist) {
           apiProgress(null, {
@@ -1016,10 +1172,21 @@
           return 0;
         });
 
+        const visible =
+          taskFilter === "undone"
+            ? sorted.filter((t) => !t.completed)
+            : sorted;
+
         const done = tasks.filter((t) => t.completed).length;
         taskMeta.textContent = `${tasks.length} task${tasks.length !== 1 ? "s" : ""}${done ? `, ${done} done` : ""}`;
 
-        taskList.innerHTML = sorted
+        if (visible.length === 0) {
+          taskList.innerHTML =
+            '<div class="task-empty">All tasks are done.</div>';
+          return;
+        }
+
+        taskList.innerHTML = visible
           .map((t) => {
             const isDone = t.completed;
             return `
@@ -1086,6 +1253,16 @@
           e.preventDefault();
           taskAddBtn.click();
         }
+      });
+
+      taskFilterEl.addEventListener("click", (e) => {
+        const btn = e.target.closest(".task-filter-btn");
+        if (!btn || btn.dataset.filter === taskFilter) return;
+        taskFilterEl
+          .querySelectorAll(".task-filter-btn")
+          .forEach((b) => b.classList.toggle("active", b === btn));
+        taskFilter = btn.dataset.filter;
+        renderTasks();
       });
 
       // ============================================================
@@ -1379,10 +1556,114 @@ ${cardsHtml}
       const tsCount = document.getElementById("ts-count");
       const tsInput = document.getElementById("ts-input");
       const tsAddBtn = document.getElementById("ts-add-btn");
+      const tsCalTitle = document.getElementById("ts-cal-title");
+      const tsCalGrid = document.getElementById("ts-cal-grid");
+      const tsCalPrev = document.getElementById("ts-cal-prev");
+      const tsCalNext = document.getElementById("ts-cal-next");
+
+      // Month shown in the mini calendar (day 1 avoids month overflow when
+      // shifting, e.g. Jan 31 -> Feb 31 -> Mar 3).
+      let tsCalView = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+      // "YYYY-MM-DD" -> entry count, from the full timesheet list.
+      let entryDates = {};
 
       function tsFormatDate(d) {
-        return d.toISOString().slice(0, 10);
+        return (
+          d.getFullYear() +
+          "-" +
+          String(d.getMonth() + 1).padStart(2, "0") +
+          "-" +
+          String(d.getDate()).padStart(2, "0")
+        );
       }
+
+      function tsCalShiftMonth(offset) {
+        tsCalView = new Date(
+          tsCalView.getFullYear(),
+          tsCalView.getMonth() + offset,
+          1,
+        );
+        renderMiniCalendar();
+      }
+
+      function renderMiniCalendar() {
+        const year = tsCalView.getFullYear();
+        const month = tsCalView.getMonth();
+
+        tsCalTitle.textContent = tsCalView.toLocaleDateString("en-MY", {
+          month: "long",
+          year: "numeric",
+        });
+
+        const selectedKey = tsFormatDate(tsDate);
+        const todayKey = tsFormatDate(new Date());
+
+        const cell = (dayNum, cellMonth, other) => {
+          const key = tsFormatDate(new Date(year, cellMonth, dayNum));
+          let cls = "ts-cal-day";
+          if (other) cls += " other-month";
+          if (key === todayKey) cls += " today";
+          if (key === selectedKey) cls += " selected";
+          const dot = entryDates[key] ? '<span class="ts-cal-dot"></span>' : "";
+          return (
+            '<button type="button" class="' +
+            cls +
+            '" data-date="' +
+            key +
+            '">' +
+            dayNum +
+            dot +
+            "</button>"
+          );
+        };
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const daysInPrev = new Date(year, month, 0).getDate();
+
+        let html = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+          .map((d) => '<div class="ts-cal-dow">' + d + "</div>")
+          .join("");
+
+        for (let i = firstDay - 1; i >= 0; i--) {
+          html += cell(daysInPrev - i, month - 1, true);
+        }
+        for (let d = 1; d <= daysInMonth; d++) {
+          html += cell(d, month, false);
+        }
+        const trailing = (7 - ((firstDay + daysInMonth) % 7)) % 7;
+        for (let d = 1; d <= trailing; d++) {
+          html += cell(d, month + 1, true);
+        }
+
+        tsCalGrid.innerHTML = html;
+      }
+
+      async function loadEntryDates() {
+        try {
+          const res = await fetchWithFallback(TIMESHEET_API);
+          const all = await res.json();
+          const map = {};
+          for (const e of all) {
+            if (e.date) map[e.date] = (map[e.date] || 0) + 1;
+          }
+          entryDates = map;
+        } catch {}
+        renderMiniCalendar();
+      }
+
+      tsCalPrev.addEventListener("click", () => tsCalShiftMonth(-1));
+      tsCalNext.addEventListener("click", () => tsCalShiftMonth(1));
+
+      tsCalGrid.addEventListener("click", (e) => {
+        const btn = e.target.closest(".ts-cal-day");
+        if (!btn) return;
+        tsDate = new Date(btn.dataset.date + "T00:00:00");
+        tsCalView = new Date(tsDate.getFullYear(), tsDate.getMonth(), 1);
+        tsUpdateDateInput();
+        loadEntries();
+        renderMiniCalendar();
+      });
 
       function tsUpdateDateInput() {
         tsDateInput.value = tsFormatDate(tsDate);
@@ -1392,7 +1673,9 @@ ${cardsHtml}
         const d = new Date(tsDate);
         d.setDate(d.getDate() + offset);
         tsDate = d;
+        tsCalView = new Date(tsDate.getFullYear(), tsDate.getMonth(), 1);
         tsUpdateDateInput();
+        renderMiniCalendar();
         loadEntries();
       }
 
@@ -1460,7 +1743,9 @@ ${cardsHtml}
           });
           const saved = await res.json();
           entries.unshift(saved);
+          entryDates[saved.date] = (entryDates[saved.date] || 0) + 1;
           renderEntries();
+          renderMiniCalendar();
         } catch {}
       }
 
@@ -1469,8 +1754,14 @@ ${cardsHtml}
           await fetchWithFallback(TIMESHEET_API + "/" + id, {
             method: "DELETE",
           });
+          const removed = entries.find((e) => e._id === id);
+          if (removed && removed.date && entryDates[removed.date]) {
+            entryDates[removed.date] -= 1;
+            if (entryDates[removed.date] <= 0) delete entryDates[removed.date];
+          }
           entries = entries.filter((e) => e._id !== id);
           renderEntries();
+          renderMiniCalendar();
         } catch {}
       }
 
@@ -1483,6 +1774,7 @@ ${cardsHtml}
           if (progress.elsaTab) activeTab = progress.elsaTab;
         } catch {}
         tsUpdateDateInput();
+        renderMiniCalendar();
         switchTab(activeTab, false);
         loadTasks();
       })();
@@ -1532,7 +1824,9 @@ ${cardsHtml}
       tsDateInput.addEventListener("change", () => {
         if (tsDateInput.value) {
           tsDate = new Date(tsDateInput.value + "T00:00:00");
+          tsCalView = new Date(tsDate.getFullYear(), tsDate.getMonth(), 1);
           loadEntries();
+          renderMiniCalendar();
         }
       });
       tsPrev.addEventListener("click", () => tsChangeDate(-1));
