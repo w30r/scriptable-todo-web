@@ -22,7 +22,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
         <div class="hero-inner">
           <div class="hero-pattern" aria-hidden="true"></div>
           <div class="hero-top">
-            <p class="hero-greeting">Hello, Meor 👋</p>
+            <p class="hero-greeting">Hello Syamil 👋</p>
             <div class="hero-avatar" aria-hidden="true">M</div>
           </div>
           <h1 class="hero-headline">You Have <span id="month-count">0</span> Tasks in This Month</h1>
@@ -41,39 +41,40 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
         </div>
       </header>
 
-      <div id="pomodoro-bar">
-        <span id="pomo-icon">⏱</span>
-        <span id="pomo-time">25:00</span>
-        <button id="pomo-start" class="pomo-btn" aria-label="Start pomodoro">▶</button>
-        <button id="pomo-reset" class="pomo-btn" aria-label="Reset pomodoro">⟳</button>
-        <span id="pomo-sessions"></span>
+      <div class="hero-sticky" id="hero-sticky" aria-hidden="true">
+        <p class="hero-sticky-headline">You Have <span id="sticky-month-count">0</span> Tasks in This Month</p>
       </div>
 
       <div id="todo-section">
-        <div class="filters">
-          <button class="filter-btn active" data-filter="all">
-            <span class="filter-icon icon-yellow" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.5 1.5L8 4M3.5 12l1.5 1.5L8 10M3.5 18l1.5 1.5L8 16"/></svg>
-            </span>
-            <span class="filter-label">All</span>
-          </button>
-          <button class="filter-btn" data-filter="active">
-            <span class="filter-icon icon-mint" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4h-4"/></svg>
-            </span>
-            <span class="filter-label">Active</span>
-          </button>
-          <button class="filter-btn" data-filter="completed">
-            <span class="filter-icon icon-pink" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg>
-            </span>
-            <span class="filter-label">Completed</span>
-          </button>
+        <div class="todo-controls">
+          <div class="filter-wrap" id="filter-wrap">
+            <button id="filter-toggle" class="search-toggle filter-toggle" type="button" aria-label="Filter: Active" aria-expanded="false" aria-haspopup="true" aria-controls="filter-menu">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16l-6.4 7.6V19l-3.2 1.6v-8L4 5z" /></svg>
+            </button>
+            <div class="filter-menu" id="filter-menu" role="menu" aria-label="Filter tasks" hidden>
+              <button class="filter-option" data-filter="all" role="menuitemradio" aria-checked="false">
+                <span>All</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l4 4 10-10" /></svg>
+              </button>
+              <button class="filter-option active" data-filter="active" role="menuitemradio" aria-checked="true">
+                <span>Active</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l4 4 10-10" /></svg>
+              </button>
+              <button class="filter-option" data-filter="completed" role="menuitemradio" aria-checked="false">
+                <span>Completed</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l4 4 10-10" /></svg>
+              </button>
+            </div>
+          </div>
+          <div class="search-wrap" id="todo-search-wrap">
+            <button id="search-toggle" class="search-toggle" type="button" aria-label="Search todos" aria-expanded="false" aria-controls="todo-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.6-3.6" /></svg>
+            </button>
+            <input type="text" id="todo-search" class="search-input" placeholder="Search todos..." aria-label="Search todos" />
+          </div>
         </div>
 
-        <input type="text" id="todo-search" class="search-input" placeholder="Search todos..." aria-label="Search todos" />
-
-        <div id="matrix" class="matrix">
+        <div id="matrix" class="matrix deck">
           <div class="loading">Loading todos...</div>
         </div>
 
@@ -85,30 +86,45 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       </div>
 
       <div id="shopping-section" style="display: none">
-        <form id="shop-form" class="shop-form">
-          <div class="input-row">
-            <input type="text" id="shop-input" placeholder="What to buy?" required />
-            <select id="shop-category" aria-label="Category">
-              <option value="grocery">Grocery</option>
-              <option value="watsons">Watsons / Pharmacy</option>
-              <option value="mrdiy">MRDIY</option>
-              <option value="online">Online</option>
-              <option value="etc">Etc</option>
-            </select>
-            <button type="submit" id="shop-add-btn">Add</button>
+        <div class="todo-controls">
+          <div class="filter-wrap" id="shop-filter-wrap">
+            <button id="shop-filter-toggle" class="search-toggle filter-toggle" type="button" aria-label="Filter: All" aria-expanded="false" aria-haspopup="true" aria-controls="shop-filter-menu">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16l-6.4 7.6V19l-3.2 1.6v-8L4 5z" /></svg>
+            </button>
+            <div class="filter-menu" id="shop-filter-menu" role="menu" aria-label="Filter shopping items" hidden>
+              <button class="filter-option shop-filter-option active" data-cat="all" role="menuitemradio" aria-checked="true">
+                <span>All</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l4 4 10-10" /></svg>
+              </button>
+              <button class="filter-option shop-filter-option" data-cat="grocery" role="menuitemradio" aria-checked="false">
+                <span>Grocery</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l4 4 10-10" /></svg>
+              </button>
+              <button class="filter-option shop-filter-option" data-cat="watsons" role="menuitemradio" aria-checked="false">
+                <span>Watsons</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l4 4 10-10" /></svg>
+              </button>
+              <button class="filter-option shop-filter-option" data-cat="mrdiy" role="menuitemradio" aria-checked="false">
+                <span>MRDIY</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l4 4 10-10" /></svg>
+              </button>
+              <button class="filter-option shop-filter-option" data-cat="online" role="menuitemradio" aria-checked="false">
+                <span>Online</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l4 4 10-10" /></svg>
+              </button>
+              <button class="filter-option shop-filter-option" data-cat="etc" role="menuitemradio" aria-checked="false">
+                <span>Etc</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l4 4 10-10" /></svg>
+              </button>
+            </div>
           </div>
-        </form>
-
-        <div class="shop-filters">
-          <button class="shop-filter-btn active" data-cat="all">All</button>
-          <button class="shop-filter-btn" data-cat="grocery">Grocery</button>
-          <button class="shop-filter-btn" data-cat="watsons">Watsons</button>
-          <button class="shop-filter-btn" data-cat="mrdiy">MRDIY</button>
-          <button class="shop-filter-btn" data-cat="online">Online</button>
-          <button class="shop-filter-btn" data-cat="etc">Etc</button>
+          <div class="search-wrap" id="shop-search-wrap">
+            <button id="shop-search-toggle" class="search-toggle" type="button" aria-label="Search shopping items" aria-expanded="false" aria-controls="shop-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.6-3.6" /></svg>
+            </button>
+            <input type="text" id="shop-search" class="search-input" placeholder="Search shopping items..." aria-label="Search shopping items" />
+          </div>
         </div>
-
-        <input type="text" id="shop-search" class="search-input" placeholder="Search shopping items..." aria-label="Search shopping items" />
 
         <div id="shopping-list" class="shopping-list">
           <div class="loading">Loading shopping items...</div>
@@ -196,6 +212,24 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
           <button class="modal-quadrant q2" data-tag="!nui"><span class="mq-title">Schedule</span><span class="mq-sub">Not Urgent &amp; Important</span></button>
           <button class="modal-quadrant q3" data-tag="!uni"><span class="mq-title">Delegate</span><span class="mq-sub">Urgent &amp; Not Important</span></button>
           <button class="modal-quadrant q4" data-tag=""><span class="mq-title">Eliminate</span><span class="mq-sub">Not Urgent &amp; Not Important</span></button>
+        </div>
+      </div>
+    </div>
+
+    <div id="shop-modal" class="modal-overlay" style="display:none">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>Add to Shopping</h2>
+          <button class="modal-close" id="shop-modal-close" aria-label="Close">✕</button>
+        </div>
+        <input type="text" id="shop-modal-input" placeholder="What to buy?" aria-label="Item name">
+        <p class="modal-hint">Tap a category to add</p>
+        <div class="modal-cats">
+          <button class="modal-cat" data-cat="grocery"><span class="cat-dot" style="background:#30d158"></span>Grocery</button>
+          <button class="modal-cat" data-cat="watsons"><span class="cat-dot" style="background:#0a84ff"></span>Watsons</button>
+          <button class="modal-cat" data-cat="mrdiy"><span class="cat-dot" style="background:#ff9f0a"></span>MRDIY</button>
+          <button class="modal-cat" data-cat="online"><span class="cat-dot" style="background:#bf5af2"></span>Online</button>
+          <button class="modal-cat" data-cat="etc"><span class="cat-dot" style="background:#636366"></span>Etc</button>
         </div>
       </div>
     </div>

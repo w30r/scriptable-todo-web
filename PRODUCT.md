@@ -12,13 +12,13 @@ Existing codebase answers this: vanilla HTML/CSS/JS. No build step, no package m
 
 ## Users
 
-Single user (Meor Syamil) in Malaysia (en-MY locale, UTC+8). Personal productivity hub used daily across devices: capture tasks, prioritize, track shopping, focus sessions, and maintain a work knowledge base.
+Single user (Meor Syamil) in Malaysia (en-MY locale, UTC+8). Personal productivity hub used daily across devices: capture tasks, prioritize, track shopping, and maintain a work knowledge base.
 
 ## Product Purpose
 
 Personal second brain. Two apps in one repo, both backed by the same Express + Mongoose backend on Render:
 
-- **Second Brain** (`index.html`): todo list organized by Eisenhower quadrant (Do First / Schedule / Delegate / Eliminate), shopping list with categories, calendar view of due dates, pomodoro timer, and RPG gamification (XP, levels, streaks, confetti). Success = tasks actually completed, momentum sustained via streaks.
+- **Second Brain** (`index.html`): todo list organized by Eisenhower quadrant (Do First / Schedule / Delegate / Eliminate), shopping list with categories, calendar view of due dates, and RPG gamification (XP, levels, streaks, confetti). Success = tasks actually completed, momentum sustained via streaks.
 - **ELSA Work Hub** (`elsa.html`): knowledge base of cards with titles, content, and categories, organized into tabs; supports export to static HTML / plain text for feeding into Gemini Notebook and a server-rendered export endpoint.
 
 ## Positioning
@@ -37,19 +37,18 @@ Gamification is the differentiator: completing tasks earns XP scaled by quadrant
 
 ### Capabilities
 - Todos: create, edit (via modal), rename, delete, clear completed; tags embedded in title (`!ui`/`!nui`/`!uni`, empty = Eliminate); drag-and-drop between quadrants; search; filter All/Active/Completed; due dates.
-- Shopping: add with category, inline rename on double-click, checkbox toggle, clear bought, search, category filter.
+- Shopping: add via the floating + button (modal with category chooser), inline rename on double-click, checkbox toggle, clear bought, search, category filter. Categories render as pastel cards matching the TODO quadrant-card UI; the filter and search are the same circle controls as TODO.
 - Calendar: month view, prev/next nav, due-date dots (done/overdue/upcoming), click day to add task with that date, click dot to edit.
-- Pomodoro: 25 min focus / 5 min break, pause/resume/reset, session count persisted.
 - RPG: XP, level (cap 20), streak, total completed, level-up confetti + sound.
 - Stats dashboard: level/XP/streak/done, weekly bar chart, quadrant distribution, shopping category breakdown, 30-day streak grid.
 - Sounds via Web Audio API `SoundManager` (check/uncheck/add/delete/drop/click/success/levelUp).
-- Keyboard: `/` or `n` focuses add (shopping) or opens new-task modal; `Escape` closes modals.
+- Keyboard: `/` or `n` opens the add modal for the current tab (new-task modal on TODO, category-picker shopping modal on SHOPPING); `Escape` closes modals.
 
 ### Constraints
 - No auth — single user, data shared across everything.
 - No build step; pure vanilla JS, no frameworks, no tests, no lint.
 - Free Render tier: cold starts happen; frontend retries fetch every 5s while API spins up.
-- Filters/tab/session state persisted in `localStorage` (`meor-filter`, `meor-shop-filter`, `meor-tab`, `meor-pomo-sessions`).
+- Filters/tab state persisted in `localStorage` (`meor-filter`, `meor-shop-filter`, `meor-tab`).
 - RPG progression state synced to backend `/api/progress`; falls back to defaults if API unavailable.
 - No XSS risk taken — user content escaped via `escapeHtml()`.
 

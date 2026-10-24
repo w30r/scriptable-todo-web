@@ -89,7 +89,7 @@ const SoundManager = {
 
 let todos = [];
 let shoppingItems = [];
-let currentFilter = localStorage.getItem("meor-filter") || "all";
+let currentFilter = localStorage.getItem("meor-filter") || "active";
 let activeTab = localStorage.getItem("meor-tab") || "todo";
 let shoppingFilter = localStorage.getItem("meor-shop-filter") || "all";
 let activeQuadrant = localStorage.getItem("meor-quadrant") || "q1";
@@ -286,17 +286,13 @@ function triggerLevelUp() {
 const matrix = document.getElementById("matrix");
 const todoCount = document.getElementById("todo-count");
 const clearCompletedBtn = document.getElementById("clear-completed");
-const filterBtns = document.querySelectorAll(".filter-btn");
+const filterBtns = document.querySelectorAll(".filter-option");
 
-const shopForm = document.getElementById("shop-form");
-const shopInput = document.getElementById("shop-input");
-const shopCategory = document.getElementById("shop-category");
-const shopAddBtn = document.getElementById("shop-add-btn");
 const shopList = document.getElementById("shopping-list");
 const shopCount = document.getElementById("shop-count");
 const shopBoughtCount = document.getElementById("shop-bought-count");
 const clearBoughtBtn = document.getElementById("clear-bought");
-const shopFilterBtns = document.querySelectorAll(".shop-filter-btn");
+const shopFilterBtns = document.querySelectorAll(".shop-filter-option");
 const tabBtns = document.querySelectorAll(".tab");
 const todoSection = document.getElementById("todo-section");
 const shoppingSection = document.getElementById("shopping-section");
@@ -521,6 +517,8 @@ function render() {
   todoCount.textContent = `${activeCount} item${activeCount !== 1 ? "s" : ""} left`;
   const monthEl = document.getElementById("month-count");
   if (monthEl) monthEl.textContent = String(activeCount);
+  const stickyMonthEl = document.getElementById("sticky-month-count");
+  if (stickyMonthEl) stickyMonthEl.textContent = String(activeCount);
 
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
@@ -557,7 +555,7 @@ function renderShopping() {
 
   if (shoppingItems.length === 0) {
     shopList.innerHTML =
-      '<div class="loading">Nothing to buy yet. Add something above!</div>';
+      '<div class="list-empty">Nothing to buy yet. Tap + to add something!</div>';
     shopCount.textContent = "0 items";
     shopBoughtCount.textContent = "";
     return;
@@ -565,7 +563,7 @@ function renderShopping() {
 
   if (!hasItems) {
     shopList.innerHTML =
-      '<div class="loading">No items in this category.</div>';
+      '<div class="list-empty">No items in this category.</div>';
     shopCount.textContent = `${shoppingItems.length} item${shoppingItems.length !== 1 ? "s" : ""}`;
     const boughtCount = shoppingItems.filter((i) => i.completed).length;
     shopBoughtCount.textContent = boughtCount ? `${boughtCount} bought` : "";
@@ -577,8 +575,10 @@ function renderShopping() {
     if (items.length === 0) return "";
     return `
       <div class="shop-category" data-category="${cat.key}">
-        <div class="shop-category-header" style="--cat-color: ${cat.color}">
-          <span class="shop-cat-label">${cat.label}</span>
+        <div class="quadrant-header">
+          <div class="quadrant-title">
+            <span class="label">${cat.label}</span>
+          </div>
           <span class="badge">${items.length}</span>
         </div>
         <div class="shop-category-list">
@@ -589,7 +589,6 @@ function renderShopping() {
               <input type="checkbox" class="shop-checkbox" ${item.completed ? "checked" : ""}>
               <div class="shop-body">
                 <span class="shop-name">${escapeHtml(item.name)}</span>
-                <span class="shop-cat-badge" style="--cat-color: ${cat.color}">${cat.label}</span>
               </div>
               <button class="shop-edit" title="Edit">✎</button>
               <button class="shop-delete" title="Delete">✕</button>
@@ -703,21 +702,13 @@ async function clearCompleted() {
 }
 
 async function addShoppingItem(name, category) {
-  shopAddBtn.disabled = true;
-  shopAddBtn.textContent = "Adding...";
   try {
     const item = await shopFetch("POST", { name, category });
     shoppingItems.unshift(item);
     SoundManager.add();
-    shopInput.value = "";
-    applyShopFilterUI();
     renderShopping();
   } catch (err) {
     alert("Failed to add shopping item: " + err.message);
-  } finally {
-    shopAddBtn.disabled = false;
-    shopAddBtn.textContent = "Add";
-    shopInput.focus();
   }
 }
 
@@ -775,9 +766,14 @@ async function clearBought() {
 }
 
 function applyFilterUI() {
+  const labels = { all: "All", active: "Active", completed: "Completed" };
   filterBtns.forEach((b) => {
-    b.classList.toggle("active", b.dataset.filter === currentFilter);
+    const on = b.dataset.filter === currentFilter;
+    b.classList.toggle("active", on);
+    b.setAttribute("aria-checked", String(on));
   });
+  const ft = document.getElementById("filter-toggle");
+  if (ft) ft.setAttribute("aria-label", `Filter: ${labels[currentFilter] || "All"}`);
 }
 
 function setFilter(filter) {
@@ -814,9 +810,15 @@ function setActiveQuadrant(key) {
 }
 
 function applyShopFilterUI() {
+  const labels = { all: "All" };
+  for (const c of CATEGORIES) labels[c.key] = c.label;
   shopFilterBtns.forEach((b) => {
-    b.classList.toggle("active", b.dataset.cat === shoppingFilter);
+    const on = b.dataset.cat === shoppingFilter;
+    b.classList.toggle("active", on);
+    b.setAttribute("aria-checked", String(on));
   });
+  const ft = document.getElementById("shop-filter-toggle");
+  if (ft) ft.setAttribute("aria-label", `Filter: ${labels[shoppingFilter] || "All"}`);
 }
 
 function setShopFilter(cat) {
@@ -835,7 +837,6 @@ function switchTab(tab) {
   shoppingSection.style.display = tab === "shopping" ? "" : "none";
   calendarSection.style.display = tab === "calendar" ? "" : "none";
   tabBtns.forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
-  if (tab === "shopping") shopInput.focus();
   if (tab === "calendar") renderCalendar();
 }
 
@@ -855,7 +856,6 @@ function startShopEdit(item) {
   input.value = raw;
   item.querySelector(".shop-body").prepend(input);
   nameEl.style.display = "none";
-  item.querySelector(".shop-cat-badge").style.display = "none";
   item.classList.add("editing");
   input.focus();
   input.select();
@@ -871,8 +871,6 @@ function startShopEdit(item) {
   function cleanup() {
     input.remove();
     nameEl.style.display = "";
-    const badge = item.querySelector(".shop-cat-badge");
-    if (badge) badge.style.display = "";
     item.classList.remove("editing");
   }
 
@@ -1017,10 +1015,45 @@ addModal.addEventListener("click", (e) => {
   closeModal();
 });
 
-floatAddBtn.addEventListener("click", openModal);
+floatAddBtn.addEventListener("click", () => {
+  if (activeTab === "shopping") openShopModal();
+  else openModal();
+});
 
-const deckAddBtn = document.getElementById("deck-add-btn");
-if (deckAddBtn) deckAddBtn.addEventListener("click", openModal);
+/* ── Add Shopping Modal ── */
+
+const shopModal = document.getElementById("shop-modal");
+const shopModalInput = document.getElementById("shop-modal-input");
+const shopModalClose = document.getElementById("shop-modal-close");
+
+function openShopModal() {
+  SoundManager.click();
+  shopModalInput.value = "";
+  shopModal.style.display = "flex";
+  setTimeout(() => shopModalInput.focus(), 50);
+}
+
+function closeShopModal() {
+  shopModal.style.display = "none";
+}
+
+shopModal.addEventListener("click", (e) => {
+  if (e.target === shopModal) closeShopModal();
+});
+
+shopModalClose.addEventListener("click", closeShopModal);
+
+shopModal.addEventListener("click", (e) => {
+  const btn = e.target.closest(".modal-cat");
+  if (!btn) return;
+  const name = shopModalInput.value.trim();
+  if (!name) {
+    shopModalInput.focus();
+    return;
+  }
+  addShoppingItem(name, btn.dataset.cat);
+  closeShopModal();
+});
 
 /* ── Calendar ── */
 
@@ -1127,130 +1160,6 @@ function renderCalendar() {
     dayNames.map((d) => `<div class="cal-day-header">${d}</div>`).join("") +
     cells.join("");
 }
-
-/* ── Pomodoro Timer ── */
-
-const POMO_FOCUS = 25 * 60;
-const POMO_BREAK = 5 * 60;
-
-let pomoState = "idle"; // idle | running | paused | break | breakRunning
-let pomoTimeLeft = POMO_FOCUS;
-let pomoInterval = null;
-let pomoSessions = parseInt(localStorage.getItem("meor-pomo-sessions")) || 0;
-
-const pomoTimeEl = document.getElementById("pomo-time");
-const pomoStartBtn = document.getElementById("pomo-start");
-const pomoResetBtn = document.getElementById("pomo-reset");
-const pomoSessionsEl = document.getElementById("pomo-sessions");
-const pomoIconEl = document.getElementById("pomo-icon");
-
-function pomoFormat(seconds) {
-  const m = String(Math.floor(seconds / 60)).padStart(2, "0");
-  const s = String(seconds % 60).padStart(2, "0");
-  return `${m}:${s}`;
-}
-
-function pomoUpdateDisplay() {
-  pomoTimeEl.textContent = pomoFormat(pomoTimeLeft);
-  pomoTimeEl.classList.toggle(
-    "break",
-    pomoState === "break" || pomoState === "breakRunning",
-  );
-  pomoSessionsEl.textContent = pomoSessions > 0 ? `🍅 x${pomoSessions}` : "";
-  pomoIconEl.textContent =
-    pomoState === "break" || pomoState === "breakRunning" ? "☕" : "⏱";
-
-  if (pomoState === "running" || pomoState === "breakRunning") {
-    pomoStartBtn.textContent = "⏸";
-    pomoStartBtn.classList.add("running");
-  } else {
-    pomoStartBtn.textContent = "▶";
-    pomoStartBtn.classList.remove("running");
-  }
-}
-
-function pomoStop() {
-  if (pomoInterval) {
-    clearInterval(pomoInterval);
-    pomoInterval = null;
-  }
-}
-
-function pomoTick() {
-  pomoTimeLeft--;
-  pomoUpdateDisplay();
-
-  if (pomoTimeLeft <= 0) {
-    pomoStop();
-
-    if (pomoState === "running") {
-      // Focus session complete
-      pomoSessions++;
-      localStorage.setItem("meor-pomo-sessions", pomoSessions);
-      SoundManager.levelUp(); // triumphant sound
-      pomoState = "break";
-      pomoTimeLeft = POMO_BREAK;
-      pomoUpdateDisplay();
-      // Auto-start break
-      pomoStartBreak();
-    } else if (pomoState === "breakRunning") {
-      // Break complete
-      SoundManager.success();
-      pomoState = "idle";
-      pomoTimeLeft = POMO_FOCUS;
-      pomoUpdateDisplay();
-    }
-  }
-}
-
-function pomoStartFocus() {
-  pomoStop();
-  pomoState = "running";
-  pomoInterval = setInterval(pomoTick, 1000);
-  pomoUpdateDisplay();
-}
-
-function pomoStartBreak() {
-  pomoStop();
-  pomoState = "breakRunning";
-  pomoInterval = setInterval(pomoTick, 1000);
-  pomoUpdateDisplay();
-}
-
-function pomoStartPause() {
-  if (pomoState === "idle" || pomoState === "break") {
-    // Start
-    if (pomoState === "idle") {
-      pomoTimeLeft = POMO_FOCUS;
-      pomoStartFocus();
-    } else {
-      pomoStartBreak();
-    }
-  } else if (pomoState === "running" || pomoState === "breakRunning") {
-    // Pause
-    pomoStop();
-    pomoState = pomoState === "running" ? "paused" : "break";
-    pomoUpdateDisplay();
-  } else if (pomoState === "paused") {
-    // Resume
-    pomoStartFocus();
-  }
-}
-
-pomoStartBtn.addEventListener("click", () => {
-  SoundManager.click();
-  pomoStartPause();
-});
-
-pomoResetBtn.addEventListener("click", () => {
-  SoundManager.click();
-  pomoStop();
-  pomoState = "idle";
-  pomoTimeLeft = POMO_FOCUS;
-  pomoUpdateDisplay();
-});
-
-pomoUpdateDisplay();
 
 /* ── Stats Dashboard ── */
 
@@ -1421,13 +1330,6 @@ document.getElementById("stats-modal").addEventListener("click", (e) => {
 
 /* ── Event listeners ── */
 
-shopForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const name = shopInput.value.trim();
-  const cat = shopCategory.value;
-  if (name && cat) addShoppingItem(name, cat);
-});
-
 matrix.addEventListener("click", (e) => {
   const tab = e.target.closest(".deck-tab");
   if (tab) {
@@ -1569,12 +1471,14 @@ matrix.addEventListener("drop", (e) => {
 filterBtns.forEach((btn) => {
   btn.addEventListener("click", () => {
     setFilter(btn.dataset.filter);
+    closeFilterMenu();
   });
 });
 
 shopFilterBtns.forEach((btn) => {
   btn.addEventListener("click", () => {
     setShopFilter(btn.dataset.cat);
+    closeShopFilterMenu();
   });
 });
 
@@ -1601,6 +1505,163 @@ shopSearch.addEventListener("input", () => {
   shopSearchQuery = shopSearch.value;
   renderShopping();
 });
+
+const shopSearchWrap = document.getElementById("shop-search-wrap");
+const shopSearchToggle = document.getElementById("shop-search-toggle");
+
+shopSearch.tabIndex = -1; // start collapsed: circle only
+
+function openShopSearch() {
+  shopSearchWrap.classList.add("open");
+  shopSearchToggle.setAttribute("aria-expanded", "true");
+  shopSearch.removeAttribute("tabindex");
+  shopSearch.focus();
+}
+
+function closeShopSearch() {
+  shopSearchWrap.classList.remove("open");
+  shopSearchToggle.setAttribute("aria-expanded", "false");
+  shopSearch.tabIndex = -1;
+  shopSearch.value = "";
+  shopSearchQuery = "";
+  renderShopping();
+}
+
+shopSearchToggle.addEventListener("click", () => {
+  SoundManager.click();
+  if (shopSearchWrap.classList.contains("open")) closeShopSearch();
+  else openShopSearch();
+});
+
+shopSearch.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    e.stopPropagation();
+    closeShopSearch();
+    shopSearchToggle.focus();
+  }
+});
+
+const todoSearchWrap = document.getElementById("todo-search-wrap");
+const searchToggle = document.getElementById("search-toggle");
+
+todoSearch.tabIndex = -1; // start collapsed: circle only
+
+function openTodoSearch() {
+  todoSearchWrap.classList.add("open");
+  searchToggle.setAttribute("aria-expanded", "true");
+  todoSearch.removeAttribute("tabindex");
+  todoSearch.focus();
+}
+
+function closeTodoSearch() {
+  todoSearchWrap.classList.remove("open");
+  searchToggle.setAttribute("aria-expanded", "false");
+  todoSearch.tabIndex = -1;
+  todoSearch.value = "";
+  todoSearchQuery = "";
+  render();
+}
+
+searchToggle.addEventListener("click", () => {
+  SoundManager.click();
+  if (todoSearchWrap.classList.contains("open")) {
+    closeTodoSearch();
+  } else {
+    openTodoSearch();
+  }
+});
+
+todoSearch.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    e.stopPropagation();
+    closeTodoSearch();
+    searchToggle.focus();
+  }
+});
+
+/* ── Filter menu ── */
+
+const filterWrap = document.getElementById("filter-wrap");
+const filterToggle = document.getElementById("filter-toggle");
+const filterMenu = document.getElementById("filter-menu");
+
+function openFilterMenu() {
+  filterMenu.hidden = false;
+  filterToggle.setAttribute("aria-expanded", "true");
+}
+
+function closeFilterMenu() {
+  filterMenu.hidden = true;
+  filterToggle.setAttribute("aria-expanded", "false");
+}
+
+filterToggle.addEventListener("click", (e) => {
+  e.stopPropagation();
+  SoundManager.click();
+  if (filterMenu.hidden) openFilterMenu();
+  else closeFilterMenu();
+});
+
+document.addEventListener("click", (e) => {
+  if (!filterMenu.hidden && !filterWrap.contains(e.target)) closeFilterMenu();
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !filterMenu.hidden) {
+    closeFilterMenu();
+    filterToggle.focus();
+  }
+});
+
+/* ── Shopping controls: filter menu ── */
+
+const shopFilterWrap = document.getElementById("shop-filter-wrap");
+const shopFilterToggle = document.getElementById("shop-filter-toggle");
+const shopFilterMenu = document.getElementById("shop-filter-menu");
+
+function openShopFilterMenu() {
+  shopFilterMenu.hidden = false;
+  shopFilterToggle.setAttribute("aria-expanded", "true");
+}
+
+function closeShopFilterMenu() {
+  shopFilterMenu.hidden = true;
+  shopFilterToggle.setAttribute("aria-expanded", "false");
+}
+
+shopFilterToggle.addEventListener("click", (e) => {
+  e.stopPropagation();
+  SoundManager.click();
+  if (shopFilterMenu.hidden) openShopFilterMenu();
+  else closeShopFilterMenu();
+});
+
+document.addEventListener("click", (e) => {
+  if (!shopFilterMenu.hidden && !shopFilterWrap.contains(e.target))
+    closeShopFilterMenu();
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !shopFilterMenu.hidden) {
+    closeShopFilterMenu();
+    shopFilterToggle.focus();
+  }
+});
+
+/* ── Sticky condensed headline ── */
+
+const heroHeadline = document.querySelector(".hero-headline");
+const heroSticky = document.getElementById("hero-sticky");
+
+window.addEventListener(
+  "scroll",
+  () => {
+    const r = heroHeadline.getBoundingClientRect();
+    // height check hides the bar when the hero section is display:none (tab switch)
+    heroSticky.classList.toggle("show", r.height > 0 && r.bottom < 48);
+  },
+  { passive: true }
+);
 
 /* ── Calendar events ── */
 
@@ -1638,6 +1699,7 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
     if (editModal.style.display === "flex") closeEditModal();
     else if (addModal.style.display === "flex") closeModal();
+    else if (shopModal.style.display === "flex") closeShopModal();
     return;
   }
   if (e.key === "n" || e.key === "/") {
@@ -1647,7 +1709,7 @@ document.addEventListener("keydown", (e) => {
       e.target.tagName !== "SELECT"
     ) {
       e.preventDefault();
-      if (activeTab === "shopping") shopInput.focus();
+      if (activeTab === "shopping") openShopModal();
       else openModal();
     }
   }

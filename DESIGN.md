@@ -35,7 +35,7 @@ typography:
   display:
     fontFamily: "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"SF Pro Display\", \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif"
     fontSize: "clamp(26px, 6vw, 32px)"
-    fontWeight: 800
+    fontWeight: 500
     lineHeight: 1.15
     letterSpacing: "-0.03em"
   headline:
@@ -129,11 +129,11 @@ components:
 
 **Creative North Star: "The Obsidian Companion"**
 
-A personal second brain carried like a pocket notebook laid on a slab of dark obsidian. The page is a single column on a deep near-black ground (#0d0d0f); the only full-bleed color moment is the pastel gradient hero banner, and every interactive surface above the ground is either a pastel card carrying dark ink text or a dark-glass control. The density is low and the rhythm is calm: one banner, three filter capsules, four quadrant cards, a stats row, and a floating glass dock that keeps every destination one thumb away even on desktop.
+A personal second brain carried like a pocket notebook laid on a slab of dark obsidian. The page is a single column on a deep near-black ground (#0d0d0f); the only full-bleed color moment is the pastel gradient hero banner, and every interactive surface above the ground is either a pastel card carrying dark ink text or a dark-glass control. The density is low and the rhythm is calm: one banner, a compact row of dark toggle circles (filter + search), four quadrant cards, a stats row, and a floating glass dock that keeps every destination one thumb away even on desktop.
 
 The world was restyled from a prior flat-dark dashboard identity, and it refuses that grammar outright. There is no browser-tab strip, no dashboard grid of chrome cards, no toolbars. Navigation lives in a floating glass dock with a raised white add button; the Eisenhower matrix is four warm pastel cards you can drag tasks between; the hero's bottom-right corner is scooped out by a page-colored notch that nests the stats button. The result reads as a handheld companion — a pinned, pastel-toned user brief — rather than a management console.
 
-Two divergences between the intended direction and the build are recorded as build truth. Per-quadrant "live progress bars" did not land on the quadrant cards themselves: the cards carry a live task-count badge, while live progress appears as the XP fill inside the hero's RPG badge and as per-quadrant hbar fills in the stats dashboard. And the JS-driven unicode glyphs on the pomodoro/delete/close/calendar-nav buttons (▶ ⟳ ⏸ ✕ ← → ⏱ ☕) exist because their labels swap at runtime; they are a carried defect, not a system rule.
+Two divergences between the intended direction and the build are recorded as build truth. Per-quadrant "live progress bars" did not land on the quadrant cards themselves: the cards carry a live task-count badge, while live progress appears as the XP fill inside the hero's RPG badge and as per-quadrant hbar fills in the stats dashboard. And the JS-driven unicode glyphs on the delete/close/calendar-nav buttons (✕ ← →) exist because their labels swap at runtime; they are a carried defect, not a system rule.
 
 **Key Characteristics:**
 - One-column obsidian surface with a single pastel-gradient hero banner, scooped at the bottom-right.
@@ -155,7 +155,7 @@ A warm pastel "paper" palette floats over a cold obsidian ground: the four quadr
 ### Secondary
 - **Accent Green** (#30d158): the canonical progress fill on dark tracks; also the "bought/done" status on calendar task dots and the grocery category color.
 - **Accent Blue** (#0a84ff): status on dark surfaces (upcoming task dots, watsons category, edit actions).
-- **Accent Orange** (#ff9f0a): pomodoro focus identity (icon, running time) and mrdiy category.
+- **Accent Orange** (#ff9f0a): mrdiy category.
 - **Accent Purple** (#bf5af2): online category, quadrants in the distribution chart.
 - **Accent Red** (#ff453a): destructive actions (clear buttons, delete hover, overdue states).
 
@@ -169,7 +169,7 @@ A warm pastel "paper" palette floats over a cold obsidian ground: the four quadr
 ### Neutral
 - **Obsidian Ground** (#0d0d0f): the page background, with a radial #17171b glow bleeding in from the top.
 - **Surface** (#1c1c20) / **Surface Soft** (#232327): dark control fills, row backgrounds, and stat/chart boxes.
-- **Glass** (rgba(28,28,32,0.72)) / **Glass Border** (rgba(255,255,255,0.08)): the dock, pomodoro bar, calendar nav, and modal hairlines.
+- **Glass** (rgba(28,28,32,0.72)) / **Glass Border** (rgba(255,255,255,0.08)): the dock, calendar nav, and modal hairlines.
 - **Ink** (#111111): the only text on pastel surfaces — headline, card labels, todo titles.
 - **Ink Faint** (rgba(17,17,17,0.6)): secondary text on pastel surfaces (greeting, sublabels, meta).
 - **Text Primary** (#f2f2f7) / **Secondary** (#aeaeb2) / **Tertiary** (#8e8e93): the dark-surface text ramp.
@@ -185,16 +185,16 @@ A warm pastel "paper" palette floats over a cold obsidian ground: the four quadr
 
 **Display Font:** System SF stack (`-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif`)
 **Body Font:** Same system SF stack.
-**Label/Mono Font:** None distinct; the pomodoro timer uses `font-variant-numeric: tabular-nums` on the system stack so digits don't jump.
+**Label/Mono Font:** None distinct.
 
 **Character:** A single quiet system face — no display type, no serif, no mono — so the pastel world stays the personality and the type stays weight, spacing, and color. Hierarchy is carried by weight (400→800), size (9.5px→32px), and letter-spacing (positive tracking on labels, negative on display only).
 
 ### Hierarchy
-- **Display** (800, `clamp(26px, 6vw, 32px)`, 1.15, −0.03em): the hero headline "You Have N Tasks in This Month", where N is the live count. Negative tracking at its strongest; only on this one line.
+- **Display** (500, `clamp(26px, 6vw, 32px)`, 1.15, −0.03em): the hero headline "You Have N Tasks in This Month", where N is the live count. Thin display weight; negative tracking at its strongest, only on this one line. A condensed sticky clone (15px/500, −0.02em, live count) rides a blurred obsidian glass bar at the viewport top once the headline scrolls out of view.
 - **Headline** (800, 22px, −0.02em): large numerals in the stats dashboard (Level / XP / Streak / Done boxes).
 - **Title** (700, 19px, −0.02em): modal headers ("Edit Task", "New Task", "Stats Dashboard") and the hero avatar monogram.
 - **Body** (400, 15px, 1.45): inputs, selects, and base text. Task titles run at 600/14.5px; meta at 500/11.5px; shopping names at 600/14.5px.
-- **Label** (600, 12px, 0.04em, uppercase): filter capsules, chips, and section headers. The micro-caps ramp runs 9.5px (dock) → 11px (card pills, calendar headers) → 12px (filter capsules) → 13px (section headers), weight 600–700, tracking 0.04–0.08em.
+- **Label** (600, 12px, 0.04em, uppercase): chips and section headers. The micro-caps ramp runs 9.5px (dock) → 11px (card pills, calendar headers) → 13px (section headers), weight 600–700, tracking 0.04–0.08em. Dropdown menu options are sentence-case 13px/600 controls, not labels.
 
 ### Named Rules
 **The Display-Only Tracking Rule.** Negative letter-spacing is reserved for display/headline/title type (hero −0.03em, numerals and modal headers −0.02em). Body and meta text never go below 0 tracking; labels track positive (0.04–0.08em) and uppercase.
@@ -203,9 +203,9 @@ A warm pastel "paper" palette floats over a cold obsidian ground: the four quadr
 
 ## Layout
 
-A single 720px column centered on the obsidian ground (max-width 760px once the viewport reaches ≥1200px). The container is `padding: 16px 16px 132px` — the bottom 132px is dock clearance so the fixed glass nav never covers content. The column uses a small gap rhythm: 8px inside items and lists, 12px between top-level blocks, 14px between sections, 16px between matrix cards. The matrix is a 2-column grid until the **640px breakpoint**, where it stacks to one column, the container tightens (14px 12px 128px), the XP bar shortens to 80px, and the shopping input row stacks.
+A single 720px column centered on the obsidian ground (max-width 760px once the viewport reaches ≥1200px). The container is `padding: 16px 16px 132px` — the bottom 132px is dock clearance so the fixed glass nav never covers content. The column uses a small gap rhythm: 8px inside items and lists, 12px between top-level blocks, 14px between sections, 16px between matrix cards. The matrix is a 2-column grid until the **640px breakpoint**, where it stacks to one column, the container tightens (14px 12px 128px), and the XP bar shortens to 80px.
 
-Vertical structure is fixed by role, top to bottom: hero banner → glass pomodoro bar → filter capsules → search → quadrant matrix → stats row (then the hidden shopping and calendar sections swap in via the dock). The first viewport shows the greeting, the headline with the live task count, the RPG level/XP/streak pill bottom-left of the banner, and the dark stats button nested in the banner's scoop notch bottom-right.
+Vertical structure is fixed by role, top to bottom: hero banner → the filter and search toggle circles → quadrant matrix → stats row (then the hidden shopping and calendar sections swap in via the dock). The filter is a 44px circle that opens a dropdown menu of All / Active / Completed (default Active); the todo search starts collapsed as a 44px circle and expands into the full pill on tap. The shopping tab reuses the same control row: its filter lists All + the five categories (default All), its search circle behaves identically, and its items render as pastel category cards in the quadrant-card grammar, with the floating + opening a category-picker add sheet. When the headline scrolls out of view, a condensed sticky clone (15px/500) slides down from the top (0.28s spring) in a blurred obsidian glass bar. The first viewport shows the greeting, the headline with the live task count, the RPG level/XP/streak pill bottom-left of the banner, and the dark stats button nested in the banner's scoop notch bottom-right.
 
 The dock is `position: fixed; left: 50%`, bottom 14px, `width: min(calc(100% - 28px), 500px)`, with the white add button raised 26px above its rim. It is the only fixed element and the only navigation.
 
@@ -217,11 +217,11 @@ A hybrid system: **tonal layering + soft ambient shadows + one glass layer.** Th
 - **card** (`0 12px 30px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3)`): resting elevation for the hero banner and the four quadrant cards.
 - **float** (`0 16px 40px rgba(0, 0, 0, 0.5)`): the glass dock and modal cards — the highest floating layer.
 - **add** (`0 10px 26px rgba(0, 0, 0, 0.45)`): the dock's raised white add button.
-- **notch** (`0 6px 18px rgba(0, 0, 0, 0.32)`): small controls popping off their surface (the banner notch button, the RPG badge, the pomodoro bar).
+- **notch** (`0 6px 18px rgba(0, 0, 0, 0.32)`): small controls popping off their surface (the banner notch button, the RPG badge).
 - **badge** (`0 6px 16px rgba(0, 0, 0, 0.28)`): the RPG badge's own shadow (ambient, near-black).
 
 ### Named Rules
-**The Glass-Restraint Rule.** Backdrop blur appears on exactly the glass family: the dock (22px), the pomodoro and calendar nav bars (16px), and the modal overlay (10px over rgba(13,13,15,0.84)). Cards and inputs are solid fills plus shadow — blur is for floating chrome, never for content surfaces.
+**The Glass-Restraint Rule.** Backdrop blur appears on exactly the glass family: the dock (22px), the calendar nav bar (16px), and the modal overlay (10px over rgba(13,13,15,0.84)). Cards and inputs are solid fills plus shadow — blur is for floating chrome, never for content surfaces.
 
 ## Shapes
 
@@ -237,18 +237,18 @@ The form language is squircle-with-pills. Corners step with surface size: **sm 1
 - **Primary:** mint→sky gradient (135°) fill, ink (#111) 700-weight text, pill, padding 12px 18px. Hover brightens (filter brightness 1.06) and lifts 1px; active scales to 0.96. Used for Add and Save.
 - **Float add:** 58px white circle with an ink 2.6px-stroke plus; raised 26px above the dock; hover scales to 1.07, active 0.94.
 - **Notch button:** 50px circle, rgba(17,17,17,0.92) fill, white 2px-stroke stats icon, nested in the hero notch; hover scales to 1.06.
-- **Circular controls:** 32px soft-filled circles (pomodoro, calendar nav, modal close) that brighten on hover; touch targets grow to 38–40px under `(hover: none)`.
+- **Circular controls:** 32px soft-filled circles (calendar nav, modal close) that brighten on hover; touch targets grow to 38–40px under `(hover: none)`.
 - **Focus:** all buttons get a 3px mint outline with 2px offset on `:focus-visible`.
 
 ### Chips
-- **Filter capsules:** tall dark capsules (#222226, radius 20px) with a pastel circular icon well (38px, colored by state: yellow / mint-soft / pink) and a micro-caps label. Active = mint border + slightly lighter fill (#2b2b30) + brighter label; hover lifts 2px.
-- **Pill chips:** one-line filter/shop chips — dark surface fill, glass hairline, tertiary text; active flips to mint fill with ink text.
+- **Filter toggle + menu:** a 44px dark circle (surface fill, glass hairline, funnel icon) that shares its shape family with the search toggle; tapping opens a dropdown menu below it (surface fill, glass hairline, radius 20px, float shadow, 0.15s fade-drop). Menu options are sentence-case 13px/600 rows; the selected option carries mint text, a mint-tinted fill (10% mint), and a trailing check. The circle's icon and border flip mint while the menu is open. Default filter is Active.
+- **Pill chips:** one-line selectable pills (deck tabs and other chip rows) — dark surface fill, glass hairline, tertiary text; active flips to mint fill with ink text.
 - **Status pills on pastel:** dark rgba(17,17,17,0.9) pills with near-white text — quadrant name pills (11px micro-caps) and count badges (13px/700, min 30px).
 
 ### Cards / Containers
-- **Hero banner:** the signature surface — mint→sky 135° gradient, radius 32px, card shadow, a faint ink dot-pattern overlay (opacity 0.5), greeting + avatar top row, display headline, RPG badge bottom-left, scoop notch bottom-right.
+- **Hero banner:** the signature surface — mint→sky 135° gradient, radius 32px, card shadow, a faint ink dot-pattern overlay (opacity 0.5), greeting + avatar top row, display headline (thin 500 weight), RPG badge bottom-left, scoop notch bottom-right; a fixed condensed clone of the headline (15px/500 on blurred obsidian glass, z-index below modals) slides in when the headline scrolls past.
 - **Quadrant cards:** 180° pastel gradients (coral / leaf mint / sky / lavender) over radius 26px, ink text, 1px rgba(17,17,17,0.06) hairline, card shadow. Header = dark label pill + sublabel + count badge; body = the draggable todo list (min-height 44px) with a dashed-ink outline on drag-over.
-- **Rows (shopping):** dark surface fills, radius 20px, glass hairline; hover softens to surface-soft.
+- **Shopping category cards:** the quadrant card grammar for the five shopping categories — 180° pastel gradients (mint / sky / apricot / lavender / graphite) over radius 26px, ink text, dark label pill + count badge header, item rows as white 38% chips (radius 14px, hover 58%) with square 6px-radius checkboxes.
 - **Stat boxes:** surface-soft fills, radius 20px, centered 22px mint numerals over micro-caps labels.
 
 ### Inputs / Fields
@@ -262,10 +262,10 @@ The form language is squircle-with-pills. Corners step with surface size: **sm 1
 A dark pill (rgba(17,17,17,0.88)) docked bottom-left in the hero banner: mint 700-weight level text ("Lv. N"), a 110×6px pill track at white 16% holding a mint→banner-mint gradient fill that animates width in 0.5s spring ease, and a 12px streak label. On level-up the level text pulses (0.6s scale 1→1.25→1) while confetti falls.
 
 ### Signature: todo items on pastel
-White 38% translucency chips (radius 14px) floating on the pastel cards, hover 58%: a 20px round checkbox (ink fill + mint check on checked, hover scale 1.12), ink 600-weight title (struck-through at 55% opacity when complete), 11.5px ink-faint meta with a green due-date (#1e7a3d) that flips to red (#c0241a) when overdue, and a hover-revealed round delete button that fills dark on hover.
+White 38% translucency chips (radius 14px) floating on the pastel cards, hover 58%: a 20px rounded-square checkbox (6px radius, ink fill + mint check on checked, hover scale 1.12), ink 600-weight title (struck-through at 55% opacity when complete), 11.5px ink-faint meta with a green due-date (#1e7a3d) that flips to red (#c0241a) when overdue, and a hover-revealed round delete button that fills dark on hover.
 
 ### Signature: bottom-sheet modals
-Bottom-anchored overlays (rgba(13,13,15,0.84) + 10px blur) rising to a surface card (radius 32px, max-width 520px, 560px wide variant, float shadow) that animates up in 0.28s spring ease. Inside: a title row with a close circle, full-width inputs, a 2×2 quadrant picker reusing the four pastel gradients with a 2px ink border on selection, and a mint→sky gradient Save button.
+Bottom-anchored overlays (rgba(13,13,15,0.84) + 10px blur) rising to a surface card (radius 32px, max-width 520px, 560px wide variant, float shadow) that animates up in 0.28s spring ease. Inside: a title row with a close circle, full-width inputs, a 2×2 quadrant picker reusing the four pastel gradients with a 2px ink border on selection, and a mint→sky gradient Save button. The shopping add sheet swaps the quadrant picker for a 2-column category picker (colored dot + label); typing a name and tapping a category adds immediately.
 
 ### Signature: data viz in the stats dashboard
 - **Chart bars:** 7 flexing columns on a 130px baseline; done days fill mint→sky (180°), idle days stay surface-soft; labels in 11px tertiary.
